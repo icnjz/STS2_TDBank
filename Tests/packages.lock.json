@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net9.0": {
+      "Alchyr.Sts2.ModAnalyzers": {
+        "type": "Transitive",
+        "resolved": "0.1.9",
+        "contentHash": "teENiNx0cUVhjLevWBsdZfvhnipwyD6tz3ibFD0s+1b10ABC2dWErjXZS0q5ei3RCe+5PWkwLaBdO3+mHjkykw=="
+      },
+      "Godot.SourceGenerators": {
+        "type": "Transitive",
+        "resolved": "4.5.1",
+        "contentHash": "HOHYJQO5A/kzf5CUobeTPOX+JawSvjkDE0v/Fyo4EMYEC2MvCTGUvpJFjqQQmHYLNsiiB7RLVilcnup+jiVfdA=="
+      },
+      "GodotSharp": {
+        "type": "Transitive",
+        "resolved": "4.5.1",
+        "contentHash": "5CFnEHT+FByv5desNHMipz/209SCrWR9CGWFZjGHnXupl1Rw8U8q4nf65/unqZVL97Rx+3J5hskPMoDGaiZL9g=="
+      },
+      "GodotSharpEditor": {
+        "type": "Transitive",
+        "resolved": "4.5.1",
+        "contentHash": "8CM49047b0Us3qPJo6L7kdldreOvR7JCoXlKoSHzpA0TQP6+Qnoxz/26GZ1ONg2wW4vV9uzor0AHXSGUFP9XSw==",
+        "dependencies": {
+          "GodotSharp": "4.5.1"
+        }
+      },
+      "tdbank": {
+        "type": "Project",
+        "dependencies": {
+          "Alchyr.Sts2.ModAnalyzers": "[0.1.9, )",
+          "Godot.SourceGenerators": "[4.5.1, )",
+          "GodotSharp": "[4.5.1, )",
+          "GodotSharpEditor": "[4.5.1, )",
+          "TDLib": "[0.1.0, )"
+        }
+      },
+      "tdlib": {
+        "type": "Project"
+      }
+    }
+  }
+}

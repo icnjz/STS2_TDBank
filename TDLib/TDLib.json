@@ -1,0 +1,12 @@
+{
+  "id": "TDLib",
+  "name": "TDLib",
+  "author": "cnj lab",
+  "description": "Dedicated player-save and multiplayer-state support for TD Bank.",
+  "version": "0.1.0",
+  "min_game_version": "0.109.1",
+  "has_pck": false,
+  "has_dll": true,
+  "dependencies": [],
+  "affects_gameplay": false
+}

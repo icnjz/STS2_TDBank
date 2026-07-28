@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CNJ.TowerDebt.Setup</RootNamespace>
+    <AssemblyName>TDBank_Setup_v0.1</AssemblyName>
+    <Version>0.1</Version>
+    <Company>cnj lab</Company>
+    <Authors>cnj lab</Authors>
+    <Product>TD Bank — Tower Debt Installer / 一键安装器</Product>
+    <Description>Installs or safely removes TD Bank v0.1 and its dedicated TDLib dependency while protecting vanilla and modded saves.</Description>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <SetupIconPath Condition="'$(SetupIconPath)' == ''">$(MSBuildProjectDirectory)\setup.ico</SetupIconPath>
+    <ApplicationIcon>$(SetupIconPath)</ApplicationIcon>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishTrimmed>false</PublishTrimmed>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    <Deterministic>true</Deterministic>
+    <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
+    <DebugSymbols Condition="'$(Configuration)' == 'Release'">false</DebugSymbols>
+    <PayloadRoot Condition="'$(PayloadRoot)' == ''">$(MSBuildProjectDirectory)\Payload</PayloadRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TDBank.Setup.Tests" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\TDBank.dll"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.TDBank.dll" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\TDBank.json"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.TDBank.json" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bank_logo.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bank_logo.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bank_background.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bank_background.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_broke_zh.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_broke_zh.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_middle_zh.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_middle_zh.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_rich_zh.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_rich_zh.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_broke_en.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_broke_en.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_middle_en.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_middle_en.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_rich_en.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_rich_en.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDLib\TDLib.dll"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDLib.TDLib.dll" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDLib\TDLib.json"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDLib.TDLib.json" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDLib\THIRD_PARTY_LICENSES\BaseLib-LICENSE.txt"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDLib.THIRD_PARTY_LICENSES.BaseLib-LICENSE.txt" />
+  </ItemGroup>
+</Project>

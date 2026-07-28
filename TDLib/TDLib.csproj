@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="CheckDependencyPaths">
+  <Import Project="..\Sts2PathDiscovery.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>TDLib</AssemblyName>
+    <RootNamespace>TDLib</RootNamespace>
+    <Version>0.1</Version>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>$(NoWarn);MSB3270;STS002</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="Exists('$(Sts2DataDir)')">
+    <Reference Include="0Harmony">
+      <HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="sts2">
+      <HintPath>$(Sts2DataDir)/sts2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Krafs.Publicizer"
+                      Version="2.3.0"
+                      PrivateAssets="All" />
+    <PackageReference Include="Alchyr.Sts2.ModAnalyzers"
+                      Version="0.1.9"
+                      PrivateAssets="All" />
+    <None Include="TDLib.json" />
+    <None Include="THIRD_PARTY_LICENSES\BaseLib-LICENSE.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Publicize Include="sts2"
+               IncludeVirtualMembers="false"
+               IncludeCompilerGeneratedMembers="false" />
+  </ItemGroup>
+
+  <Target Name="CheckDependencyPaths">
+    <Error
+      Text=" Slay the Spire 2 data not found at path '$(Sts2DataDir)'"
+      Condition="'$(Sts2DataDir)' == '' or !Exists('$(Sts2DataDir)')" />
+  </Target>
+
+  <Target Name="CopyToModsFolderOnBuild" AfterTargets="Build">
+    <Message Text="Copying TDLib DLL, PDB, and manifest to the mods folder."
+             Importance="high" />
+    <MakeDir Directories="$(ModsPath)TDLib/" />
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFolder="$(ModsPath)TDLib/" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\TDLib.json"
+          DestinationFolder="$(ModsPath)TDLib/" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb"
+          DestinationFolder="$(ModsPath)TDLib/"
+          Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+    <MakeDir Directories="$(ModsPath)TDLib/THIRD_PARTY_LICENSES/" />
+    <Copy
+      SourceFiles="$(MSBuildProjectDirectory)\THIRD_PARTY_LICENSES\BaseLib-LICENSE.txt"
+      DestinationFolder="$(ModsPath)TDLib/THIRD_PARTY_LICENSES/" />
+  </Target>
+</Project>
