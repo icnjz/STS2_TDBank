@@ -3064,6 +3064,25 @@ string runtimeSource = File.ReadAllText(
         "TDBankCode",
         "Integration",
         "BankRuntime.cs"));
+string uninstallHandoffSource = File.ReadAllText(
+    Path.Combine(
+        "TDBankCode",
+        "Integration",
+        "UninstallSaveHandoffBridge.cs"));
+Expect(
+    !uninstallHandoffSource.Contains(
+        "ValidateHistoryCloudCapacity",
+        StringComparison.Ordinal)
+    && uninstallHandoffSource.Contains(
+        "ForgetFilesInDirectoryBeforeWritingIfNecessary",
+        StringComparison.Ordinal)
+    && uninstallHandoffSource.Contains(
+        "cloud.IsFilePersisted(relative)",
+        StringComparison.Ordinal)
+    && uninstallHandoffSource.Contains(
+        "Remote rollback persistence mismatch",
+        StringComparison.Ordinal),
+    "Uninstall handoff can block quota-managed local history or lose cloud persistence state.");
 int nativeGainStart = runtimeSource.IndexOf(
     "internal static void RecordNativeGoldGain(",
     StringComparison.Ordinal);

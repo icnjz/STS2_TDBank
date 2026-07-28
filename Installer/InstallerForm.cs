@@ -624,6 +624,11 @@ internal sealed class InstallerForm : Form
         {
             var selectedPath = _pathBox.Text;
             ThrowIfGameRunning();
+            _status.Text = _language == UiLanguage.ZhCn
+                ? "正在更新安全销户组件，旧版卸载 Bug 不许赖账……"
+                : "Updating the safe account-closure component before handoff…";
+            await Task.Run(
+                () => TransactionInstaller.Install(selectedPath));
             var transactionId =
                 $"{DateTime.UtcNow:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}";
             _status.Text = _language == UiLanguage.ZhCn

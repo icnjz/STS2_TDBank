@@ -54,6 +54,7 @@
         <Compile Remove="Installer.Tests/**" />
         <Compile Remove="LiveSaveRepair/**" />
         <Compile Remove="Tools/**" />
+        <Compile Remove="artifacts/**" />
         <Compile Remove=".godot/**" />
         <EmbeddedResource Remove="TDBank/**" />
         <EmbeddedResource Remove="materials/**" />
@@ -64,6 +65,7 @@
         <EmbeddedResource Remove="Installer.Tests/**" />
         <EmbeddedResource Remove="LiveSaveRepair/**" />
         <EmbeddedResource Remove="Tools/**" />
+        <EmbeddedResource Remove="artifacts/**" />
         <EmbeddedResource Remove=".godot/**" />
     </ItemGroup>
 

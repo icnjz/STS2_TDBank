@@ -117,7 +117,6 @@ internal static class UninstallSaveHandoffBridge
             throw new InvalidDataException(
                 "The pending handoff contains no usable modded save files.");
         }
-        ValidateHistoryCloudCapacity(baseline, stagedFiles);
 
         var applied = new List<AppliedFile>();
         try
@@ -253,9 +252,9 @@ internal static class UninstallSaveHandoffBridge
             result.Add(
                 relative,
                 new RemoteBaseline(
-                    Existed: true,
                     remoteText ?? string.Empty,
-                    cloud.GetLastModifiedTime(relative)));
+                    cloud.GetLastModifiedTime(relative),
+                    cloud.IsFilePersisted(relative)));
         }
 
 
@@ -340,6 +339,7 @@ internal static class UninstallSaveHandoffBridge
             target_relative_path = pair.Key,
             sha256 = HashText(pair.Value.Contents),
             last_modified_utc = pair.Value.LastModifiedUtc,
+            was_persisted = pair.Value.WasPersisted,
         });
         WriteJsonAtomically(manifestPath, manifest);
     }
@@ -639,11 +639,15 @@ internal static class UninstallSaveHandoffBridge
             if (file.IsHistory)
             {
                 var history = file.TargetRelativePath[..file.TargetRelativePath.LastIndexOf('/')];
-                cloudStore.ForgetFilesInDirectoryBeforeWritingIfNecessary(
-                    history,
-                    Encoding.UTF8.GetByteCount(contents),
-                    HistoryByteLimit,
-                    HistoryFileLimit);
+                var byteCount = Encoding.UTF8.GetByteCount(contents);
+                if (byteCount <= HistoryByteLimit)
+                {
+                    cloudStore.ForgetFilesInDirectoryBeforeWritingIfNecessary(
+                        history,
+                        byteCount,
+                        HistoryByteLimit,
+                        HistoryFileLimit);
+                }
             }
 
             cloudStore.WriteFile(file.TargetRelativePath, contents);
@@ -655,49 +659,15 @@ internal static class UninstallSaveHandoffBridge
                 throw new IOException(
                     $"Steam Cloud did not verify the returned save: {file.TargetRelativePath}");
             }
-        }
-    }
-
-    private static void ValidateHistoryCloudCapacity(
-        IReadOnlyDictionary<string, RemoteBaseline> baseline,
-        IReadOnlyCollection<StagedFile> staged)
-    {
-        var directories = baseline.Keys
-            .Concat(staged.Where(file => file.IsHistory)
-                .Select(file => file.TargetRelativePath))
-            .Where(path => path.EndsWith(".run", StringComparison.OrdinalIgnoreCase))
-            .Select(path => path[..path.LastIndexOf('/')])
-            .Distinct(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var directory in directories)
-        {
-            var prefix = directory + "/";
-            var existing = baseline
-                .Where(pair =>
-                    pair.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-                    && pair.Key.EndsWith(".run", StringComparison.OrdinalIgnoreCase))
-                .ToArray();
-            var additions = staged
-                .Where(file =>
-                    file.IsHistory
-                    && file.TargetRelativePath.StartsWith(
-                        prefix,
-                        StringComparison.OrdinalIgnoreCase))
-                .ToArray();
-            var fileCount = checked(existing.Length + additions.Length);
-            var byteCount = existing.Aggregate(
-                0L,
-                (total, pair) => checked(
-                    total + Encoding.UTF8.GetByteCount(pair.Value.Contents)));
-            byteCount = additions.Aggregate(
-                byteCount,
-                (total, file) => checked(
-                    total + new FileInfo(file.StagePath).Length));
-            if (fileCount > HistoryFileLimit || byteCount > HistoryByteLimit)
+            if (file.IsHistory
+                && Encoding.UTF8.GetByteCount(contents) > HistoryByteLimit)
             {
-                throw new InvalidDataException(
-                    $"Returning run history would exceed Steam Cloud's safe "
-                    + $"quota for {directory}; no save was changed.");
+                cloudStore.CloudStore.ForgetFile(file.TargetRelativePath);
+                if (cloudStore.CloudStore.IsFilePersisted(file.TargetRelativePath))
+                {
+                    throw new IOException(
+                        $"Oversized run history remained persisted in Steam Cloud: {file.TargetRelativePath}");
+                }
             }
         }
     }
@@ -788,6 +758,15 @@ internal static class UninstallSaveHandoffBridge
                         {
                             throw new IOException(
                                 $"Remote rollback hash mismatch: {target}");
+                        }
+                        if (!original.WasPersisted)
+                        {
+                            cloud.ForgetFile(target);
+                        }
+                        if (cloud.IsFilePersisted(target) != original.WasPersisted)
+                        {
+                            throw new IOException(
+                                $"Remote rollback persistence mismatch: {target}");
                         }
                     }
                     else if (cloud.FileExists(target))
@@ -1122,9 +1101,9 @@ internal static class UninstallSaveHandoffBridge
     private sealed record ProgressIdentity(int SchemaVersion, string UniqueId);
 
     private sealed record RemoteBaseline(
-        bool Existed,
         string Contents,
-        DateTimeOffset LastModifiedUtc);
+        DateTimeOffset LastModifiedUtc,
+        bool WasPersisted);
 
     private sealed record StagedFile(
         string TargetRelativePath,

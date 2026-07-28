@@ -23,6 +23,8 @@ internal static class UninstallSaveHandoffTests
             Path.Combine(root, "unsafe-receipt"));
         ReplacesOnlyProtocolArtifactsAfterBackingThemUp(
             Path.Combine(root, "stale-protocol"));
+        PreservesOverflowHistoryInBackupAndAllowsVerifiedCoreHandoff(
+            Path.Combine(root, "overflow-history"));
 
         Assert(
             UninstallSaveHandoff.IsAllowedVanillaCloudTarget(
@@ -298,6 +300,82 @@ internal static class UninstallSaveHandoffTests
                         UninstallSaveHandoff.ReceiptName))
                 == """{"old":"receipt"}""",
             "Stale receipt was not backed up.");
+    }
+
+    private static void PreservesOverflowHistoryInBackupAndAllowsVerifiedCoreHandoff(
+        string scenario)
+    {
+        var saveRoot = NewSaveRoot(scenario);
+        var account = AccountRoot(saveRoot);
+        WriteSelector(Path.Combine(account, "profile.save"), 1);
+        WriteProfile(
+            Path.Combine(account, "profile1"),
+            UniqueId,
+            progressMarker: "vanilla");
+        WriteSelector(Path.Combine(account, "modded", "profile.save"), 1);
+        var modded = WriteProfile(
+            Path.Combine(account, "modded", "profile1"),
+            UniqueId,
+            progressMarker: "modded");
+        var history = Path.Combine(modded, "saves", "history");
+        for (var index = 1; index < 125; index++)
+        {
+            WriteText(
+                Path.Combine(history, $"overflow-{index:D3}.run"),
+                $$"""{"schema_version":22,"run":{{index}}}""");
+        }
+
+        var moddedBefore = SnapshotTree(modded);
+        var preparation = UninstallSaveHandoff.Prepare(
+            saveRoot,
+            "overflowhistory01");
+        AssertTreeExact(
+            moddedBefore,
+            Path.Combine(
+                preparation.BackupDirectory,
+                "snapshot",
+                "steam",
+                AccountId,
+                "modded",
+                "profile1"),
+            "Overflow run history was not fully preserved in the handoff backup.");
+
+        var progressRelative = "profile1/saves/progress.save";
+        var progressPath = Path.Combine(
+            account,
+            "profile1",
+            "saves",
+            "progress.save");
+        File.Copy(
+            Path.Combine(modded, "saves", "progress.save"),
+            progressPath,
+            overwrite: true);
+        var pendingAccount = preparation.Accounts.Single();
+        WriteReceipt(
+            pendingAccount,
+            preparation.TransactionId,
+            success: true,
+            cloudStatus: "verified",
+            progressRelative,
+            HashFile(progressPath));
+        Assert(
+            UninstallSaveHandoff.Inspect(preparation).MayRemoveMods,
+            "A verified core handoff was rejected because backup-only history exceeds cloud quota.");
+        Assert(
+            Directory.EnumerateFiles(
+                    Path.Combine(
+                        preparation.BackupDirectory,
+                        "snapshot",
+                        "steam",
+                        AccountId,
+                        "modded",
+                        "profile1",
+                        "saves",
+                        "history"),
+                    "*.run",
+                    SearchOption.TopDirectoryOnly)
+                .Count() == 125,
+            "The complete overflow history is not recoverable from the verified backup.");
     }
 
     private static string NewSaveRoot(string scenario)
