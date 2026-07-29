@@ -80,7 +80,6 @@ public readonly record struct AccountSnapshot(
 
 public static class BankService
 {
-    public const int SavingsInterestPercent = 10;
     public const int DebtGraceFloorCount = 3;
     public const int PoorDebtInterestBasisPoints = 2199;
     public const int MiddleClassDebtInterestBasisPoints = 2499;
@@ -258,10 +257,8 @@ public static class BankService
    long savingsBalance,
    int carriedTenths)
     {
-        long tenths =
-            Math.Max(0L, savingsBalance)
-            + Math.Clamp(carriedTenths, 0, 9);
-        return tenths / 10L;
+        return AscensionBankBenefits.ForAscension(0)
+            .CalculateSavingsInterest(savingsBalance);
     }
 
     public static long CalculateNextSavingsInterest(
@@ -270,10 +267,8 @@ public static class BankService
    int carriedTenths)
     {
         ArgumentNullException.ThrowIfNull(player);
-        return checked(
-            CalculateNextSavingsInterest(savingsBalance, carriedTenths)
-            + AscensionBankBenefits.For(player)
-                .CalculateSavingsBonus(savingsBalance));
+        return AscensionBankBenefits.For(player)
+            .CalculateSavingsInterest(savingsBalance);
     }
 
     public static int GetQualifyingEarned(Player player)
@@ -1221,13 +1216,11 @@ public static class BankService
             }
 
             ReconcileSavingsComponentsLocked(player, state);
-            long tenths =
-                (long)state.SavingsTenths + Math.Max(0, player.Gold);
             int wholeGold = checked((int)CalculateNextSavingsInterest(
                 player,
                 player.Gold,
                 state.SavingsTenths));
-            int remainingTenths = (int)(tenths % 10L);
+            int remainingTenths = 0;
             int debtRepaid = Math.Min(state.CreditDebt, wholeGold);
             int walletAmount = wholeGold - debtRepaid;
             long newInterest =

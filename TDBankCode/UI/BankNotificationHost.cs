@@ -12,7 +12,9 @@ internal sealed partial class BankNotificationHost : Control
     private Button? _modalBackdrop;
     private Label? _modalTitle;
     private Label? _modalMessage;
+    private Button? _modalAction;
     private Button? _modalDismiss;
+    private Action? _modalActionCallback;
 
     public override void _Ready()
     {
@@ -46,17 +48,41 @@ internal sealed partial class BankNotificationHost : Control
 
 
 
+        bool actionPoint = inputEvent switch
+        {
+            InputEventMouseButton actionMouse
+                => IsActionPoint(actionMouse.Position),
+            InputEventScreenTouch actionTouch
+                => IsActionPoint(actionTouch.Position),
+            _ => false,
+        };
+        bool actionFocused = _modalAction is
+            {
+                Visible: true,
+            }
+            && _modalAction.HasFocus();
         if (inputEvent.IsActionPressed("ui_accept")
             || inputEvent is InputEventMouseButton
             {
                 ButtonIndex: MouseButton.Left,
                 Pressed: true,
             } mouse
-                && IsDismissPoint(mouse.Position)
+                && (actionPoint
+                    || IsDismissPoint(mouse.Position))
             || inputEvent is InputEventScreenTouch { Pressed: true } touch
-                && IsDismissPoint(touch.Position))
+                && (actionPoint
+                    || IsDismissPoint(touch.Position)))
         {
-            HideModal();
+            if (actionPoint
+                || inputEvent.IsActionPressed("ui_accept")
+                    && actionFocused)
+            {
+                ExecuteModalAction();
+            }
+            else
+            {
+                HideModal();
+            }
             GetViewport().SetInputAsHandled();
             return;
         }
@@ -123,12 +149,32 @@ internal sealed partial class BankNotificationHost : Control
         _modalTitle.Text = title;
         _modalTitle.AddThemeColorOverride("font_color", accent);
         _modalMessage.Text = message;
+        _modalActionCallback = null;
+        _modalAction?.Hide();
         _modalDismiss.Text = BankUiText.Get("notification_dismiss");
         MouseFilter = MouseFilterEnum.Stop;
         _modalRoot.Show();
         _modalRoot.MoveToFront();
         BankUiBridge.OnImportantModalOpened();
         _modalDismiss.GrabFocus();
+    }
+
+    public void ShowActionModal(
+        string title,
+        string message,
+        string actionText,
+        Action action)
+    {
+        ShowModal(title, message, danger: false);
+        if (_modalAction is null)
+        {
+            return;
+        }
+
+        _modalActionCallback = action;
+        _modalAction.Text = actionText;
+        _modalAction.Show();
+        _modalAction.GrabFocus();
     }
 
     public void HideModal()
@@ -139,6 +185,8 @@ internal sealed partial class BankNotificationHost : Control
         }
 
         _modalRoot.Hide();
+        _modalActionCallback = null;
+        _modalAction?.Hide();
         MouseFilter = MouseFilterEnum.Ignore;
         BankUiBridge.OnImportantModalClosed();
         ActiveScreenContext.Instance.Update();
@@ -150,6 +198,21 @@ internal sealed partial class BankNotificationHost : Control
             && GodotObject.IsInstanceValid(_modalDismiss)
             && _modalDismiss.IsVisibleInTree()
             && _modalDismiss.GetGlobalRect().HasPoint(point);
+    }
+
+    private bool IsActionPoint(Vector2 point)
+    {
+        return _modalAction is not null
+            && GodotObject.IsInstanceValid(_modalAction)
+            && _modalAction.IsVisibleInTree()
+            && _modalAction.GetGlobalRect().HasPoint(point);
+    }
+
+    private void ExecuteModalAction()
+    {
+        Action? action = _modalActionCallback;
+        HideModal();
+        action?.Invoke();
     }
 
     private void BuildToast()
@@ -250,6 +313,16 @@ internal sealed partial class BankNotificationHost : Control
         _modalMessage.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _modalMessage.SizeFlagsVertical = SizeFlags.ExpandFill;
         column.AddChild(_modalMessage);
+
+        _modalAction = new Button
+        {
+            Text = string.Empty,
+            CustomMinimumSize = new Vector2(0, 56),
+        };
+        BankUiTheme.ApplyPrimaryButton(_modalAction);
+        _modalAction.Pressed += ExecuteModalAction;
+        _modalAction.Hide();
+        column.AddChild(_modalAction);
 
         _modalDismiss = new Button
         {

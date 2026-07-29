@@ -239,6 +239,9 @@ public static class BankRuntime
             }
 
             int localSavingsCredit = 0;
+            int localSavingsAscension = 0;
+            int localSavingsRateBasisPoints = 0;
+            int localSavingsCap = 0;
             int localInterestCharge = 0;
             int localCeilingCollection = 0;
             bool settledAnyAccount = false;
@@ -253,6 +256,14 @@ public static class BankRuntime
                     && LocalContext.NetId == player.NetId)
                 {
                     localSavingsCredit = savingsResult.Amount;
+                    AscensionBankBenefits localBenefits =
+                        AscensionBankBenefits.For(player);
+                    localSavingsAscension =
+                        localBenefits.AscensionLevel;
+                    localSavingsRateBasisPoints =
+                        localBenefits.SavingsInterestBasisPoints;
+                    localSavingsCap =
+                        localBenefits.SavingsInterestCap;
                 }
 
                 BankOperationResult result = BankService.AccrueDebtInterest(player, floorToken);
@@ -287,7 +298,10 @@ public static class BankRuntime
                 SafeNotify(
                     "savings_interest_notice",
                     isError: false,
-                    localSavingsCredit);
+                    localSavingsCredit,
+                    localSavingsAscension,
+                    localSavingsRateBasisPoints / 100m,
+                    localSavingsCap);
             }
             if (localInterestCharge > 0)
             {
@@ -378,11 +392,10 @@ public static class BankRuntime
             SavingsInterestEarned =
                 snapshot.SavingsInterestEarnedTotal,
             SavingsInterestTurns = state.SavingsInterestTurns,
-            SavingsBaseRateBasisPoints =
-                BankService.SavingsInterestPercent * 100,
-            SavingsBonusRateBasisPoints =
-                benefits.SavingsBonusBasisPoints,
-            SavingsBonusCap = benefits.SavingsBonusCap,
+            SavingsInterestRateBasisPoints =
+                benefits.SavingsInterestBasisPoints,
+            SavingsInterestCap =
+                benefits.SavingsInterestCap,
             CreditOffers = creditOffers,
             CreditTier = ToUiTier(snapshot.CreditTier),
             CreditLimit = snapshot.CreditLimit,

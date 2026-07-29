@@ -38,11 +38,9 @@ public sealed record BankUiSnapshot
     public int SavingsInterestTurns { get; init; }
     public BankCreditTier? CreditTier { get; init; }
 
-    public int SavingsBaseRateBasisPoints { get; init; } = 1_000;
+    public int SavingsInterestRateBasisPoints { get; init; } = 500;
 
-    public int SavingsBonusRateBasisPoints { get; init; }
-
-    public int SavingsBonusCap { get; init; }
+    public int SavingsInterestCap { get; init; } = 50;
 
     public IReadOnlyList<BankCreditOffer> CreditOffers { get; init; } =
    new BankCreditOffer[]

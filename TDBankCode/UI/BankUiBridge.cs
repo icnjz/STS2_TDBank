@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Text.Json;
 using Godot;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Combat;
@@ -11,6 +13,11 @@ namespace TDBank.TDBankCode.UI;
 public static class BankUiBridge
 {
     private const string LayerName = "TDBankUiLayer";
+    private const string CurrentVersion = "0.1.1";
+    private const string LatestReleaseApi =
+        "https://api.github.com/repos/icnjz/STS2_TDBank/releases/latest";
+    private const string LatestReleasePage =
+        "https://github.com/icnjz/STS2_TDBank/releases/latest";
     private static CanvasLayer? _layer;
     private static BankOverlay? _overlay;
     private static BankNotificationHost? _notifications;
@@ -21,6 +28,7 @@ public static class BankUiBridge
     private static bool _remoteCursorOriginalZAsRelative;
     private static bool _overlaySurfaceVisible;
     private static bool _importantModalVisible;
+    private static bool _updateCheckStarted;
     private static BankUiSnapshot _fallbackSnapshot = BankUiSnapshot.Empty;
 
     public static Func<BankUiSnapshot>? SnapshotProvider { get; set; }
@@ -145,6 +153,7 @@ public static class BankUiBridge
         }
 
         _overlay!.Open(ReadSnapshot());
+        CheckForUpdate();
     }
 
     public static void Open(Node context)
@@ -168,7 +177,8 @@ public static class BankUiBridge
 
     public static void Refresh()
     {
-        if (GodotObject.IsInstanceValid(_overlay))
+        if (GodotObject.IsInstanceValid(_overlay)
+            && _overlay!.Visible)
         {
             _overlay!.Refresh(ReadSnapshot());
         }
@@ -214,6 +224,90 @@ public static class BankUiBridge
     public static void ShowInformation(string title, string message)
     {
         NotifyImportant(title, message, danger: false);
+    }
+
+    private static void CheckForUpdate()
+    {
+        if (_updateCheckStarted
+            || !GodotObject.IsInstanceValid(_layer))
+        {
+            return;
+        }
+
+        _updateCheckStarted = true;
+        var request = new HttpRequest
+        {
+            Name = "TDBankUpdateCheck",
+            Timeout = 5,
+        };
+        request.RequestCompleted += (
+            result,
+            responseCode,
+            headers,
+            body) =>
+        {
+            try
+            {
+                if (responseCode != 200
+                    || !TryGetNewerVersion(body, out string latest))
+                {
+                    return;
+                }
+
+                _notifications?.ShowActionModal(
+                    BankUiText.Get("update_available_title"),
+                    BankUiText.Get(
+                        "update_available",
+                        CurrentVersion,
+                        latest),
+                    BankUiText.Get("download_update"),
+                    () => OS.ShellOpen(LatestReleasePage));
+            }
+            catch (Exception exception)
+            {
+                MainFile.Logger.Warn(
+                    $"TD Bank update check could not read the response: {exception.Message}");
+            }
+            finally
+            {
+                request.QueueFree();
+            }
+        };
+        _layer!.AddChild(request);
+        Error error = request.Request(
+            LatestReleaseApi,
+            ["User-Agent: TD-Bank-Mod"]);
+        if (error != Error.Ok)
+        {
+            request.QueueFree();
+        }
+    }
+
+    internal static bool TryGetNewerVersion(
+        byte[] responseBody,
+        out string latest)
+    {
+        latest = string.Empty;
+        using JsonDocument document = JsonDocument.Parse(
+            Encoding.UTF8.GetString(responseBody));
+        if (!document.RootElement.TryGetProperty(
+                "tag_name",
+                out JsonElement tagElement))
+        {
+            return false;
+        }
+
+        string tag = tagElement.GetString()?.Trim() ?? string.Empty;
+        string normalized = tag.TrimStart('v', 'V');
+        if (!Version.TryParse(CurrentVersion, out Version? current)
+            || !Version.TryParse(normalized, out Version? available)
+            || available <= current)
+        {
+            return false;
+        }
+
+        latest = tag;
+        return true;
     }
 
     public static void NotifyButtFreeloader(int hpLoss)

@@ -75,7 +75,7 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
 
 
 
-    internal const int ProtocolMagic = 0x54444241;
+    internal const int ProtocolMagic = 0x54444242;
 
     public BankOperationKind Kind;
     public CreditTier Tier;

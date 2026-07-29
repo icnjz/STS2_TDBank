@@ -52,7 +52,7 @@ try
         }
 
         Console.WriteLine(
-            "TD Bank Setup v0.1 uninstall/save-preservation matrix passed.");
+            "TD Bank Setup v0.1.1 uninstall/save-preservation matrix passed.");
         return;
     }
 
@@ -368,11 +368,11 @@ static void AssertInstallerVersion(string game)
     var statePath = Path.Combine(game, "mods", "TDBank", "install-state.json");
     using var state = JsonDocument.Parse(File.ReadAllText(statePath));
     Assert(
-        state.RootElement.GetProperty("packageVersion").GetString() == "v0.1",
-        "Installer state did not record package version v0.1.");
+        state.RootElement.GetProperty("packageVersion").GetString() == "v0.1.1",
+        "Installer state did not record package version v0.1.1.");
     Assert(
-        state.RootElement.GetProperty("installerVersion").GetString() == "v0.1",
-        "Installer state did not record setup version v0.1.");
+        state.RootElement.GetProperty("installerVersion").GetString() == "v0.1.1",
+        "Installer state did not record setup version v0.1.1.");
 }
 
 static void AssertTDLibOwnershipState(
@@ -481,8 +481,8 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
     using (var manifest = JsonDocument.Parse(EmbeddedPayload.Read(manifestFile)))
     {
         Assert(
-            manifest.RootElement.GetProperty("version").GetString() == "0.1.0",
-            "Embedded TD Bank manifest is not 0.1.0.");
+            manifest.RootElement.GetProperty("version").GetString() == "0.1.1",
+            "Embedded TD Bank manifest is not 0.1.1.");
         Assert(
             manifest.RootElement.GetProperty("author").GetString() == "cnj lab",
             "Embedded TD Bank manifest must spell the user-visible author cnj lab in lowercase.");
@@ -547,8 +547,8 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
     File.WriteAllBytes(embeddedDllPath, EmbeddedPayload.Read(dllFile));
     Assert(
         AssemblyName.GetAssemblyName(embeddedDllPath).Version
-            == new Version(0, 1, 0, 0),
-        "Embedded TD Bank DLL assembly version is not 0.1.0.0.");
+            == new Version(0, 1, 1, 0),
+        "Embedded TD Bank DLL assembly version is not 0.1.1.0.");
     var tdBankReferences = Assembly.Load(EmbeddedPayload.Read(dllFile))
         .GetReferencedAssemblies();
     Assert(
@@ -576,8 +576,8 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
         "Embedded TDLib DLL identity or BaseLib isolation is incorrect.");
     Assert(
         typeof(TransactionInstaller).Assembly.GetName().Version
-            == new Version(0, 1, 0, 0),
-        "Installer assembly version is not 0.1.0.0.");
+            == new Version(0, 1, 1, 0),
+        "Installer assembly version is not 0.1.1.0.");
     Assert(
         string.Equals(
             typeof(TransactionInstaller).Assembly
@@ -2169,7 +2169,7 @@ static void AssertUiLanguageSwitchPreservesState()
 
                 form.SetLanguage(UiLanguage.ZhCn);
                 Assert(
-                    form.Text.Contains("Setup v0.1", StringComparison.Ordinal)
+                    form.Text.Contains("Setup v0.1.1", StringComparison.Ordinal)
                     && form.Text.Contains("卸载器", StringComparison.Ordinal),
                     "Chinese switch did not update the setup/uninstall window title.");
                 Assert(pathBox.Text == preservedPath, "Chinese switch changed the selected path.");
@@ -2180,7 +2180,7 @@ static void AssertUiLanguageSwitchPreservesState()
 
                 form.SetLanguage(UiLanguage.En);
                 Assert(
-                    form.Text.Contains("Setup v0.1", StringComparison.Ordinal)
+                    form.Text.Contains("Setup v0.1.1", StringComparison.Ordinal)
                     && !ContainsHanCharacter(form.Text),
                     "English switch did not update the setup/uninstall window title.");
                 Assert(pathBox.Text == preservedPath, "English switch changed the selected path.");

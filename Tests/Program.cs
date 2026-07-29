@@ -12,6 +12,7 @@ using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -335,11 +336,10 @@ static BankUiSnapshot UiSnapshotFor(
     {
         AscensionLevel = benefits.AscensionLevel,
         IsAccountOpened = true,
-        SavingsBaseRateBasisPoints =
-            BankService.SavingsInterestPercent * 100,
-        SavingsBonusRateBasisPoints =
-            benefits.SavingsBonusBasisPoints,
-        SavingsBonusCap = benefits.SavingsBonusCap,
+        SavingsInterestRateBasisPoints =
+            benefits.SavingsInterestBasisPoints,
+        SavingsInterestCap =
+            benefits.SavingsInterestCap,
         CreditOffers =
         [
             new(
@@ -1313,27 +1313,27 @@ Expect(
     && BankService.GetSavingsPrincipal(observedGold) == 137,
     "A completed native gold gain did not update qualification and principal.");
 Expect(
-    BankService.AccrueSavingsInterest(observedGold, 501).Amount == 13
-    && observedGold.Gold == 150
+    BankService.AccrueSavingsInterest(observedGold, 501).Amount == 6
+    && observedGold.Gold == 143
     && BankService.GetSavingsPrincipal(observedGold) == 137
-    && BankService.GetSavingsInterest(observedGold) == 13
-    && BankService.GetSavingsInterestEarnedTotal(observedGold) == 13
-    && BankService.GetQualifyingEarned(observedGold) == 50
-    && BankService.GetSavingsTenths(observedGold) == 7,
+    && BankService.GetSavingsInterest(observedGold) == 6
+    && BankService.GetSavingsInterestEarnedTotal(observedGold) == 6
+    && BankService.GetQualifyingEarned(observedGold) == 43
+    && BankService.GetSavingsTenths(observedGold) == 0,
     "Savings-interest setup for native-loss reconciliation is incorrect.");
 int beforeFirstLoss = observedGold.Gold;
-observedGold.Gold = 138;
+observedGold.Gold = 131;
 Expect(
     BankService.RecordNativeGoldLoss(observedGold, beforeFirstLoss).Amount == 12
-    && BankService.GetSavingsInterest(observedGold) == 1
-    && BankService.GetSavingsPrincipal(observedGold) == 137,
+    && BankService.GetSavingsInterest(observedGold) == 0
+    && BankService.GetSavingsPrincipal(observedGold) == 131,
     "Native loss did not consume accrued interest before principal.");
 int beforeSecondLoss = observedGold.Gold;
 observedGold.Gold = 100;
 Expect(
-    BankService.RecordNativeGoldLoss(observedGold, beforeSecondLoss).Amount == 38
+    BankService.RecordNativeGoldLoss(observedGold, beforeSecondLoss).Amount == 31
     && BankService.GetSavingsInterest(observedGold) == 0
-    && BankService.GetSavingsInterestEarnedTotal(observedGold) == 13
+    && BankService.GetSavingsInterestEarnedTotal(observedGold) == 6
     && BankService.GetSavingsPrincipal(observedGold) == 100
     && BankService.GetSavingsBalance(observedGold) == observedGold.Gold,
     "Native loss did not reconcile unified savings components.");
@@ -1376,10 +1376,10 @@ _ = BankService.RecordNativeGoldLoss(
     MegaCrit.Sts2.Core.Entities.Gold.GoldLossType.Stolen);
 AccountState stolenState = BankStateStore.Get(stolenGold);
 Expect(
-    stolenState.StolenSavingsInterest == 10
-    && stolenState.StolenSavingsPrincipal == 40
+    stolenState.StolenSavingsInterest == 5
+    && stolenState.StolenSavingsPrincipal == 45
     && stolenState.SavingsInterest == 0
-    && stolenState.SavingsPrincipal == 60,
+    && stolenState.SavingsPrincipal == 55,
     "Stolen gold did not preserve removed interest/principal composition.");
 stolenGold.Gold += 50;
 _ = BankService.RecordNativeGoldGainAmount(
@@ -1387,7 +1387,7 @@ _ = BankService.RecordNativeGoldGainAmount(
     50,
     wasStolenBack: true);
 Expect(
-    BankService.GetSavingsInterest(stolenGold) == 10
+    BankService.GetSavingsInterest(stolenGold) == 5
     && BankService.GetSavingsPrincipal(stolenGold) == 100
     && BankService.GetQualifyingEarned(stolenGold)
         == qualificationBeforeTheft
@@ -1417,7 +1417,7 @@ _ = BankService.RecordNativeGoldGainAmount(
     wasStolenBack: true);
 Expect(
     BankService.GetSavingsInterest(escapedTheft) == 0
-    && BankService.GetSavingsPrincipal(escapedTheft) == 90
+    && BankService.GetSavingsPrincipal(escapedTheft) == 85
     && BankStateStore.Get(escapedTheft).StolenSavingsInterest == 0
     && BankStateStore.Get(escapedTheft).StolenSavingsPrincipal == 0,
     "An escaped thief's stale composition leaked into a later refund.");
@@ -1431,19 +1431,19 @@ _ = BankService.RecordNativeGoldLoss(
     beforeFractionalTheft,
     MegaCrit.Sts2.Core.Entities.Gold.GoldLossType.Stolen);
 Expect(
-    BankStateStore.Get(fractionalTheft).StolenSavingsTenths == 5,
-    "A full theft discarded outstanding fractional compound interest.");
+    BankStateStore.Get(fractionalTheft).StolenSavingsTenths == 0,
+    "Rounded-down savings unexpectedly retained fractional interest.");
 fractionalTheft.Gold = 5;
 _ = BankService.RecordNativeGoldGainAmount(
     fractionalTheft,
     5,
     wasStolenBack: true);
 Expect(
-    BankService.GetSavingsTenths(fractionalTheft) == 5
+    BankService.GetSavingsTenths(fractionalTheft) == 0
     && BankService.AccrueSavingsInterest(
         fractionalTheft,
-        1002).Amount == 1,
-    "A full stolen refund did not restore fractional compound interest.");
+        1002).Amount == 0,
+    "Rounded-down savings unexpectedly paid carried fractional interest.");
 
 Expect(
     CreditBackedSpendingPatch.PreserveNegativeBalanceAfterNativeLoss(
@@ -1460,24 +1460,24 @@ BankOperationResult interestFloorOne =
     BankService.AccrueSavingsInterest(compoundInterest, 1101);
 Expect(
     interestFloorOne.Success
-    && interestFloorOne.Amount == 10
-    && compoundInterest.Gold == 110,
-    "The first unique floor did not pay 10% compound interest.");
+    && interestFloorOne.Amount == 5
+    && compoundInterest.Gold == 105,
+    "The first unique floor did not pay 5% compound interest.");
 Expect(
     BankService.AccrueSavingsInterest(compoundInterest, 1101).Error
         == BankErrorCode.AlreadyProcessed
-    && compoundInterest.Gold == 110,
+    && compoundInterest.Gold == 105,
     "The same savings floor token paid twice.");
 BankOperationResult interestFloorTwo =
     BankService.AccrueSavingsInterest(compoundInterest, 1102);
 Expect(
     interestFloorTwo.Success
-    && interestFloorTwo.Amount == 11
-    && compoundInterest.Gold == 121
+    && interestFloorTwo.Amount == 5
+    && compoundInterest.Gold == 110
     && BankService.GetSavingsPrincipal(compoundInterest) == 100
-    && BankService.GetSavingsInterest(compoundInterest) == 21
-    && BankService.GetSavingsInterestEarnedTotal(compoundInterest) == 21
-    && BankService.GetQualifyingEarned(compoundInterest) == 21
+    && BankService.GetSavingsInterest(compoundInterest) == 10
+    && BankService.GetSavingsInterestEarnedTotal(compoundInterest) == 10
+    && BankService.GetQualifyingEarned(compoundInterest) == 10
     && BankStateStore.Get(compoundInterest).SavingsInterestTurns == 2,
     "Savings interest did not compound on the next real floor.");
 
@@ -1577,7 +1577,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         200, 1000, 2000,
         200, 3,
         2199, 2499, 2799,
-        0, 0,
+        500, 50,
         10, 200,
         5, 50,
         100, int.MaxValue),
@@ -1587,7 +1587,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         225, 1050, 2100,
         200, 3,
         2199, 2499, 2799,
-        0, 0,
+        500, 50,
         10, 200,
         5, 50,
         100, int.MaxValue),
@@ -1597,7 +1597,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         250, 1100, 2200,
         200, 3,
         2199, 2499, 2799,
-        0, 0,
+        500, 50,
         10, 200,
         5, 50,
         100, int.MaxValue),
@@ -1607,7 +1607,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         300, 1200, 2400,
         250, 6,
         1599, 1899, 2199,
-        200, 20,
+        600, 60,
         8, 300,
         4, 80,
         250, 6),
@@ -1617,7 +1617,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         325, 1300, 2600,
         250, 6,
         1549, 1849, 2149,
-        250, 25,
+        600, 60,
         8, 320,
         4, 85,
         300, 6),
@@ -1627,7 +1627,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         350, 1400, 2800,
         260, 7,
         1499, 1799, 2099,
-        300, 30,
+        600, 60,
         8, 340,
         4, 90,
         350, 5),
@@ -1637,7 +1637,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         375, 1500, 3000,
         270, 8,
         1449, 1749, 2049,
-        350, 35,
+        700, 70,
         7, 360,
         4, 95,
         400, 5),
@@ -1647,7 +1647,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         400, 1600, 3200,
         280, 9,
         1399, 1699, 1999,
-        400, 40,
+        700, 70,
         7, 380,
         3, 100,
         450, 5),
@@ -1657,7 +1657,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         450, 1750, 3500,
         290, 10,
         1299, 1599, 1899,
-        450, 45,
+        700, 70,
         6, 400,
         3, 110,
         500, 4),
@@ -1667,7 +1667,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         500, 1900, 3800,
         300, 11,
         1199, 1499, 1799,
-        500, 50,
+        800, 80,
         5, 450,
         2, 125,
         600, 4),
@@ -1677,7 +1677,7 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         600, 2200, 4400,
         300, 12,
         999, 1299, 1599,
-        600, 60,
+        800, 80,
         5, 500,
         2, 150,
         750, 3),
@@ -1697,6 +1697,24 @@ Expect(
     && AscensionBankBenefits.ForAscension(99)
         == expectedAscensionBenefits[10],
     "Ascension benefit lookup no longer clamps outside the A0-A10 range.");
+Expect(
+    AscensionBankBenefits.ForAscension(0)
+        .CalculateSavingsInterest(100) == 5
+    && AscensionBankBenefits.ForAscension(0)
+        .CalculateSavingsInterest(2000) == 50
+    && AscensionBankBenefits.ForAscension(3)
+        .CalculateSavingsInterest(100) == 6
+    && AscensionBankBenefits.ForAscension(3)
+        .CalculateSavingsInterest(2000) == 60
+    && AscensionBankBenefits.ForAscension(6)
+        .CalculateSavingsInterest(100) == 7
+    && AscensionBankBenefits.ForAscension(6)
+        .CalculateSavingsInterest(2000) == 70
+    && AscensionBankBenefits.ForAscension(9)
+        .CalculateSavingsInterest(100) == 8
+    && AscensionBankBenefits.ForAscension(9)
+        .CalculateSavingsInterest(2000) == 80,
+    "Ascension savings rates or per-floor caps regressed.");
 
 BankCreditOffer[] expectedA0UiOffers =
 [
@@ -1750,9 +1768,9 @@ Expect(
     && a3CreditCopy.Contains("15.99%", StringComparison.Ordinal)
     && a3CreditCopy.Contains("每 250G", StringComparison.Ordinal)
     && a3CreditCopy.Contains("最多 6 件", StringComparison.Ordinal)
-    && a3SavingsCopy.Contains("2%", StringComparison.Ordinal)
-    && a3SavingsCopy.Contains("最多 20G", StringComparison.Ordinal)
-    && a3SavingsCopy.Contains("12G", StringComparison.Ordinal)
+    && a3SavingsCopy.Contains("6%", StringComparison.Ordinal)
+    && a3SavingsCopy.Contains("最多 60G", StringComparison.Ordinal)
+    && a3SavingsCopy.Contains("6G", StringComparison.Ordinal)
     && a10OpeningCopy.Contains("当前 A10", StringComparison.Ordinal)
     && a10OpeningCopy.Contains("12 层", StringComparison.Ordinal)
     && a10OpeningCopy.Contains("9.99%", StringComparison.Ordinal)
@@ -1834,15 +1852,15 @@ Player a3Savings = OpenAscensionPlayer(3, 100, 9805);
 BankOperationResult a3Interest =
     BankService.AccrueSavingsInterest(a3Savings, 3101);
 Expect(
-    a3Interest == BankOperationResult.Ok(12, 0)
-    && a3Savings.Gold == 112
-    && BankService.GetSavingsInterest(a3Savings) == 12
-    && BankService.GetQualifyingEarned(a3Savings) == 12
+    a3Interest == BankOperationResult.Ok(6, 0)
+    && a3Savings.Gold == 106
+    && BankService.GetSavingsInterest(a3Savings) == 6
+    && BankService.GetQualifyingEarned(a3Savings) == 6
     && BankService.CalculateNextSavingsInterest(
         a3Savings,
         100,
-        0) == 12,
-    "A3 live savings did not pay qualifying 10% base + 2% comfort interest.");
+        0) == 6,
+    "A3 live savings did not pay capped qualifying 6% interest.");
 
 Player a3Kk = OpenAscensionPlayer(3, 0, 9806, 50, 70);
 BankOperationResult a3Kidney =
@@ -1923,15 +1941,15 @@ Player a10Savings = OpenAscensionPlayer(10, 2000, 9812);
 BankOperationResult a10Interest =
     BankService.AccrueSavingsInterest(a10Savings, 10101);
 Expect(
-    a10Interest == BankOperationResult.Ok(260, 0)
-    && a10Savings.Gold == 2260
-    && BankService.GetSavingsInterest(a10Savings) == 260
-    && BankService.GetQualifyingEarned(a10Savings) == 260
+    a10Interest == BankOperationResult.Ok(80, 0)
+    && a10Savings.Gold == 2080
+    && BankService.GetSavingsInterest(a10Savings) == 80
+    && BankService.GetQualifyingEarned(a10Savings) == 80
     && BankService.CalculateNextSavingsInterest(
         a10Savings,
         2000,
-        0) == 260,
-    "A10 live savings did not pay 10% base plus the capped 60G bonus.");
+        0) == 80,
+    "A10 live savings did not respect the capped 8%/80G terms.");
 
 Player a10Kk = OpenAscensionPlayer(10, 0, 9813, 50, 70);
 BankOperationResult a10Kidney =
@@ -2128,14 +2146,14 @@ BankStateStore.Set(
 BankOperationResult debtPaidByInterest =
     BankService.AccrueSavingsInterest(interestPaysDebt, 1601);
 Expect(
-    debtPaidByInterest == BankOperationResult.Ok(0, 10)
+    debtPaidByInterest == BankOperationResult.Ok(0, 5)
     && interestPaysDebt.Gold == 100
-    && BankService.GetCreditDebt(interestPaysDebt) == 20
+    && BankService.GetCreditDebt(interestPaysDebt) == 25
     && BankService.GetSavingsInterest(interestPaysDebt) == 0,
     "Savings interest did not automatically repay debt first.");
 Expect(
-    BankService.GetQualifyingEarned(interestPaysDebt) == 310
-    && BankService.GetSavingsInterestEarnedTotal(interestPaysDebt) == 10,
+    BankService.GetQualifyingEarned(interestPaysDebt) == 305
+    && BankService.GetSavingsInterestEarnedTotal(interestPaysDebt) == 5,
     "Debt-paid savings interest did not count as issued interest and qualification.");
 
 
@@ -2347,9 +2365,9 @@ _ = BankService.ETransfer(
     15);
 Expect(
     BankService.GetSavingsInterest(compositionSender) == 0
-    && BankService.GetSavingsPrincipal(compositionSender) == 95
-    && BankService.GetSavingsInterest(compositionRecipient) == 10
-    && BankService.GetSavingsPrincipal(compositionRecipient) == 5,
+    && BankService.GetSavingsPrincipal(compositionSender) == 90
+    && BankService.GetSavingsInterest(compositionRecipient) == 5
+    && BankService.GetSavingsPrincipal(compositionRecipient) == 10,
     "e-Transfer laundered already-earned interest into principal.");
 MethodInfo[] eTransferMethods = typeof(BankService)
     .GetMethods(BindingFlags.Public | BindingFlags.Static)
@@ -2965,16 +2983,16 @@ var wireWriter = new PacketWriter();
 operationPayloads[3].Serialize(wireWriter);
 Expect(
     wireWriter.BytePosition == 45,
-    $"TDBA request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
+    $"TDBB request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
 var wireReader = new PacketReader();
 wireReader.Reset(wireWriter.Buffer);
 _ = wireReader.ReadInt();
 _ = wireReader.ReadInt();
 Expect(
     wireReader.ReadInt() == TDBankNetOperationAction.ProtocolMagic
-    && TDBankNetOperationAction.ProtocolMagic == 0x54444241
+    && TDBankNetOperationAction.ProtocolMagic == 0x54444242
     && wireReader.ReadInt() == BankNetwork.CurrentLifecycleEpoch,
-    "The operation packet does not carry TDBA and the lifecycle epoch.");
+    "The operation packet does not carry TDBB and the lifecycle epoch.");
 
 Player threePeerHost = OpenAscensionPlayer(
     0,
@@ -3476,6 +3494,44 @@ Expect(
         StringComparison.Ordinal),
     "The notification backdrop can intercept the modal dismiss button.");
 Expect(
+    notificationHostSource.Contains(
+        "_modalAction.Pressed += ExecuteModalAction;",
+        StringComparison.Ordinal)
+    && notificationHostSource.Contains(
+        "IsActionPoint(actionMouse.Position)",
+        StringComparison.Ordinal)
+    && notificationHostSource.Contains(
+        "IsActionPoint(actionTouch.Position)",
+        StringComparison.Ordinal)
+    && notificationHostSource.Contains(
+        "&& _modalAction.HasFocus();",
+        StringComparison.Ordinal),
+    "The update modal action is not reachable by mouse, touch, or keyboard.");
+Expect(
+    BankUiBridge.TryGetNewerVersion(
+        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.2"}"""),
+        out string newerVersion)
+    && newerVersion == "v0.1.2"
+    && !BankUiBridge.TryGetNewerVersion(
+        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.1"}"""),
+        out _)
+    && uiBridgeSource.Contains(
+        "private static bool _updateCheckStarted;",
+        StringComparison.Ordinal)
+    && uiBridgeSource.Contains(
+        "Timeout = 5",
+        StringComparison.Ordinal)
+    && uiBridgeSource.Contains(
+        "&& _overlay!.Visible",
+        StringComparison.Ordinal)
+    && !uiBridgeSource.Contains(
+        "override void _Process",
+        StringComparison.Ordinal)
+    && !overlaySource.Contains(
+        "override void _Process",
+        StringComparison.Ordinal),
+    "Update checking or hidden UI refresh can add continuous host-side work.");
+Expect(
     uiBridgeSource.Contains(
         "cursors.Reparent(_layer!, keepGlobalTransform: true);",
         StringComparison.Ordinal)
@@ -3660,7 +3716,8 @@ Expect(
     && BankUiText.Get("open_account_forced_agree") ==
         "被迫同意并开户"
     && chineseOpening.Contains("当前 A0", StringComparison.Ordinal)
-    && chineseOpening.Contains("10% 复利", StringComparison.Ordinal)
+    && chineseOpening.Contains("5%", StringComparison.Ordinal)
+    && chineseOpening.Contains("每层最多 50G", StringComparison.Ordinal)
     && chineseOpening.Contains(
         "200 G / 900 G / 2,200 G",
         StringComparison.Ordinal)
@@ -3713,7 +3770,7 @@ Expect(
         "100G",
         StringComparison.Ordinal)
     && chineseSavingsRules.Contains(
-        "10G",
+        "5G",
         StringComparison.Ordinal)
     && chineseSavingsRules.Contains(
         "每个新地图层开始时",
@@ -3725,8 +3782,8 @@ Expect(
         "计入办卡累计",
         StringComparison.Ordinal)
     && BankUiText.Get("interest_turns") == "已发息层数"
-    && BankUiText.Get("savings_interest_notice", 10)
-        == "储蓄利息 +10 金币。"
+    && BankUiText.Get("savings_interest_notice", 10, 0, 5, 50)
+        == "TD储蓄利息：+10G\n当前进阶 A0：5%，本层最多 50G"
     && chineseCreditExample.Contains(
         "张三",
         StringComparison.Ordinal)
@@ -3989,8 +4046,8 @@ Expect(
         "map-floor end",
         StringComparison.OrdinalIgnoreCase)
     && BankUiText.Get("interest_turns") == "Floors paid"
-    && BankUiText.Get("savings_interest_notice", 10)
-        == "Savings interest +10 G."
+    && BankUiText.Get("savings_interest_notice", 10, 0, 5, 50)
+        == "TD savings interest: +10G\nAscension A0: 5%, up to 50G this floor"
     && englishCredit.Contains(
         "Only native-game gold and savings interest earned after opening",
         StringComparison.OrdinalIgnoreCase)

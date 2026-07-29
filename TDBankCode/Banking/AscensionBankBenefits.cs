@@ -16,8 +16,8 @@ public readonly record struct AscensionBankBenefits(
    int PoorDebtInterestBasisPoints,
    int MiddleClassDebtInterestBasisPoints,
    int TycoonDebtInterestBasisPoints,
-   int SavingsBonusBasisPoints,
-   int SavingsBonusCap,
+   int SavingsInterestBasisPoints,
+   int SavingsInterestCap,
    int KidneyHpCost,
    int KidneyGoldValue,
    int ButtHpCost,
@@ -52,7 +52,7 @@ public readonly record struct AscensionBankBenefits(
                 200,
                 3,
                 2199, 2499, 2799,
-                0, 0,
+                500, 50,
                 10, 200,
                 5, 50,
                 100, int.MaxValue),
@@ -63,7 +63,7 @@ public readonly record struct AscensionBankBenefits(
                 200,
                 3,
                 2199, 2499, 2799,
-                0, 0,
+                500, 50,
                 10, 200,
                 5, 50,
                 100, int.MaxValue),
@@ -74,7 +74,7 @@ public readonly record struct AscensionBankBenefits(
                 200,
                 3,
                 2199, 2499, 2799,
-                0, 0,
+                500, 50,
                 10, 200,
                 5, 50,
                 100, int.MaxValue),
@@ -85,7 +85,7 @@ public readonly record struct AscensionBankBenefits(
                 250,
                 6,
                 1599, 1899, 2199,
-                200, 20,
+                600, 60,
                 8, 300,
                 4, 80,
                 250, 6),
@@ -96,7 +96,7 @@ public readonly record struct AscensionBankBenefits(
                 250,
                 6,
                 1549, 1849, 2149,
-                250, 25,
+                600, 60,
                 8, 320,
                 4, 85,
                 300, 6),
@@ -107,7 +107,7 @@ public readonly record struct AscensionBankBenefits(
                 260,
                 7,
                 1499, 1799, 2099,
-                300, 30,
+                600, 60,
                 8, 340,
                 4, 90,
                 350, 5),
@@ -118,7 +118,7 @@ public readonly record struct AscensionBankBenefits(
                 270,
                 8,
                 1449, 1749, 2049,
-                350, 35,
+                700, 70,
                 7, 360,
                 4, 95,
                 400, 5),
@@ -129,7 +129,7 @@ public readonly record struct AscensionBankBenefits(
                 280,
                 9,
                 1399, 1699, 1999,
-                400, 40,
+                700, 70,
                 7, 380,
                 3, 100,
                 450, 5),
@@ -140,7 +140,7 @@ public readonly record struct AscensionBankBenefits(
                 290,
                 10,
                 1299, 1599, 1899,
-                450, 45,
+                700, 70,
                 6, 400,
                 3, 110,
                 500, 4),
@@ -151,7 +151,7 @@ public readonly record struct AscensionBankBenefits(
                 300,
                 11,
                 1199, 1499, 1799,
-                500, 50,
+                800, 80,
                 5, 450,
                 2, 125,
                 600, 4),
@@ -162,7 +162,7 @@ public readonly record struct AscensionBankBenefits(
                 300,
                 12,
                 999, 1299, 1599,
-                600, 60,
+                800, 80,
                 5, 500,
                 2, 150,
                 750, 3),
@@ -213,18 +213,18 @@ public readonly record struct AscensionBankBenefits(
         };
     }
 
-    public long CalculateSavingsBonus(long positiveBalance)
+    public long CalculateSavingsInterest(long positiveBalance)
     {
         if (positiveBalance <= 0
-            || SavingsBonusBasisPoints <= 0
-            || SavingsBonusCap <= 0)
+            || SavingsInterestBasisPoints <= 0
+            || SavingsInterestCap <= 0)
         {
             return 0;
         }
 
         decimal raw =
-            (decimal)positiveBalance * SavingsBonusBasisPoints / 10_000m;
-        return Math.Min(SavingsBonusCap, (long)decimal.Floor(raw));
+            (decimal)positiveBalance * SavingsInterestBasisPoints / 10_000m;
+        return Math.Min(SavingsInterestCap, (long)decimal.Floor(raw));
     }
 
     private static AscensionBankBenefits Create(
@@ -240,8 +240,8 @@ public readonly record struct AscensionBankBenefits(
         int poorInterestBasisPoints,
         int middleInterestBasisPoints,
         int tycoonInterestBasisPoints,
-        int savingsBonusBasisPoints,
-        int savingsBonusCap,
+        int savingsInterestBasisPoints,
+        int savingsInterestCap,
         int kidneyHpCost,
         int kidneyGoldValue,
         int buttHpCost,
@@ -261,8 +261,8 @@ public readonly record struct AscensionBankBenefits(
             poorInterestBasisPoints,
             middleInterestBasisPoints,
             tycoonInterestBasisPoints,
-            savingsBonusBasisPoints,
-            savingsBonusCap,
+            savingsInterestBasisPoints,
+            savingsInterestCap,
             kidneyHpCost,
             kidneyGoldValue,
             buttHpCost,

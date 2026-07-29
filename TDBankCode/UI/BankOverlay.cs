@@ -1287,35 +1287,23 @@ public sealed partial class BankOverlay : Control, IScreenContext
 
     private string SavingsOpeningTerms()
     {
-        return _snapshot.SavingsBonusRateBasisPoints > 0
-            && _snapshot.SavingsBonusCap > 0
-            ? BankUiText.Get(
-                "savings_opening_terms_bonus",
-                FlexibleInterestRate(_snapshot.SavingsBaseRateBasisPoints),
-                FlexibleInterestRate(_snapshot.SavingsBonusRateBasisPoints),
-                _snapshot.SavingsBonusCap)
-            : BankUiText.Get(
-                "savings_opening_terms_base",
-                FlexibleInterestRate(_snapshot.SavingsBaseRateBasisPoints));
+        return BankUiText.Get(
+            "savings_opening_terms",
+            _snapshot.AscensionLevel,
+            FlexibleInterestRate(
+                _snapshot.SavingsInterestRateBasisPoints),
+            _snapshot.SavingsInterestCap);
     }
 
     private string SavingsRules()
     {
-        long exampleInterest = EstimateSavingsInterest(100, 0);
-        return _snapshot.SavingsBonusRateBasisPoints > 0
-            && _snapshot.SavingsBonusCap > 0
-            ? BankUiText.Get(
-                "savings_rules_bonus",
-                _snapshot.AscensionLevel,
-                FlexibleInterestRate(_snapshot.SavingsBaseRateBasisPoints),
-                FlexibleInterestRate(_snapshot.SavingsBonusRateBasisPoints),
-                _snapshot.SavingsBonusCap,
-                exampleInterest)
-            : BankUiText.Get(
-                "savings_rules_base",
-                _snapshot.AscensionLevel,
-                FlexibleInterestRate(_snapshot.SavingsBaseRateBasisPoints),
-                exampleInterest);
+        return BankUiText.Get(
+            "savings_rules",
+            _snapshot.AscensionLevel,
+            FlexibleInterestRate(
+                _snapshot.SavingsInterestRateBasisPoints),
+            _snapshot.SavingsInterestCap,
+            EstimateSavingsInterest(100, 0));
     }
 
     private string CreditRules()
@@ -1391,29 +1379,15 @@ public sealed partial class BankOverlay : Control, IScreenContext
         long savingsBalance,
         int carriedTenths)
     {
-        decimal baseInterest =
+        decimal rawInterest =
             Math.Max(0L, savingsBalance)
-            * (decimal)Math.Max(0, _snapshot.SavingsBaseRateBasisPoints)
+            * (decimal)Math.Max(
+                0,
+                _snapshot.SavingsInterestRateBasisPoints)
             / 10_000m;
-
-
-        baseInterest += Math.Clamp(carriedTenths, 0, 9) / 10m;
-        long wholeBase = DecimalToLongFloor(baseInterest);
-
-        if (_snapshot.SavingsBonusRateBasisPoints <= 0
-            || _snapshot.SavingsBonusCap <= 0)
-        {
-            return wholeBase;
-        }
-
-        decimal rawBonus =
-            Math.Max(0L, savingsBalance)
-            * (decimal)_snapshot.SavingsBonusRateBasisPoints
-            / 10_000m;
-        long bonus = Math.Min(
-            DecimalToLongFloor(rawBonus),
-            _snapshot.SavingsBonusCap);
-        return SaturatingAdd(wholeBase, bonus);
+        return Math.Min(
+            DecimalToLongFloor(rawInterest),
+            Math.Max(0, _snapshot.SavingsInterestCap));
     }
 
     private static long CeilingInterest(long debt, int basisPoints)

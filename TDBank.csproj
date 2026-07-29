@@ -2,7 +2,7 @@
     <Import Project=".\Sts2PathDiscovery.props"/>
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
-        <Version>0.1</Version>
+        <Version>0.1.1</Version>
         <ImplicitUsings>true</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -15,7 +15,7 @@
     <PropertyGroup>
 
 
-        <NoWarn>$(NoWarn);MSB3270;STS002</NoWarn>
+        <NoWarn>$(NoWarn);MSB3270;STS002;NETSDK1023</NoWarn>
     </PropertyGroup>
 
     <ItemGroup Condition="Exists('$(Sts2DataDir)')" >
@@ -36,6 +36,9 @@
     <ItemGroup>
         <ProjectReference Include="TDLib\TDLib.csproj"
                           Private="false" />
+        <PackageReference Include="GodotSharpEditor"
+                          Version="4.5.1"
+                          PrivateAssets="All" />
         <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="All"/>
         <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.1.9" />
 

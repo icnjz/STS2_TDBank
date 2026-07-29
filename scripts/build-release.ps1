@@ -31,7 +31,7 @@ if ($releaseInfo.version -ne "v0.107.1")
 
 if ([string]::IsNullOrWhiteSpace($OutputDirectory))
 {
-    $OutputDirectory = Join-Path $repositoryRoot "artifacts\release-v0.1"
+    $OutputDirectory = Join-Path $repositoryRoot "artifacts\release-v0.1.1"
 }
 
 $releaseRoot = [System.IO.Path]::GetFullPath($OutputDirectory)

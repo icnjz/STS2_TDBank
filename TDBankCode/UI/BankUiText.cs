@@ -72,21 +72,15 @@ internal static class BankUiText
         ["kk_tab"] = ("KK园区缅甸总部", "KK Compound"),
         ["current_balance"] = ("当前余额", "Current balance"),
         ["total_earned"] = ("本局累计合资格金币", "Qualifying gold this run"),
-        ["savings_opening_terms_base"] = (
-            "每个新地图层开始时按余额发 {0}% 复利。",
-            "At the start of each new map floor, the balance earns {0}% compound interest."),
-        ["savings_opening_terms_bonus"] = (
-            "每个新地图层开始时按余额发 {0}% 复利，另加 {1}% 进阶补贴（每层补贴最多 {2}G）。",
-            "At the start of each new map floor, the balance earns {0}% compound interest plus an A-level bonus of {1}% (bonus capped at {2}G per floor)."),
+        ["savings_opening_terms"] = (
+            "每个新地图层开始时按当前进阶发放复利并向下取整。当前 A{0} 为 {1}%，每层最多 {2}G。",
+            "At the start of each new map floor, compound interest is paid for the current Ascension and rounded down. Current A{0}: {1}%, up to {2}G per floor."),
         ["savings_blurb"] = (
             "每个新地图层开始时结算一次；不是战斗回合。",
             "Settles once at the start of each new map floor, not per combat turn."),
-        ["savings_rules_base"] = (
-            "当前 A{0}：每个新地图层开始时按余额发 {1}% 复利。例：带着 100G 进入下层时预计获得 {2}G。利息加入余额，之后继续生利息；有欠款时先自动还债，储蓄利息仍计入办卡累计。",
-            "Current A{0}: at the start of each new map floor, the balance earns {1}% compound interest. Example: entering the next floor with 100G is estimated to pay {2}G. Interest joins the balance and compounds later; active debt is repaid first, and savings interest still counts toward card qualification."),
-        ["savings_rules_bonus"] = (
-            "当前 A{0}：每个新地图层开始时先按余额发 {1}% 复利，再发 {2}% 进阶舒适补贴；补贴每层最多 {3}G。例：带着 100G 进入下层时预计共获得 {4}G。利息加入余额继续生利息；有欠款时先自动还债，全部储蓄利息都计入办卡累计。",
-            "Current A{0}: at the start of each new map floor, the balance earns {1}% compound interest plus an A-level comfort bonus of {2}%, capped at {3}G per floor. Example: entering the next floor with 100G is estimated to pay {4}G. Interest joins the balance and compounds; active debt is repaid first, and all savings interest counts toward card qualification."),
+        ["savings_rules"] = (
+            "每个新地图层开始时按当前进阶发放复利，向下取整。A0–A2：5%，每层最多 50G；A3–A5：6%，每层最多 60G；A6–A8：7%，每层最多 70G；A9–A10：8%，每层最多 80G。\n当前 A{0}：{1}%，每层最多 {2}G。例：带着 100G 进入下层时预计获得 {3}G。利息加入余额继续计息；有信用卡欠款时优先自动还债，实际发放的利息计入办卡累计。",
+            "At the start of each new map floor, compound interest is paid for the current Ascension and rounded down. A0–A2: 5%, up to 50G per floor; A3–A5: 6%, up to 60G; A6–A8: 7%, up to 70G; A9–A10: 8%, up to 80G.\nCurrent A{0}: {1}%, up to {2}G per floor. Example: entering the next floor with 100G is estimated to pay {3}G. Interest joins the balance and compounds later; active credit debt is repaid first, and interest actually paid counts toward card qualification."),
         ["principal"] = ("计息本金", "Interest principal"),
         ["interest_earned"] = ("已获得利息（累计）", "Interest earned (cumulative)"),
         ["interest_turns"] = ("已发息层数", "Floors paid"),
@@ -223,6 +217,11 @@ internal static class BankUiText
         ["status_ready"] = ("安全连接：大概吧。", "Secure connection: probably."),
         ["notification_error_title"] = ("业务出问题辣！", "Transaction problem!"),
         ["notification_dismiss"] = ("知道了", "Got it"),
+        ["update_available_title"] = ("TD Bank 有新版本", "TD Bank update available"),
+        ["update_available"] = (
+            "当前版本 v{0}，最新版本 {1}。使用 Setup 安装的玩家请下载最新版并直接覆盖安装；存档和银行数据会保留。",
+            "Installed version: v{0}. Latest version: {1}. Setup users should download the latest Setup and install it over this version; saves and bank data are preserved."),
+        ["download_update"] = ("下载最新版 Setup", "Download latest Setup"),
         ["account"] = ("账户", "Account"),
         ["gold"] = ("金币", "gold"),
         ["debt"] = ("欠款", "debt"),
@@ -235,8 +234,8 @@ internal static class BankUiText
             "先把手里的药水或目标选择处理完，再来找 TD。",
             "Finish the potion or target selection before opening TD."),
         ["savings_interest_notice"] = (
-            "储蓄利息 +{0} 金币。",
-            "Savings interest +{0} G."),
+            "TD储蓄利息：+{0}G\n当前进阶 A{1}：{2}%，本层最多 {3}G",
+            "TD savings interest: +{0}G\nAscension A{1}: {2}%, up to {3}G this floor"),
         ["account_opened"] = (
             "开户成功。欢迎来到 TD，财务问题现在正式生效。",
             "Account opened. Welcome to TD; your financial problems are now official."),
