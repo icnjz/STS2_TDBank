@@ -357,7 +357,8 @@ public static class KkCompoundService
         }
 
         int nextSaleOrdinal = checked(completedSales + 1);
-        ulong seed = player.RunState.Rng.Seed;
+        ulong seed = GameApiCompatibility.GetRunSeed(
+            player.RunState.Rng);
         int slot = player.RunState.GetPlayerSlotIndex(player);
 
         Rng rng = GameApiCompatibility.CreateRng(

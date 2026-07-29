@@ -25,6 +25,37 @@ Assembly tdBank = Assembly.LoadFrom(tdBankPath);
 _ = tdLib.GetTypes();
 _ = tdBank.GetTypes();
 
+Type compatibilityType = tdBank.GetType(
+    "TDBank.TDBankCode.Compatibility.GameApiCompatibility",
+    throwOnError: true)!;
+MethodInfo getRunSeed = compatibilityType.GetMethod(
+    "GetRunSeed",
+    BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+    ?? throw new MissingMethodException(
+        compatibilityType.FullName,
+        "GetRunSeed");
+var runtimeRngSet =
+    new MegaCrit.Sts2.Core.Runs.RunRngSet(
+        "td-bank-binary-compatibility");
+object runtimeSeedValue =
+    runtimeRngSet.GetType().GetProperty("Seed")!.GetValue(runtimeRngSet)
+    ?? throw new InvalidOperationException("Runtime RNG seed is missing.");
+ulong expectedRunSeed = runtimeSeedValue switch
+{
+    ulong seed64 => seed64,
+    uint seed32 => seed32,
+    _ => throw new InvalidOperationException(
+        $"Unsupported runtime seed type {runtimeSeedValue.GetType()}."),
+};
+ulong compatibleRunSeed = Convert.ToUInt64(
+    getRunSeed.Invoke(null, [runtimeRngSet]));
+if (compatibleRunSeed != expectedRunSeed)
+{
+    throw new InvalidOperationException(
+        $"Run seed compatibility returned {compatibleRunSeed}, "
+        + $"expected {expectedRunSeed}.");
+}
+
 AssemblyName[] references = tdBank.GetReferencedAssemblies();
 if (!references.Any(reference => reference.Name == "TDLib")
     || references.Any(reference => reference.Name == "BaseLib"))

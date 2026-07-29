@@ -1,5 +1,6 @@
 using System.Reflection;
 using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Managers;
 
 namespace TDBank.TDBankCode.Compatibility;
@@ -19,6 +20,13 @@ internal static class GameApiCompatibility
             binder: null,
             [typeof(uint), typeof(string)],
             modifiers: null);
+
+    private static readonly PropertyInfo? RunSeedProperty =
+        typeof(RunRngSet).GetProperty(
+            "Seed",
+            BindingFlags.Instance
+            | BindingFlags.Public
+            | BindingFlags.NonPublic);
 
     public static bool Uses64BitRng =>
         Rng64StringConstructor is not null;
@@ -43,6 +51,20 @@ internal static class GameApiCompatibility
         throw new MissingMethodException(
             typeof(Rng).FullName,
             ".ctor(UInt64|UInt32, String)");
+    }
+
+    public static ulong GetRunSeed(RunRngSet rngSet)
+    {
+        ArgumentNullException.ThrowIfNull(rngSet);
+        object? value = RunSeedProperty?.GetValue(rngSet);
+        return value switch
+        {
+            ulong seed64 => seed64,
+            uint seed32 => seed32,
+            _ => throw new MissingMemberException(
+                typeof(RunRngSet).FullName,
+                "Seed"),
+        };
     }
 
     public static string GetProgressPathForProfile(

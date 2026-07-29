@@ -101,7 +101,7 @@ public static class CreditCeilingRelicLiquidationService
         }
 
         Rng rng = GameApiCompatibility.CreateRng(
-            runState.Rng.Seed,
+            GameApiCompatibility.GetRunSeed(runState.Rng),
             $"td_bank_credit_ceiling_liquidation_v1_act_{runState.CurrentActIndex}"
             + $"_floor_{runState.TotalFloor}"
             + $"_slot_{runState.GetPlayerSlotIndex(player)}");
