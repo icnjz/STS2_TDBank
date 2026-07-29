@@ -208,6 +208,9 @@ internal static class BankUiText
             "第 {0} 次卖屁股：-{1} HP / +{2}G",
             "Butt sale #{0}: -{1} HP / +{2}G"),
         ["butt_fatal"] = ("再卖就暴毙了。客户死了影响园区复购率。", "One more sale would kill you. Dead customers hurt repeat business."),
+        ["organ_sales_combat_disabled"] = (
+            "战斗中暂停器官交易。打完再卖，园区不收带战斗特效的货。",
+            "Organ sales are disabled during combat. Finish the fight before selling."),
         ["butt_repeat_page_warning"] = (
             "怎么又是你，小心老了被护工骂。",
             "You again? Be careful or your caregiver will scold you when you're old."),

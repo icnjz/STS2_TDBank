@@ -75,7 +75,7 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
 
 
 
-    internal const int ProtocolMagic = 0x54444238;
+    internal const int ProtocolMagic = 0x54444239;
 
     public BankOperationKind Kind;
     public CreditTier Tier;
@@ -271,6 +271,13 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
         {
             return (false, GameActionType.Any);
         }
+        if (IsOrganSale(operationKind)
+            && (requestedType != GameActionType.NonCombat
+                || hostCombatState
+                    != ActionSynchronizerCombatState.NotInCombat))
+        {
+            return (false, GameActionType.Any);
+        }
 
         if (peerType != NetGameType.Host)
         {
@@ -304,6 +311,11 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
             or BankOperationKind.SellKidneys
             or BankOperationKind.SellButt;
     }
+
+    internal static bool IsOrganSale(BankOperationKind kind)
+        => kind is
+            BankOperationKind.SellKidneys
+            or BankOperationKind.SellButt;
 }
 
 public sealed class TDBankOperationGameAction : GameAction
@@ -733,7 +745,8 @@ public static class BankNetwork
             return;
         }
 
-        if (!TryGetExecutionType(out GameActionType executionType))
+        if (!TryGetNonCombatExecutionType(
+                out GameActionType executionType))
         {
             return;
         }
@@ -753,7 +766,8 @@ public static class BankNetwork
             return;
         }
 
-        if (!TryGetExecutionType(out GameActionType executionType))
+        if (!TryGetNonCombatExecutionType(
+                out GameActionType executionType))
         {
             return;
         }
@@ -978,6 +992,22 @@ public static class BankNetwork
 
         SafeNotify("error_unavailable_timing", isError: true);
         return false;
+    }
+
+    private static bool TryGetNonCombatExecutionType(
+        out GameActionType executionType)
+    {
+        if (FloorTransitionGate.IsActive
+            || RunManager.Instance.ActionQueueSynchronizer.CombatState
+                != ActionSynchronizerCombatState.NotInCombat)
+        {
+            executionType = GameActionType.None;
+            SafeNotify("error_unavailable_timing", isError: true);
+            return false;
+        }
+
+        executionType = GameActionType.NonCombat;
+        return true;
     }
 
     private static void SafeNotify(string key, bool isError)

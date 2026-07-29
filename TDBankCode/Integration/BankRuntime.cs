@@ -1,6 +1,7 @@
 using System.Globalization;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Gold;
+using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs;
@@ -389,6 +390,10 @@ public static class BankRuntime
             KidneyGoldValue = benefits.KidneyGoldValue,
             ButtHpCost = benefits.ButtHpCost,
             ButtGoldValue = benefits.ButtGoldValue,
+            AreOrganSalesAvailable =
+                !FloorTransitionGate.IsActive
+                && RunManager.Instance.ActionQueueSynchronizer.CombatState
+                    == ActionSynchronizerCombatState.NotInCombat,
             Teammates = teammates,
         };
     }

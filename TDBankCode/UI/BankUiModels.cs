@@ -81,6 +81,7 @@ public sealed record BankUiSnapshot
     public int KidneyGoldValue { get; init; } = 200;
     public int ButtHpCost { get; init; } = 5;
     public int ButtGoldValue { get; init; } = 50;
+    public bool AreOrganSalesAvailable { get; init; } = true;
 
     public bool IsBankingAvailable { get; init; } = true;
     public string? UnavailableReason { get; init; }

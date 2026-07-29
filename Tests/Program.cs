@@ -2908,16 +2908,16 @@ var wireWriter = new PacketWriter();
 operationPayloads[3].Serialize(wireWriter);
 Expect(
     wireWriter.BytePosition == 45,
-    $"TDB8 request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
+    $"TDB9 request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
 var wireReader = new PacketReader();
 wireReader.Reset(wireWriter.Buffer);
 _ = wireReader.ReadInt();
 _ = wireReader.ReadInt();
 Expect(
     wireReader.ReadInt() == TDBankNetOperationAction.ProtocolMagic
-    && TDBankNetOperationAction.ProtocolMagic == 0x54444238
+    && TDBankNetOperationAction.ProtocolMagic == 0x54444239
     && wireReader.ReadInt() == BankNetwork.CurrentLifecycleEpoch,
-    "The operation packet does not carry TDB8 and the lifecycle epoch.");
+    "The operation packet does not carry TDB9 and the lifecycle epoch.");
 
 Player threePeerHost = OpenAscensionPlayer(
     0,
@@ -3061,6 +3061,34 @@ Expect(
     && BankService.GetSnapshot(actionOwner)
         == beforeRejectedAction,
     "A host-rejected operation was not a mutation-free Any no-op.");
+
+(bool Authorized, GameActionType ExecutionType) combatButtRejection =
+    TDBankNetOperationAction.ResolveAuthorizationForPeer(
+        NetGameType.Host,
+        ActionSynchronizerCombatState.PlayPhase,
+        BankOperationKind.SellButt,
+        GameActionType.CombatPlayPhaseOnly,
+        payloadAuthorization: true);
+(bool Authorized, GameActionType ExecutionType) combatKidneyRejection =
+    TDBankNetOperationAction.ResolveAuthorizationForPeer(
+        NetGameType.Client,
+        ActionSynchronizerCombatState.PlayPhase,
+        BankOperationKind.SellKidneys,
+        GameActionType.CombatPlayPhaseOnly,
+        payloadAuthorization: true);
+(bool Authorized, GameActionType ExecutionType) mapButtAuthorization =
+    TDBankNetOperationAction.ResolveAuthorizationForPeer(
+        NetGameType.Host,
+        ActionSynchronizerCombatState.NotInCombat,
+        BankOperationKind.SellButt,
+        GameActionType.NonCombat,
+        payloadAuthorization: true);
+Expect(
+    combatButtRejection == (false, GameActionType.Any)
+    && combatKidneyRejection == (false, GameActionType.Any)
+    && mapButtAuthorization
+        == (true, GameActionType.NonCombat),
+    "Organ sales were not rejected during combat or allowed outside it.");
 
 BankOperationKind unknownKind = (BankOperationKind)999;
 (bool Authorized, GameActionType ExecutionType) unknownAuthorization =

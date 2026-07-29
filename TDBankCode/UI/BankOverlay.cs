@@ -1137,6 +1137,10 @@ public sealed partial class BankOverlay : Control, IScreenContext
         var sellKidney = new Button
         {
             Text = BankUiText.Get("sell_kidney_button", 0),
+            Disabled = !_snapshot.AreOrganSalesAvailable,
+            TooltipText = _snapshot.AreOrganSalesAvailable
+                ? string.Empty
+                : BankUiText.Get("organ_sales_combat_disabled"),
         };
         BankUiTheme.ApplyPrimaryButton(sellKidney);
         quantity.Input.TextChanged += text =>
@@ -1234,6 +1238,10 @@ public sealed partial class BankOverlay : Control, IScreenContext
                     _snapshot.ButtHpCost,
                     _snapshot.ButtGoldValue),
             CustomMinimumSize = new Vector2(0, 58),
+            Disabled = !_snapshot.AreOrganSalesAvailable,
+            TooltipText = _snapshot.AreOrganSalesAvailable
+                ? string.Empty
+                : BankUiText.Get("organ_sales_combat_disabled"),
         };
         BankUiTheme.ApplyPrimaryButton(sellButt);
         sellButt.Pressed += () =>
