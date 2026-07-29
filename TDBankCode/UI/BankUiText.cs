@@ -43,12 +43,12 @@ internal static class BankUiText
         ["opening_rules"] = (
             "开户规则（当前 A{0}）\n\n" +
             "1. 储蓄：{1}\n" +
-            "2. 信用卡：开户后办卡累计从 0G 开始，三档资格为 {2}；额度为 {3}；最大欠款为 {4}。整局第一次欠款免息 {5} 层，此后按三档每层 {6} 复利并向上取整。商店和原生付费事件可自动刷卡；游戏事件损失金币不会制造债务。所有金币入账先还债。刷爆即扣清欠款、永久停卡，并且{7}\n" +
+            "2. 信用卡：开户后办卡累计从 0G 开始，三档资格为 {2}；额度为 {3}；最大欠款为 {4}。整局第一次欠款免息 {5} 层，此后按三档每层 {6} 复利并向上取整。商店和原生付费事件可自动刷卡；游戏事件损失金币不会制造债务。所有金币入账先还债。刷爆时先扣光现有正金币，剩余欠款由抄家结清，金币不会变负，永久停卡，并且{7}\n" +
             "3. e-Transfer 可给已开户队友转账；到账先还收款人的债，不累计办卡资格。\n" +
             "4. KK 园区：每份肾 -{8} 当前及最大生命换 {9}G；卖屁股标价为每次 -{10} 当前生命，前三次 {11}G、第 4 次起 {12}G。园区收入不累计办卡资格。",
             "Account rules (current A{0})\n\n" +
             "1. Savings: {1}\n" +
-            "2. Credit: qualification starts at 0G after opening. Tier requirements are {2}; limits are {3}; maximum debts are {4}. The run's first debt gets {5} interest-free floors, then compounds by tier at {6} per completed floor, rounded up. Merchants and native paid events can charge the card automatically; gold lost to game events cannot create debt. Every deposit pays debt first. Maxing out collects the debt, closes the card forever, and {7}\n" +
+            "2. Credit: qualification starts at 0G after opening. Tier requirements are {2}; limits are {3}; maximum debts are {4}. The run's first debt gets {5} interest-free floors, then compounds by tier at {6} per completed floor, rounded up. Merchants and native paid events can charge the card automatically; gold lost to game events cannot create debt. Every deposit pays debt first. Maxing out takes all positive gold, settles the rest through foreclosure without making gold negative, closes the card forever, and {7}\n" +
             "3. e-Transfer sends gold to teammates with accounts. It repays their debt first and never counts toward qualification.\n" +
             "4. KK Compound: each kidney costs {8} current and maximum HP for {9}G. Butt sales are listed at {10} current HP for {11}G for the first three, then {12}G from sale four onward. KK proceeds never count toward qualification."),
         ["opening_credit_example"] = (
@@ -118,13 +118,13 @@ internal static class BankUiText
             "• 整局第一次欠款免息 {4} 个完成层；之后三档每层复利为 {5}，每次向上取整。还清再欠没有第二次免息。\n" +
             "• 余额不足时，商店和原生付费事件自动刷卡；游戏事件损失金币不会制造债务。所有金币入账先自动还债，没有手动还款。\n" +
             "• 只有开户后的原生游戏金币和储蓄利息累计办卡资格；e-Transfer、KK 园区和信用垫款不算。\n" +
-            "• 刷到所持卡最大欠款即扣清欠款、金币可变负、永久停卡；随后{6}",
+            "• 刷到所持卡最大欠款时先扣光现有正金币，剩余欠款由抄家结清，金币不会变负，信用卡永久停用；随后{6}",
             "Credit rules (current A{0})\n" +
             "• Tier requirements: {1}; limits: {2}; maximum debts: {3}.\n" +
             "• The run's first debt gets {4} completed floors interest-free. After that, tier rates are {5} per floor, compounded and rounded up. Paying it off and borrowing again grants no second grace period.\n" +
             "• If savings are short, merchants and native paid events charge the card automatically. Gold lost to game events cannot create debt. Every deposit repays debt first; there is no manual payment.\n" +
             "• Only native-game gold and savings interest earned after opening count toward qualification; e-Transfer, KK, and credit advances do not.\n" +
-            "• Reaching the active card's maximum debt collects it in full, may push gold negative, closes the card forever, then {6}"),
+            "• Reaching the active card's maximum debt first takes all positive gold; foreclosure settles the rest without making gold negative, and the card closes forever; then {6}"),
         ["credit_interest_example"] = (
             "张三本局第一次欠 100G：前 {0} 个完成层利息为 0。第 {1} 层结束，最低卡按 {2}% 向上取整收 {3}G，欠款变 {4}G；下一层再收 {5}G。TD 的计算器只朝自己有利的方向取整。",
             "Zhang San's first debt is 100G: the first {0} completed floors add 0 interest. At floor {1}'s end, the starter card charges {2}%, rounded up to {3}G, making {4}G debt; the next floor adds {5}G. TD only rounds in TD's favor."),
@@ -136,8 +136,8 @@ internal static class BankUiText
             "你破产了，你的蚂蚁信用分现在连共享单车都扫不起还想用信用卡？",
             "You're bankrupt. Your Sesame Credit score cannot even unlock a shared bike, and you still want a credit card?"),
         ["credit_closed_cap"] = (
-            "你把信用卡刷爆了，TD 决定清算你全部财产并且抄了你的家。TD 已扣清欠款（金币可以变负）并永久停卡；当前 A{0} 的抄家规则为：{1}你的蚂蚁信用分现在连共享单车都扫不起，还想用信用卡？",
-            "You maxed out the card, so TD liquidated your assets and raided your home. TD collected the debt—even below zero gold—and closed the card forever. Current A{0} seizure terms: {1} Your Sesame Credit score cannot unlock a shared bike, and you still want credit?"),
+            "你把信用卡刷爆了，TD 决定清算你全部财产并且抄了你的家。TD 先扣光现有正金币，剩余欠款由抄家结清，金币不会变负，信用卡永久停用；当前 A{0} 的抄家规则为：{1}你的蚂蚁信用分现在连共享单车都扫不起，还想用信用卡？",
+            "You maxed out the card, so TD liquidated your assets and raided your home. TD first takes all positive gold; foreclosure settles the rest without making gold negative, and the card closes forever. Current A{0} seizure terms: {1} Your Sesame Credit score cannot unlock a shared bike, and you still want credit?"),
         ["apply_title"] = ("选择您的财务困境", "Choose your financial predicament"),
         ["apply_disclaimer"] = ("点击申请即代表您已阅读并无条件同意8600页霸王条款。", "By applying, you confirm that you read and unconditionally accept all 8,600 pages of take-it-or-leave-it terms."),
         ["apply"] = ("申请", "Apply"),
@@ -243,12 +243,27 @@ internal static class BankUiText
         ["debt_interest_notice"] = (
             "免息期结束：信用欠款复利 +{0}G，每次都向上取整。感谢您选择负债。",
             "Grace period over: credit debt compounded by +{0}G, always rounded up. Thank you for choosing debt."),
+        ["credit_ceiling_warning_title"] = (
+            "TD短信",
+            "TD SMS"),
+        ["credit_ceiling_warning_message"] = (
+            "温馨提醒您下回合不还钱就要抄家了（扣除 {0} 件圣遗物）！",
+            "Friendly reminder: repay before the next floor or TD will seize your property ({0} relics)."),
         ["debt_grace_notice"] = (
             "整局唯一一次免息期仍在生效，还剩 {0} 个完成层不收利息；还清再欠没有第二次。",
             "The run's only interest-free period is active: {0} completed floor(s) remain. Paying it off and borrowing again grants no second grace period."),
         ["credit_ceiling_closed_notice"] = (
-            "欠款碰到本卡上限：TD 已全额扣走 {0}G，金币可以变负，信用卡永久停用；随后按当前进阶条款随机没收圣遗物。",
-            "Debt reached this card's ceiling: TD collected {0}G in full, gold may go negative, and the card is permanently closed; relics are then randomly seized under the current Ascension terms."),
+            "欠款碰到本卡上限：TD 开始清算 {0}G，先扣光现有正金币，剩余欠款由抄家结清；金币不会变负，信用卡永久停用。",
+            "Debt reached this card's ceiling: TD began settling {0}G, taking positive gold first and clearing the rest through foreclosure. Gold will not go negative, and the card is permanently closed."),
+        ["credit_liquidation_title"] = (
+            "TD 抄家清算单",
+            "TD Foreclosure Statement"),
+        ["credit_liquidation_result"] = (
+            "剩余欠款 {0}G 已结清。按当前进阶应没收 {1} 件圣遗物，实际没收 {2} 件。没得扣也算清算完成；当前金币不会低于 0，信用卡永久停用。",
+            "The remaining {0}G debt is settled. Current Ascension terms requested {1} relic(s); TD actually seized {2}. If nothing eligible remains, settlement still completes. Gold will not fall below 0, and the card is permanently closed."),
+        ["legacy_foreclosure_repaired"] = (
+            "TD 已纠正旧版抄家重复扣款：返还 {0}G，当前金币恢复为 0。",
+            "TD corrected a legacy double-charge from foreclosure: {0}G was restored and current gold was reset to 0."),
         ["kidney_sale_complete"] = (
             "成功卖肾 {0} 个，共获得 {1}G：{2}G 自动还债，{3}G 进入余额。身体少了，财务问题不一定少。",
             "Sold {0} kidney(s) for {1}G total: {2}G repaid debt and {3}G entered the balance. Less body; not necessarily fewer financial problems."),

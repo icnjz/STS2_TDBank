@@ -87,11 +87,11 @@ public static class BankService
     public const int TycoonDebtInterestBasisPoints = 2799;
     public const int MaximumDebtLimitMultiplier = 2;
 
-    public const int PoorQualification = 400;
-    public const int MiddleClassQualification = 3000;
-    public const int TycoonQualification = 10000;
+    public const int PoorQualification = 200;
+    public const int MiddleClassQualification = 900;
+    public const int TycoonQualification = 2200;
 
-    public const int PoorCreditLimit = 400;
+    public const int PoorCreditLimit = 200;
     public const int MiddleClassCreditLimit = 1000;
     public const int TycoonCreditLimit = 2000;
 
@@ -1165,8 +1165,7 @@ public static class BankService
             bool closesAtCeiling = fromCredit > 0
                 && newDebt
                     == GetMaximumDebt(player, GetStoredTier(state));
-            long finalGold = (long)player.Gold - fromSavings
-                - (closesAtCeiling ? newDebt : 0L);
+            long finalGold = (long)player.Gold - fromSavings;
             if (finalGold is > int.MaxValue or < int.MinValue)
             {
                 return BankOperationResult.Fail(
@@ -1386,6 +1385,28 @@ public static class BankService
         {
             return BankStateStore.Get(player)
                 .PendingRelicLiquidationDebt;
+        }
+    }
+
+    public static BankOperationResult RepairLegacyNegativeForeclosureBalance(
+        Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        lock (Gate)
+        {
+            AccountState state = BankStateStore.Get(player);
+            if (state.CreditPermanentlyClosed == 0 || player.Gold >= 0)
+            {
+                return BankOperationResult.Ok();
+            }
+
+            int restored = player.Gold == int.MinValue
+                ? int.MaxValue
+                : -player.Gold;
+            player.Gold = 0;
+            ReconcileSavingsComponentsLocked(player, state);
+            BumpRevision(state);
+            return BankOperationResult.Ok(restored);
         }
     }
 
@@ -1739,16 +1760,11 @@ public static class BankService
             return BankOperationResult.Ok();
         }
 
-        long newGold = (long)player.Gold - debtToCollect;
-        if (newGold is > int.MaxValue or < int.MinValue)
-        {
-            return BankOperationResult.Fail(
-                BankErrorCode.ArithmeticOverflow);
-        }
-
-        int positiveCollected =
-            PositiveBalanceDecrease(player.Gold, newGold);
-        player.Gold = (int)newGold;
+        int positiveCollected = Math.Min(
+            Math.Max(0, player.Gold),
+            debtToCollect);
+        player.Gold -= positiveCollected;
+        int debtSettledByRelics = debtToCollect - positiveCollected;
         ConsumeSavingsLocked(state, positiveCollected);
         state.CreditDebt = 0;
         state.CreditTier = (int)CreditTier.None;
@@ -1756,9 +1772,10 @@ public static class BankService
         state.CreditCeilingPending = 0;
         state.DebtCycleFloors = 0;
         state.DebtGraceUsed = 1;
-        state.PendingRelicLiquidationDebt = debtToCollect;
+        state.PendingRelicLiquidationDebt = debtSettledByRelics;
 
         return BankOperationResult.Ok(
+            positiveCollected,
             secondaryAmount: debtToCollect);
     }
 

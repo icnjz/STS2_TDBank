@@ -45,10 +45,32 @@ public readonly record struct AscensionBankBenefits(
         int level = Math.Clamp(ascensionLevel, 0, 10);
         return level switch
         {
-            <= 2 => Create(
+            0 => Create(
                 level,
-                400, 3000, 10000,
-                400, 1000, 2000,
+                200, 900, 2200,
+                200, 1000, 2000,
+                200,
+                3,
+                2199, 2499, 2799,
+                0, 0,
+                10, 200,
+                5, 50,
+                100, int.MaxValue),
+            1 => Create(
+                level,
+                175, 850, 2100,
+                225, 1050, 2100,
+                200,
+                3,
+                2199, 2499, 2799,
+                0, 0,
+                10, 200,
+                5, 50,
+                100, int.MaxValue),
+            2 => Create(
+                level,
+                150, 800, 2000,
+                250, 1100, 2200,
                 200,
                 3,
                 2199, 2499, 2799,
@@ -58,8 +80,8 @@ public readonly record struct AscensionBankBenefits(
                 100, int.MaxValue),
             3 => Create(
                 level,
-                0, 2700, 9000,
-                600, 1500, 3000,
+                0, 750, 1900,
+                300, 1200, 2400,
                 250,
                 6,
                 1599, 1899, 2199,
@@ -69,8 +91,8 @@ public readonly record struct AscensionBankBenefits(
                 250, 6),
             4 => Create(
                 level,
-                0, 2400, 8000,
-                650, 1600, 3200,
+                0, 700, 1750,
+                325, 1300, 2600,
                 250,
                 6,
                 1549, 1849, 2149,
@@ -80,8 +102,8 @@ public readonly record struct AscensionBankBenefits(
                 300, 6),
             5 => Create(
                 level,
-                0, 2100, 7000,
-                700, 1750, 3500,
+                0, 650, 1600,
+                350, 1400, 2800,
                 260,
                 7,
                 1499, 1799, 2099,
@@ -91,8 +113,8 @@ public readonly record struct AscensionBankBenefits(
                 350, 5),
             6 => Create(
                 level,
-                0, 1800, 6000,
-                750, 1900, 3800,
+                0, 600, 1450,
+                375, 1500, 3000,
                 270,
                 8,
                 1449, 1749, 2049,
@@ -102,8 +124,8 @@ public readonly record struct AscensionBankBenefits(
                 400, 5),
             7 => Create(
                 level,
-                0, 1500, 5000,
-                800, 2000, 4000,
+                0, 550, 1300,
+                400, 1600, 3200,
                 280,
                 9,
                 1399, 1699, 1999,
@@ -113,8 +135,8 @@ public readonly record struct AscensionBankBenefits(
                 450, 5),
             8 => Create(
                 level,
-                0, 1250, 4000,
-                900, 2250, 4500,
+                0, 500, 1150,
+                450, 1750, 3500,
                 290,
                 10,
                 1299, 1599, 1899,
@@ -124,8 +146,8 @@ public readonly record struct AscensionBankBenefits(
                 500, 4),
             9 => Create(
                 level,
-                0, 1000, 3200,
-                1000, 2500, 5000,
+                0, 450, 1000,
+                500, 1900, 3800,
                 300,
                 11,
                 1199, 1499, 1799,
@@ -135,8 +157,8 @@ public readonly record struct AscensionBankBenefits(
                 600, 4),
             _ => Create(
                 level,
-                0, 800, 2500,
-                1200, 3000, 6000,
+                0, 400, 850,
+                600, 2200, 4400,
                 300,
                 12,
                 999, 1299, 1599,

@@ -47,9 +47,9 @@ public sealed record BankUiSnapshot
     public IReadOnlyList<BankCreditOffer> CreditOffers { get; init; } =
    new BankCreditOffer[]
    {
-            new(BankCreditTier.Starter, 400, 400, 800, 2_199),
-            new(BankCreditTier.MiddleClass, 3_000, 1_000, 2_000, 2_499),
-            new(BankCreditTier.NouveauRiche, 10_000, 2_000, 4_000, 2_799),
+            new(BankCreditTier.Starter, 200, 200, 400, 2_199),
+            new(BankCreditTier.MiddleClass, 900, 1_000, 2_000, 2_499),
+            new(BankCreditTier.NouveauRiche, 2_200, 2_000, 4_000, 2_799),
    };
 
     public long CreditLimit { get; init; }

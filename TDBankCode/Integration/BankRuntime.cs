@@ -14,6 +14,9 @@ namespace TDBank.TDBankCode.Integration;
 public static class BankRuntime
 {
     private static int _initialized;
+    private static readonly object WarningGate = new();
+    private static readonly Dictionary<ulong, (int Debt, int Floor, int Relics)>
+        LastCeilingWarnings = new();
 
     public static void Initialize()
     {
@@ -38,6 +41,10 @@ public static class BankRuntime
     {
         BankNetwork.ResetRunState();
         FloorTransitionGate.Reset();
+        lock (WarningGate)
+        {
+            LastCeilingWarnings.Clear();
+        }
 
         foreach (Player player in runState.Players)
         {
@@ -62,11 +69,20 @@ public static class BankRuntime
                         $"Could not initialize qualification for player {player.NetId}: {result.Error}");
                 }
 
+                BankOperationResult legacyRepair =
+                    BankService.RepairLegacyNegativeForeclosureBalance(
+                        player);
+                if (legacyRepair.Amount > 0
+                    && LocalContext.NetId == player.NetId)
+                {
+                    SafeNotify(
+                        "legacy_foreclosure_repaired",
+                        isError: false,
+                        legacyRepair.Amount);
+                }
+
                 CreditCeilingRelicLiquidationResult recoveredLiquidation =
-                    CreditCeilingRelicLiquidationService
-                        .LiquidatePendingCreditCeiling(
-                            player,
-                            runState);
+                    LiquidateAndNotify(player, runState);
                 if (recoveredLiquidation.DebtCleared > 0)
                 {
                     SafeLogWarning(
@@ -136,6 +152,14 @@ public static class BankRuntime
             if (LocalContext.NetId == player.NetId)
             {
                 SafeRefresh();
+                RunState? warningRun =
+                    RunManager.Instance.DebugOnlyGetState();
+                if (warningRun is not null)
+                {
+                    MaybeWarnNextFloorLiquidation(
+                        player,
+                        warningRun);
+                }
             }
         }
         catch (Exception exception)
@@ -172,10 +196,7 @@ public static class BankRuntime
                 if (activeRun is not null
                     && activeRun.Players.Contains(player))
                 {
-                    _ = CreditCeilingRelicLiquidationService
-                        .LiquidatePendingCreditCeiling(
-                            player,
-                            activeRun);
+                    _ = LiquidateAndNotify(player, activeRun);
                 }
             }
 
@@ -188,6 +209,14 @@ public static class BankRuntime
                         "credit_ceiling_closed_notice",
                         isError: true,
                         result.SecondaryAmount);
+                }
+                RunState? warningRun =
+                    RunManager.Instance.DebugOnlyGetState();
+                if (warningRun is not null)
+                {
+                    MaybeWarnNextFloorLiquidation(
+                        player,
+                        warningRun);
                 }
             }
         }
@@ -246,11 +275,9 @@ public static class BankRuntime
                 }
                 if (result.SecondaryAmount > 0)
                 {
-                    _ = CreditCeilingRelicLiquidationService
-                        .LiquidatePendingCreditCeiling(
-                            player,
-                            runState);
+                    _ = LiquidateAndNotify(player, runState);
                 }
+                MaybeWarnNextFloorLiquidation(player, runState);
                 _ = BankService.ClearUnreturnedStolenGold(player);
             }
 
@@ -508,6 +535,79 @@ public static class BankRuntime
         {
             SafeLogError($"Could not refresh TD Bank UI: {exception}");
         }
+    }
+
+    private static void MaybeWarnNextFloorLiquidation(
+        Player player,
+        RunState runState)
+    {
+        if (LocalContext.NetId != player.NetId)
+        {
+            return;
+        }
+
+        CreditCeilingWarning? warning =
+            CreditCeilingRelicLiquidationService
+                .GetNextFloorWarning(player, runState);
+        if (warning is null)
+        {
+            lock (WarningGate)
+            {
+                LastCeilingWarnings.Remove(player.NetId);
+            }
+            return;
+        }
+
+        int relics = Math.Min(
+            warning.Value.RelicsRequested,
+            player.Relics.Count(
+                CreditCeilingRelicLiquidationService.IsSafelySeizable));
+        var key = (
+            warning.Value.DebtAtRisk,
+            runState.TotalFloor,
+            relics);
+        lock (WarningGate)
+        {
+            if (LastCeilingWarnings.TryGetValue(
+                    player.NetId,
+                    out var previous)
+                && previous == key)
+            {
+                return;
+            }
+
+            LastCeilingWarnings[player.NetId] = key;
+        }
+
+        BankUiBridge.NotifyImportant(
+            BankUiText.Get("credit_ceiling_warning_title"),
+            BankUiText.Get(
+                "credit_ceiling_warning_message",
+                relics),
+            danger: true);
+    }
+
+    private static CreditCeilingRelicLiquidationResult LiquidateAndNotify(
+        Player player,
+        RunState runState)
+    {
+        CreditCeilingRelicLiquidationResult result =
+            CreditCeilingRelicLiquidationService
+                .LiquidatePendingCreditCeiling(player, runState);
+        if (result.DebtCleared > 0
+            && LocalContext.NetId == player.NetId)
+        {
+            BankUiBridge.NotifyImportant(
+                BankUiText.Get("credit_liquidation_title"),
+                BankUiText.Get(
+                    "credit_liquidation_result",
+                    result.DebtCleared,
+                    result.RelicsRequested,
+                    result.RelicsRemoved),
+                danger: true);
+        }
+
+        return result;
     }
 
     private static void SafeNotify(string key, bool isError, params object[] args)

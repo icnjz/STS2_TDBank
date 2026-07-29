@@ -19,6 +19,10 @@ public sealed record CreditCeilingRelicLiquidationResult(
     public int RelicsRemoved => RemovedRelicIds.Count;
 }
 
+public readonly record struct CreditCeilingWarning(
+    int DebtAtRisk,
+    int RelicsRequested);
+
 public static class CreditCeilingRelicLiquidationService
 {
     private sealed record Candidate(
@@ -58,6 +62,42 @@ public static class CreditCeilingRelicLiquidationService
         return Math.Min(
             rounded,
             benefits.RelicLiquidationMaximumRelics);
+    }
+
+    public static CreditCeilingWarning? GetNextFloorWarning(
+        Player player,
+        IRunState runState)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(runState);
+
+        AccountSnapshot snapshot = BankService.GetSnapshot(player);
+        if (!snapshot.IsAccountOpened
+            || snapshot.IsBankrupt
+            || snapshot.CreditTier == CreditTier.None
+            || snapshot.CreditDebt <= 0
+            || BankService.GetDebtGraceFloorsRemaining(player) > 0)
+        {
+            return null;
+        }
+
+        int maximumDebt = BankService.GetMaximumDebt(
+            player,
+            snapshot.CreditTier);
+        int basisPoints = BankService.GetDebtInterestBasisPoints(
+            player,
+            snapshot.CreditTier);
+        int nextInterest = checked((int)(
+            ((long)snapshot.CreditDebt * basisPoints + 9_999L)
+            / 10_000L));
+        if ((long)snapshot.CreditDebt + nextInterest < maximumDebt)
+        {
+            return null;
+        }
+
+        return new CreditCeilingWarning(
+            maximumDebt,
+            CalculateRelicsRequested(maximumDebt, runState));
     }
 
     public static CreditCeilingRelicLiquidationResult

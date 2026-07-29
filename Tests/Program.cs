@@ -1534,7 +1534,7 @@ Player eventCreditClamp = OpenCardPlayer(
     9902,
     gold: int.MaxValue);
 Expect(
-    EventCreditAvailabilityPatch.SpendableGold(eventCredit) == 425
+    EventCreditAvailabilityPatch.SpendableGold(eventCredit) == 225
     && EventCreditAvailabilityPatch.SpendableGold(eventCredit)
         == BankService.GetPurchasingPower(eventCredit)
     && EventCreditAvailabilityPatch.SpendableGold(eventCreditClamp)
@@ -1543,38 +1543,38 @@ Expect(
     + "or clamp purchasing power to the vanilla int range.");
 
 Expect(
-    BankService.GetCreditLimit(CreditTier.VisaPoor) == 400
+    BankService.GetCreditLimit(CreditTier.VisaPoor) == 200
     && BankService.GetCreditLimit(CreditTier.VisaMiddleClass) == 1000
     && BankService.GetCreditLimit(CreditTier.VisaTycoon) == 2000
-    && BankService.GetMaximumDebt(CreditTier.VisaPoor) == 800
+    && BankService.GetMaximumDebt(CreditTier.VisaPoor) == 400
     && BankService.GetMaximumDebt(CreditTier.VisaMiddleClass) == 2000
     && BankService.GetMaximumDebt(CreditTier.VisaTycoon) == 4000,
     "Credit limits or the 200% debt ceilings are incorrect.");
 Expect(
-    BankService.PoorQualification == 400
-    && BankService.MiddleClassQualification == 3000
-    && BankService.TycoonQualification == 10000
-    && BankService.GetQualificationThreshold(CreditTier.VisaPoor) == 400
+    BankService.PoorQualification == 200
+    && BankService.MiddleClassQualification == 900
+    && BankService.TycoonQualification == 2200
+    && BankService.GetQualificationThreshold(CreditTier.VisaPoor) == 200
     && BankService.GetQualificationThreshold(
-        CreditTier.VisaMiddleClass) == 3000
+        CreditTier.VisaMiddleClass) == 900
     && BankService.GetQualificationThreshold(
-        CreditTier.VisaTycoon) == 10000
-    && BankService.GetHighestEligibleTier(399) == CreditTier.None
-    && BankService.GetHighestEligibleTier(400) == CreditTier.VisaPoor
-    && BankService.GetHighestEligibleTier(2999) == CreditTier.VisaPoor
-    && BankService.GetHighestEligibleTier(3000)
+        CreditTier.VisaTycoon) == 2200
+    && BankService.GetHighestEligibleTier(199) == CreditTier.None
+    && BankService.GetHighestEligibleTier(200) == CreditTier.VisaPoor
+    && BankService.GetHighestEligibleTier(899) == CreditTier.VisaPoor
+    && BankService.GetHighestEligibleTier(900)
         == CreditTier.VisaMiddleClass
-    && BankService.GetHighestEligibleTier(9999)
+    && BankService.GetHighestEligibleTier(2199)
         == CreditTier.VisaMiddleClass
-    && BankService.GetHighestEligibleTier(10000)
+    && BankService.GetHighestEligibleTier(2200)
         == CreditTier.VisaTycoon,
-    "Balanced 400/3000/10000 card qualification thresholds regressed.");
+    "Balanced 200/900/2200 card qualification thresholds regressed.");
 AscensionBankBenefits[] expectedAscensionBenefits =
 [
     new(
         0,
-        400, 3000, 10000,
-        400, 1000, 2000,
+        200, 900, 2200,
+        200, 1000, 2000,
         200, 3,
         2199, 2499, 2799,
         0, 0,
@@ -1583,8 +1583,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         100, int.MaxValue),
     new(
         1,
-        400, 3000, 10000,
-        400, 1000, 2000,
+        175, 850, 2100,
+        225, 1050, 2100,
         200, 3,
         2199, 2499, 2799,
         0, 0,
@@ -1593,8 +1593,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         100, int.MaxValue),
     new(
         2,
-        400, 3000, 10000,
-        400, 1000, 2000,
+        150, 800, 2000,
+        250, 1100, 2200,
         200, 3,
         2199, 2499, 2799,
         0, 0,
@@ -1603,8 +1603,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         100, int.MaxValue),
     new(
         3,
-        0, 2700, 9000,
-        600, 1500, 3000,
+        0, 750, 1900,
+        300, 1200, 2400,
         250, 6,
         1599, 1899, 2199,
         200, 20,
@@ -1613,8 +1613,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         250, 6),
     new(
         4,
-        0, 2400, 8000,
-        650, 1600, 3200,
+        0, 700, 1750,
+        325, 1300, 2600,
         250, 6,
         1549, 1849, 2149,
         250, 25,
@@ -1623,8 +1623,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         300, 6),
     new(
         5,
-        0, 2100, 7000,
-        700, 1750, 3500,
+        0, 650, 1600,
+        350, 1400, 2800,
         260, 7,
         1499, 1799, 2099,
         300, 30,
@@ -1633,8 +1633,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         350, 5),
     new(
         6,
-        0, 1800, 6000,
-        750, 1900, 3800,
+        0, 600, 1450,
+        375, 1500, 3000,
         270, 8,
         1449, 1749, 2049,
         350, 35,
@@ -1643,8 +1643,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         400, 5),
     new(
         7,
-        0, 1500, 5000,
-        800, 2000, 4000,
+        0, 550, 1300,
+        400, 1600, 3200,
         280, 9,
         1399, 1699, 1999,
         400, 40,
@@ -1653,8 +1653,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         450, 5),
     new(
         8,
-        0, 1250, 4000,
-        900, 2250, 4500,
+        0, 500, 1150,
+        450, 1750, 3500,
         290, 10,
         1299, 1599, 1899,
         450, 45,
@@ -1663,8 +1663,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         500, 4),
     new(
         9,
-        0, 1000, 3200,
-        1000, 2500, 5000,
+        0, 450, 1000,
+        500, 1900, 3800,
         300, 11,
         1199, 1499, 1799,
         500, 50,
@@ -1673,8 +1673,8 @@ AscensionBankBenefits[] expectedAscensionBenefits =
         600, 4),
     new(
         10,
-        0, 800, 2500,
-        1200, 3000, 6000,
+        0, 400, 850,
+        600, 2200, 4400,
         300, 12,
         999, 1299, 1599,
         600, 60,
@@ -1700,9 +1700,9 @@ Expect(
 
 BankCreditOffer[] expectedA0UiOffers =
 [
-    new(BankCreditTier.Starter, 400, 400, 800, 2199),
-    new(BankCreditTier.MiddleClass, 3000, 1000, 2000, 2499),
-    new(BankCreditTier.NouveauRiche, 10000, 2000, 4000, 2799),
+    new(BankCreditTier.Starter, 200, 200, 400, 2199),
+    new(BankCreditTier.MiddleClass, 900, 1000, 2000, 2499),
+    new(BankCreditTier.NouveauRiche, 2200, 2000, 4000, 2799),
 ];
 Expect(
     BankUiSnapshot.Empty.CreditOffers.SequenceEqual(expectedA0UiOffers),
@@ -1717,21 +1717,21 @@ Expect(
         new[]
         {
             new BankCreditOffer(
-                BankCreditTier.Starter, 0, 600, 1500, 1599),
+                BankCreditTier.Starter, 0, 300, 750, 1599),
             new BankCreditOffer(
-                BankCreditTier.MiddleClass, 2700, 1500, 3750, 1899),
+                BankCreditTier.MiddleClass, 750, 1200, 3000, 1899),
             new BankCreditOffer(
-                BankCreditTier.NouveauRiche, 9000, 3000, 7500, 2199),
+                BankCreditTier.NouveauRiche, 1900, 2400, 6000, 2199),
         })
     && a10Ui.CreditOffers.SequenceEqual(
         new[]
         {
             new BankCreditOffer(
-                BankCreditTier.Starter, 0, 1200, 3600, 999),
+                BankCreditTier.Starter, 0, 600, 1800, 999),
             new BankCreditOffer(
-                BankCreditTier.MiddleClass, 800, 3000, 9000, 1299),
+                BankCreditTier.MiddleClass, 400, 2200, 6600, 1299),
             new BankCreditOffer(
-                BankCreditTier.NouveauRiche, 2500, 6000, 18000, 1599),
+                BankCreditTier.NouveauRiche, 850, 4400, 13200, 1599),
         }),
     "BankUiSnapshot/CreditOffers do not carry the A3 or A10 dynamic terms.");
 
@@ -1745,7 +1745,7 @@ string a10OpeningCopy =
 Expect(
     a3CreditCopy.Contains("当前 A3", StringComparison.Ordinal)
     && a3CreditCopy.Contains("开户即批", StringComparison.Ordinal)
-    && a3CreditCopy.Contains("1,500 G", StringComparison.Ordinal)
+    && a3CreditCopy.Contains("1,200 G", StringComparison.Ordinal)
     && a3CreditCopy.Contains("6 个完成层", StringComparison.Ordinal)
     && a3CreditCopy.Contains("15.99%", StringComparison.Ordinal)
     && a3CreditCopy.Contains("每 250G", StringComparison.Ordinal)
@@ -1774,37 +1774,37 @@ Expect(
         CreditTier.VisaPoor) == 0
     && BankService.GetQualificationThreshold(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 2700
+        CreditTier.VisaMiddleClass) == 750
     && BankService.GetQualificationThreshold(
         a3Qualification,
-        CreditTier.VisaTycoon) == 9000
+        CreditTier.VisaTycoon) == 1900
     && BankService.ApplyForCreditCard(
         a3Qualification,
         CreditTier.VisaPoor).Success
     && BankService.GetCreditLimit(
         a3Qualification,
-        CreditTier.VisaPoor) == 600
+        CreditTier.VisaPoor) == 300
     && BankService.GetMaximumDebt(
         a3Qualification,
-        CreditTier.VisaPoor) == 1500,
-    "A3 player did not receive instant starter approval and 600/1500G "
+        CreditTier.VisaPoor) == 750,
+    "A3 player did not receive instant starter approval and 300/750G "
     + "live credit terms.");
 Expect(
     BankService.ApplyForCreditCard(
         a3Qualification,
         CreditTier.VisaMiddleClass).Error
         == BankErrorCode.NotEligible
-    && BankService.RecordGoldEarned(a3Qualification, 2700).Success
+    && BankService.RecordGoldEarned(a3Qualification, 750).Success
     && BankService.ApplyForCreditCard(
         a3Qualification,
         CreditTier.VisaMiddleClass).Success
     && BankService.GetCreditLimit(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 1500
+        CreditTier.VisaMiddleClass) == 1200
     && BankService.GetMaximumDebt(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 3750,
-    "A3 live middle-card qualification or limit did not use 2700/1500/3750G.");
+        CreditTier.VisaMiddleClass) == 3000,
+    "A3 live middle-card qualification or limit did not use 750/1200/3000G.");
 
 Player a3Debt =
     OpenAscensionCardPlayer(3, CreditTier.VisaPoor, 9804);
@@ -1868,33 +1868,33 @@ Expect(
         CreditTier.VisaPoor) == 0
     && BankService.GetQualificationThreshold(
         a10Qualification,
-        CreditTier.VisaMiddleClass) == 800
+        CreditTier.VisaMiddleClass) == 400
     && BankService.GetQualificationThreshold(
         a10Qualification,
-        CreditTier.VisaTycoon) == 2500
+        CreditTier.VisaTycoon) == 850
     && BankService.ApplyForCreditCard(
         a10Qualification,
         CreditTier.VisaPoor).Success
     && BankService.GetCreditLimit(
         a10Qualification,
-        CreditTier.VisaPoor) == 1200
+        CreditTier.VisaPoor) == 600
     && BankService.GetMaximumDebt(
         a10Qualification,
-        CreditTier.VisaPoor) == 3600,
-    "A10 player did not receive instant starter approval and 1200/3600G "
+        CreditTier.VisaPoor) == 1800,
+    "A10 player did not receive instant starter approval and 600/1800G "
     + "live credit terms.");
 Expect(
-    BankService.RecordGoldEarned(a10Qualification, 2500).Success
+    BankService.RecordGoldEarned(a10Qualification, 850).Success
     && BankService.ApplyForCreditCard(
         a10Qualification,
         CreditTier.VisaTycoon).Success
     && BankService.GetCreditLimit(
         a10Qualification,
-        CreditTier.VisaTycoon) == 6000
+        CreditTier.VisaTycoon) == 4400
     && BankService.GetMaximumDebt(
         a10Qualification,
-        CreditTier.VisaTycoon) == 18000,
-    "A10 live tycoon qualification or limit did not use 2500/6000/18000G.");
+        CreditTier.VisaTycoon) == 13200,
+    "A10 live tycoon qualification or limit did not use 850/4400/13200G.");
 
 Player a10Debt =
     OpenAscensionCardPlayer(10, CreditTier.VisaPoor, 9811);
@@ -1968,14 +1968,14 @@ Expect(
 Player perTransactionLimit =
     OpenCardPlayer(CreditTier.VisaPoor, 9903);
 Expect(
-    BankService.TrySpend(perTransactionLimit, 401).Error
+    BankService.TrySpend(perTransactionLimit, 201).Error
         == BankErrorCode.CreditLimitExceeded
     && BankService.GetCreditDebt(perTransactionLimit) == 0
-    && BankService.TrySpend(perTransactionLimit, 400).Success
-    && BankService.GetCreditDebt(perTransactionLimit) == 400
-    && BankService.GetAvailableCredit(perTransactionLimit) == 400,
-    "A purchase exceeded the nominal 400G per-transaction advance "
-    + "or the second 400G tranche was unavailable.");
+    && BankService.TrySpend(perTransactionLimit, 200).Success
+    && BankService.GetCreditDebt(perTransactionLimit) == 200
+    && BankService.GetAvailableCredit(perTransactionLimit) == 200,
+    "A purchase exceeded the nominal 200G per-transaction advance "
+    + "or the second 200G tranche was unavailable.");
 
 
 
@@ -2143,39 +2143,60 @@ Expect(
 
 Player directCeiling = OpenCardPlayer(CreditTier.VisaPoor, 17);
 BankOperationResult directCeilingFirst =
-    BankService.TrySpend(directCeiling, 400);
+    BankService.TrySpend(directCeiling, 200);
 BankOperationResult directCeilingSpend =
-    BankService.TrySpend(directCeiling, 400);
+    BankService.TrySpend(directCeiling, 200);
 AccountSnapshot directClosed = BankService.GetSnapshot(directCeiling);
 Expect(
     directCeilingFirst.Success
     && directCeilingSpend.Success
-    && directCeiling.Gold == -800
+    && directCeiling.Gold == 0
     && directClosed.CreditDebt == 0
     && directClosed.CreditTier == CreditTier.None
     && directClosed.IsBankrupt
     && BankStateStore.Get(directCeiling).CreditPermanentlyClosed == 1
-    && BankService.GetPendingRelicLiquidationDebt(directCeiling) == 800
+    && BankService.GetPendingRelicLiquidationDebt(directCeiling) == 400
     && BankService.ApplyForCreditCard(
         directCeiling,
         CreditTier.VisaPoor).Error
         == BankErrorCode.CreditPermanentlyClosed,
-    "Direct TrySpend at the 200% ceiling did not collect and permanently close.");
+    "Direct TrySpend at the 200% ceiling did not settle without negative gold and permanently close.");
 Expect(
     BankService.CompletePendingRelicLiquidation(
         directCeiling,
-        799).Error == BankErrorCode.InvalidAmount
-    && BankService.GetPendingRelicLiquidationDebt(directCeiling) == 800,
+        399).Error == BankErrorCode.InvalidAmount
+    && BankService.GetPendingRelicLiquidationDebt(directCeiling) == 400,
     "A stale relic-liquidation acknowledgement cleared the current quote.");
 Expect(
     BankService.CompletePendingRelicLiquidation(
         directCeiling,
-        800) == BankOperationResult.Ok(800)
+        400) == BankOperationResult.Ok(400)
     && BankService.GetPendingRelicLiquidationDebt(directCeiling) == 0
     && BankService.CompletePendingRelicLiquidation(
         directCeiling,
-        800).Error == BankErrorCode.AlreadyProcessed,
+        400).Error == BankErrorCode.AlreadyProcessed,
     "Relic-liquidation acknowledgement was not exact and idempotent.");
+
+Player legacyNegativeForeclosure = NewPlayer(-800, 1701);
+BankStateStore.Set(
+    legacyNegativeForeclosure,
+    new AccountState
+    {
+        Schema = AccountState.CurrentSchema,
+        BankAccountOpened = 1,
+        UnifiedSavingsInitialized = 1,
+        QualificationInitialized = 1,
+        CreditPermanentlyClosed = 1,
+    });
+BankOperationResult legacyRepair =
+    BankService.RepairLegacyNegativeForeclosureBalance(
+        legacyNegativeForeclosure);
+Expect(
+    legacyRepair == BankOperationResult.Ok(800)
+    && legacyNegativeForeclosure.Gold == 0
+    && BankService.RepairLegacyNegativeForeclosureBalance(
+        legacyNegativeForeclosure) == BankOperationResult.Ok(),
+    "Legacy foreclosure repair did not restore a negative wallet to zero idempotently.");
 
 
 Player interestCeiling = NewPlayer(0, 18);
@@ -2187,9 +2208,9 @@ BankStateStore.Set(
         BankAccountOpened = 1,
         UnifiedSavingsInitialized = 1,
         QualificationInitialized = 1,
-        QualifyingEarned = 400,
+        QualifyingEarned = 200,
         CreditTier = (int)CreditTier.VisaPoor,
-        CreditDebt = 790,
+        CreditDebt = 390,
         DebtCycleFloors = 3,
         DebtGraceUsed = 1,
     });
@@ -2198,23 +2219,23 @@ BankOperationResult interestClosure =
 Expect(
     interestClosure.Success
     && interestClosure.Amount == 10
-    && interestClosure.SecondaryAmount == 800
-    && interestCeiling.Gold == -800
+    && interestClosure.SecondaryAmount == 400
+    && interestCeiling.Gold == 0
     && BankService.IsBankrupt(interestCeiling)
     && BankService.GetPendingRelicLiquidationDebt(
-        interestCeiling) == 800,
-    "Interest reaching 200% did not cap, collect, and permanently close.");
+        interestCeiling) == 400,
+    "Interest reaching 200% did not cap, settle without negative gold, and permanently close.");
 
 
 
 Player nativeCeiling = OpenCardPlayer(CreditTier.VisaPoor, 19);
-_ = BankService.TrySpend(nativeCeiling, 400);
+_ = BankService.TrySpend(nativeCeiling, 200);
 BankOperationResult nativeAdvance =
-    BankService.AdvanceCreditForPurchase(nativeCeiling, 400);
+    BankService.AdvanceCreditForPurchase(nativeCeiling, 200);
 Expect(
     nativeAdvance.Success
-    && nativeCeiling.Gold == 400
-    && BankStateStore.Get(nativeCeiling).CreditDebt == 800
+    && nativeCeiling.Gold == 200
+    && BankStateStore.Get(nativeCeiling).CreditDebt == 400
     && BankStateStore.Get(nativeCeiling).CreditCeilingPending == 1
     && BankStateStore.Get(nativeCeiling).CreditPermanentlyClosed == 0,
     "Native credit advance did not defer an exact-ceiling collection.");
@@ -2226,12 +2247,12 @@ BankOperationResult nativeFinalization =
         beforeNativePurchase);
 Expect(
     nativeFinalization.Success
-    && nativeFinalization.SecondaryAmount == 800
-    && nativeCeiling.Gold == -800
+    && nativeFinalization.SecondaryAmount == 400
+    && nativeCeiling.Gold == 0
     && BankService.IsBankrupt(nativeCeiling)
     && BankStateStore.Get(nativeCeiling).CreditCeilingPending == 0
-    && BankService.GetPendingRelicLiquidationDebt(nativeCeiling) == 800,
-    "Native LoseGold did not finalize pending ceiling collection.");
+    && BankService.GetPendingRelicLiquidationDebt(nativeCeiling) == 400,
+    "Native LoseGold did not finalize pending ceiling settlement without negative gold.");
 
 
 
@@ -2256,6 +2277,42 @@ Expect(
             pair.Debt)
             == pair.Relics),
     "Ceiling relic-seizure nearest-hundred boundary rules are incorrect.");
+
+Player nextFloorWarning = OpenAscensionPlayer(0, 0, 20001);
+BankStateStore.Set(
+    nextFloorWarning,
+    new AccountState
+    {
+        Schema = AccountState.CurrentSchema,
+        BankAccountOpened = 1,
+        UnifiedSavingsInitialized = 1,
+        QualificationInitialized = 1,
+        CreditTier = (int)CreditTier.VisaPoor,
+        CreditDebt = 390,
+        DebtCycleFloors = 3,
+        DebtGraceUsed = 1,
+    });
+CreditCeilingWarning? warning =
+    CreditCeilingRelicLiquidationService.GetNextFloorWarning(
+        nextFloorWarning,
+        nextFloorWarning.RunState);
+BankStateStore.Get(nextFloorWarning).CreditDebt = 300;
+CreditCeilingWarning? safeNextFloor =
+    CreditCeilingRelicLiquidationService.GetNextFloorWarning(
+        nextFloorWarning,
+        nextFloorWarning.RunState);
+BankStateStore.Get(nextFloorWarning).CreditDebt = 390;
+BankStateStore.Get(nextFloorWarning).DebtCycleFloors = 2;
+CreditCeilingWarning? graceNextFloor =
+    CreditCeilingRelicLiquidationService.GetNextFloorWarning(
+        nextFloorWarning,
+        nextFloorWarning.RunState);
+Expect(
+    warning == new CreditCeilingWarning(400, 4)
+    && safeNextFloor is null
+    && graceNextFloor is null,
+    "The next-floor ceiling warning did not match interest, grace, "
+    + "or relic-seizure rules.");
 
 
 
@@ -2517,9 +2574,9 @@ try
     Player internalCeiling =
         OpenCardPlayer(CreditTier.VisaPoor, 2906);
     BankOperationResult internalFirstCharge =
-        BankService.TrySpend(internalCeiling, 400);
+        BankService.TrySpend(internalCeiling, 200);
     BankOperationResult internalCeilingCharge =
-        BankService.TrySpend(internalCeiling, 400);
+        BankService.TrySpend(internalCeiling, 200);
 
     Expect(
         internalDeposit.Success
@@ -2908,16 +2965,16 @@ var wireWriter = new PacketWriter();
 operationPayloads[3].Serialize(wireWriter);
 Expect(
     wireWriter.BytePosition == 45,
-    $"TDB9 request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
+    $"TDBA request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
 var wireReader = new PacketReader();
 wireReader.Reset(wireWriter.Buffer);
 _ = wireReader.ReadInt();
 _ = wireReader.ReadInt();
 Expect(
     wireReader.ReadInt() == TDBankNetOperationAction.ProtocolMagic
-    && TDBankNetOperationAction.ProtocolMagic == 0x54444239
+    && TDBankNetOperationAction.ProtocolMagic == 0x54444241
     && wireReader.ReadInt() == BankNetwork.CurrentLifecycleEpoch,
-    "The operation packet does not carry TDB9 and the lifecycle epoch.");
+    "The operation packet does not carry TDBA and the lifecycle epoch.");
 
 Player threePeerHost = OpenAscensionPlayer(
     0,
@@ -3575,7 +3632,7 @@ string chineseButtRules = BankUiText.Get(
 string chineseCreditLocked = BankUiText.Get(
     "credit_locked_blurb",
     a0Ui.AscensionLevel,
-    "400 G");
+    "200 G");
 string chineseClosedCap = BankUiText.Get(
     "credit_closed_cap",
     a0Ui.AscensionLevel,
@@ -3605,10 +3662,10 @@ Expect(
     && chineseOpening.Contains("当前 A0", StringComparison.Ordinal)
     && chineseOpening.Contains("10% 复利", StringComparison.Ordinal)
     && chineseOpening.Contains(
-        "400 G / 3,000 G / 10,000 G",
+        "200 G / 900 G / 2,200 G",
         StringComparison.Ordinal)
     && chineseOpening.Contains(
-        "800 G / 2,000 G / 4,000 G",
+        "400 G / 2,000 G / 4,000 G",
         StringComparison.Ordinal)
     && chineseOpening.Contains("免息 3 层", StringComparison.Ordinal)
     && chineseOpening.Contains(
@@ -3686,7 +3743,7 @@ Expect(
         "游戏事件损失金币不会制造债务",
         StringComparison.Ordinal)
     && chineseCreditRules.Contains(
-        "800 G / 2,000 G / 4,000 G",
+        "400 G / 2,000 G / 4,000 G",
         StringComparison.Ordinal)
     && chineseCreditRules.Contains(
         "只有开户后的原生游戏金币和储蓄利息",
@@ -3734,6 +3791,14 @@ Expect(
         "暴毙",
         StringComparison.Ordinal)
     && BankUiText.Get("butt_risk_hint") == "卖多了可能触发"
+    && BankUiText.Get("credit_ceiling_warning_title") == "TD短信"
+    && BankUiText.Get("credit_ceiling_warning_message", 4)
+        == "温馨提醒您下回合不还钱就要抄家了（扣除 4 件圣遗物）！"
+    && BankUiText.Get("credit_liquidation_title") == "TD 抄家清算单"
+    && BankUiText.Get("credit_liquidation_result", 800, 8, 5)
+        .Contains("实际没收 5 件", StringComparison.Ordinal)
+    && BankUiText.Get("legacy_foreclosure_repaired", 800)
+        .Contains("返还 800G", StringComparison.Ordinal)
     && BankUiText.Get("butt_risk_link") == "菊部风控"
     && BankUiText.Get("butt_risk_explanation")
         == "卖多了可能触发特殊事件。\n黑市有风险，卖屁股需谨慎。"
@@ -3867,7 +3932,7 @@ string englishButtRules = BankUiText.Get(
 string englishCreditLocked = BankUiText.Get(
     "credit_locked_blurb",
     a0Ui.AscensionLevel,
-    "400 G");
+    "200 G");
 string englishClosedCap = BankUiText.Get(
     "credit_closed_cap",
     a0Ui.AscensionLevel,
@@ -3894,7 +3959,7 @@ Expect(
     && englishOpening.Contains("24.99%", StringComparison.Ordinal)
     && englishOpening.Contains("27.99%", StringComparison.Ordinal)
     && englishOpening.Contains(
-        "800 G / 2,000 G / 4,000 G",
+        "400 G / 2,000 G / 4,000 G",
         StringComparison.Ordinal)
     && englishOpening.Contains(
         "relic",
@@ -3912,7 +3977,7 @@ Expect(
         "native paid events",
         StringComparison.OrdinalIgnoreCase)
     && englishOpening.Contains(
-        "400 G / 3,000 G / 10,000 G",
+        "200 G / 900 G / 2,200 G",
         StringComparison.Ordinal)
     && englishSavings.Contains(
         "compound interest",
@@ -3959,6 +4024,16 @@ Expect(
     && BankUiText.Get("kidney_fatal").Contains(
         "kill",
         StringComparison.OrdinalIgnoreCase)
+    && BankUiText.Get("credit_ceiling_warning_title") == "TD SMS"
+    && BankUiText.Get("credit_ceiling_warning_message", 4).Contains(
+        "4 relics",
+        StringComparison.OrdinalIgnoreCase)
+    && BankUiText.Get("credit_liquidation_title")
+        == "TD Foreclosure Statement"
+    && BankUiText.Get("credit_liquidation_result", 800, 8, 5)
+        .Contains("actually seized 5", StringComparison.OrdinalIgnoreCase)
+    && BankUiText.Get("legacy_foreclosure_repaired", 800)
+        .Contains("800G was restored", StringComparison.OrdinalIgnoreCase)
     && englishKidneyRules.Contains(
         "for 200G",
         StringComparison.Ordinal)
