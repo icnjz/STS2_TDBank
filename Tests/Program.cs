@@ -424,8 +424,42 @@ static void ExpectSamePayload(
         && actual.RecipientId == expected.RecipientId
         && actual.ExecutionType == expected.ExecutionType
         && actual.RequestId == expected.RequestId
-        && actual.HostAuthorized == expected.HostAuthorized,
+        && actual.HostAuthorized == expected.HostAuthorized
+        && actual.HasAuthoritativeState
+            == expected.HasAuthoritativeState
+        && actual.AuthoritativeButtOutcome
+            == expected.AuthoritativeButtOutcome
+        && SameAuthoritativePlayerState(
+            actual.ActorState,
+            expected.ActorState)
+        && SameAuthoritativePlayerState(
+            actual.RecipientState,
+            expected.RecipientState),
         message);
+}
+
+static bool SameAuthoritativePlayerState(
+    TDBankAuthoritativePlayerState? left,
+    TDBankAuthoritativePlayerState? right)
+{
+    if (left is null || right is null)
+    {
+        return left is null && right is null;
+    }
+
+    PropertyInfo[] properties = typeof(AccountState)
+        .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        .Where(property =>
+            property.PropertyType == typeof(int)
+            && property.CanRead)
+        .ToArray();
+    return left.Gold == right.Gold
+        && left.CurrentHp == right.CurrentHp
+        && left.MaxHp == right.MaxHp
+        && properties.All(property =>
+            Equals(
+                property.GetValue(left.Account),
+                property.GetValue(right.Account)));
 }
 
 static bool HasPatchOwner(
@@ -2873,17 +2907,120 @@ foreach (TDBankNetOperationAction payload in operationPayloads)
 var wireWriter = new PacketWriter();
 operationPayloads[3].Serialize(wireWriter);
 Expect(
-    wireWriter.BytePosition == 41,
-    "TDB7 operation packets must retain the 41-byte frame shape.");
+    wireWriter.BytePosition == 45,
+    $"TDB8 request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
 var wireReader = new PacketReader();
 wireReader.Reset(wireWriter.Buffer);
 _ = wireReader.ReadInt();
 _ = wireReader.ReadInt();
 Expect(
     wireReader.ReadInt() == TDBankNetOperationAction.ProtocolMagic
-    && TDBankNetOperationAction.ProtocolMagic == 0x54444237
+    && TDBankNetOperationAction.ProtocolMagic == 0x54444238
     && wireReader.ReadInt() == BankNetwork.CurrentLifecycleEpoch,
-    "The legacy account slots do not carry TDB7 and the lifecycle epoch.");
+    "The operation packet does not carry TDB8 and the lifecycle epoch.");
+
+Player threePeerHost = OpenAscensionPlayer(
+    0,
+    99,
+    92001,
+    currentHp: 80,
+    maxHp: 80);
+BankStateStore.Get(threePeerHost).ButtSalesCount = 3;
+TDBankAuthoritativePlayerState threePeerHostState =
+    TDBankAuthoritativePlayerState.Capture(threePeerHost);
+ButtRiskOutcome threePeerOutcome =
+    KkCompoundService.GetButtRiskOutcomeForNextSale(threePeerHost);
+var threePeerPayload = RoundTrip(
+    new TDBankNetOperationAction
+    {
+        Kind = BankOperationKind.SellButt,
+        LifecycleEpoch = BankNetwork.CurrentLifecycleEpoch,
+        Amount = 1,
+        ExecutionType = GameActionType.NonCombat,
+        RequestId = 92002,
+        HostAuthorized = true,
+        HasAuthoritativeState = true,
+        ActorState = threePeerHostState,
+        AuthoritativeButtOutcome = threePeerOutcome,
+    });
+Player threePeerClientOne = OpenAscensionPlayer(
+    0,
+    1,
+    92001,
+    currentHp: 30,
+    maxHp: 60);
+Player threePeerClientTwo = OpenAscensionPlayer(
+    0,
+    999,
+    92001,
+    currentHp: 70,
+    maxHp: 90);
+threePeerPayload.ActorState!.Apply(threePeerClientOne);
+threePeerPayload.ActorState.Apply(threePeerClientTwo);
+BankOperationResult threePeerHostResult =
+    await KkCompoundService.SellButt(
+        threePeerHost,
+        threePeerOutcome);
+BankOperationResult threePeerClientOneResult =
+    await KkCompoundService.SellButt(
+        threePeerClientOne,
+        threePeerPayload.AuthoritativeButtOutcome);
+BankOperationResult threePeerClientTwoResult =
+    await KkCompoundService.SellButt(
+        threePeerClientTwo,
+        threePeerPayload.AuthoritativeButtOutcome);
+Expect(
+    threePeerHostResult == threePeerClientOneResult
+    && threePeerHostResult == threePeerClientTwoResult
+    && SameAuthoritativePlayerState(
+        TDBankAuthoritativePlayerState.Capture(threePeerHost),
+        TDBankAuthoritativePlayerState.Capture(threePeerClientOne))
+    && SameAuthoritativePlayerState(
+        TDBankAuthoritativePlayerState.Capture(threePeerHost),
+        TDBankAuthoritativePlayerState.Capture(threePeerClientTwo)),
+    "A host-authoritative butt sale did not converge on all three peers.");
+
+Player transferHostSender = OpenPlayer(500, 92101, 80, 80);
+Player transferHostRecipient = OpenPlayer(10, 92102, 80, 80);
+var transferPayload = RoundTrip(
+    new TDBankNetOperationAction
+    {
+        Kind = BankOperationKind.ETransfer,
+        LifecycleEpoch = BankNetwork.CurrentLifecycleEpoch,
+        Amount = 100,
+        RecipientId = transferHostRecipient.NetId,
+        ExecutionType = GameActionType.NonCombat,
+        RequestId = 92103,
+        HostAuthorized = true,
+        HasAuthoritativeState = true,
+        ActorState =
+            TDBankAuthoritativePlayerState.Capture(transferHostSender),
+        RecipientState =
+            TDBankAuthoritativePlayerState.Capture(
+                transferHostRecipient),
+    });
+Player transferClientSender = OpenPlayer(5, 92101, 40, 50);
+Player transferClientRecipient = OpenPlayer(900, 92102, 60, 70);
+transferPayload.ActorState!.Apply(transferClientSender);
+transferPayload.RecipientState!.Apply(transferClientRecipient);
+BankOperationResult transferHostResult = BankService.ETransfer(
+    transferHostSender,
+    transferHostRecipient,
+    100);
+BankOperationResult transferClientResult = BankService.ETransfer(
+    transferClientSender,
+    transferClientRecipient,
+    100);
+Expect(
+    transferHostResult == transferClientResult
+    && SameAuthoritativePlayerState(
+        TDBankAuthoritativePlayerState.Capture(transferHostSender),
+        TDBankAuthoritativePlayerState.Capture(transferClientSender))
+    && SameAuthoritativePlayerState(
+        TDBankAuthoritativePlayerState.Capture(transferHostRecipient),
+        TDBankAuthoritativePlayerState.Capture(
+            transferClientRecipient)),
+    "A host-authoritative e-Transfer did not converge sender and recipient.");
 
 Player actionOwner = NewPlayer(55, 34);
 var openAction = new TDBankOperationGameAction(

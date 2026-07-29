@@ -237,7 +237,9 @@ public static class KkCompoundService
         return deposit;
     }
 
-    public static async Task<BankOperationResult> SellButt(Player player)
+    public static async Task<BankOperationResult> SellButt(
+        Player player,
+        ButtRiskOutcome? authoritativeOutcome = null)
     {
         ArgumentNullException.ThrowIfNull(player);
         AccountSnapshot snapshot = BankService.GetSnapshot(player);
@@ -273,8 +275,13 @@ public static class KkCompoundService
                 BankErrorCode.InsufficientHealth);
         }
 
-        ButtRiskOutcome outcome =
-            GetButtRiskOutcomeForNextSale(player);
+        ButtRiskOutcome outcome = authoritativeOutcome
+            ?? GetButtRiskOutcomeForNextSale(player);
+        if (!Enum.IsDefined(outcome))
+        {
+            return BankOperationResult.Fail(
+                BankErrorCode.InvalidAccount);
+        }
         int actualHpCost = outcome == ButtRiskOutcome.Hemorrhage
             ? maximumHpCost
             : hpCost;

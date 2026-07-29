@@ -22,12 +22,60 @@ public enum BankOperationKind
     SellButt = 7,
 }
 
+public sealed class TDBankAuthoritativePlayerState : IPacketSerializable
+{
+    public int Gold;
+    public int CurrentHp;
+    public int MaxHp;
+    public AccountState Account = new();
+
+    public static TDBankAuthoritativePlayerState Capture(Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        return new TDBankAuthoritativePlayerState
+        {
+            Gold = player.Gold,
+            CurrentHp = player.Creature.CurrentHp,
+            MaxHp = player.Creature.MaxHp,
+            Account = BankStateStore.Get(player).Clone(),
+        };
+    }
+
+    public void Apply(Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        player.Gold = Gold;
+        player.Creature.SetMaxHpInternal(MaxHp);
+        player.Creature.SetCurrentHpInternal(CurrentHp);
+        BankStateStore.Set(player, Account);
+    }
+
+    public void Serialize(PacketWriter writer)
+    {
+        ArgumentNullException.ThrowIfNull(writer);
+        writer.WriteInt(Gold);
+        writer.WriteInt(CurrentHp);
+        writer.WriteInt(MaxHp);
+        Account.Serialize(writer);
+    }
+
+    public void Deserialize(PacketReader reader)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        Gold = reader.ReadInt();
+        CurrentHp = reader.ReadInt();
+        MaxHp = reader.ReadInt();
+        Account = new AccountState();
+        Account.Deserialize(reader);
+    }
+}
+
 public struct TDBankNetOperationAction : INetAction, IPacketSerializable
 {
 
 
 
-    internal const int ProtocolMagic = 0x54444237;
+    internal const int ProtocolMagic = 0x54444238;
 
     public BankOperationKind Kind;
     public CreditTier Tier;
@@ -37,6 +85,10 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
     public GameActionType ExecutionType;
     public ulong RequestId;
     public bool HostAuthorized;
+    public bool HasAuthoritativeState;
+    public TDBankAuthoritativePlayerState? ActorState;
+    public TDBankAuthoritativePlayerState? RecipientState;
+    public ButtRiskOutcome AuthoritativeButtOutcome;
     private bool _protocolCompatible;
 
     public readonly GameAction ToGameAction(Player player)
@@ -48,11 +100,41 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
                 HostAuthorized,
                 _protocolCompatible,
                 LifecycleEpoch == BankNetwork.CurrentLifecycleEpoch);
+        NetGameType peerType = RunManager.Instance.NetService.Type;
+        TDBankAuthoritativePlayerState? actorState = ActorState;
+        TDBankAuthoritativePlayerState? recipientState = RecipientState;
+        ButtRiskOutcome buttOutcome = AuthoritativeButtOutcome;
+        bool hasAuthoritativeState = HasAuthoritativeState;
         if (authorized
-            && RunManager.Instance.NetService.Type == NetGameType.Host
+            && peerType == NetGameType.Host
             && !BankNetwork.TryAcceptHostRequest(
                 player.NetId,
                 RequestId))
+        {
+            authorized = false;
+            executionType = GameActionType.Any;
+        }
+        if (authorized && peerType == NetGameType.Host)
+        {
+            actorState = TDBankAuthoritativePlayerState.Capture(player);
+            recipientState = Kind == BankOperationKind.ETransfer
+                ? player.RunState.GetPlayer(RecipientId) is { } recipient
+                    ? TDBankAuthoritativePlayerState.Capture(recipient)
+                    : null
+                : null;
+            buttOutcome = Kind == BankOperationKind.SellButt
+                ? KkCompoundService.GetButtRiskOutcomeForNextSale(player)
+                : ButtRiskOutcome.Normal;
+            hasAuthoritativeState = actorState is not null
+                && (Kind != BankOperationKind.ETransfer
+                    || recipientState is not null);
+        }
+        if (authorized
+            && peerType == NetGameType.Client
+            && (!hasAuthoritativeState
+                || actorState is null
+                || (Kind == BankOperationKind.ETransfer
+                    && recipientState is null)))
         {
             authorized = false;
             executionType = GameActionType.Any;
@@ -67,7 +149,11 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
             executionType,
             RequestId,
             LifecycleEpoch,
-            authorized);
+            authorized,
+            hasAuthoritativeState,
+            actorState,
+            recipientState,
+            buttOutcome);
     }
 
     public readonly void Serialize(PacketWriter writer)
@@ -86,6 +172,16 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
         writer.WriteInt((int)ExecutionType);
         writer.WriteULong(RequestId);
         writer.WriteBool(HostAuthorized);
+        writer.WriteBool(
+            HasAuthoritativeState
+            && ActorState is not null);
+        if (HasAuthoritativeState && ActorState is not null)
+        {
+            ActorState.Serialize(writer);
+            writer.WriteBool(RecipientState is not null);
+            RecipientState?.Serialize(writer);
+        }
+        writer.WriteInt((int)AuthoritativeButtOutcome);
     }
 
     public void Deserialize(PacketReader reader)
@@ -101,6 +197,19 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
         ExecutionType = (GameActionType)reader.ReadInt();
         RequestId = reader.ReadULong();
         HostAuthorized = reader.ReadBool();
+        HasAuthoritativeState = reader.ReadBool();
+        if (HasAuthoritativeState)
+        {
+            ActorState = new TDBankAuthoritativePlayerState();
+            ActorState.Deserialize(reader);
+            if (reader.ReadBool())
+            {
+                RecipientState = new TDBankAuthoritativePlayerState();
+                RecipientState.Deserialize(reader);
+            }
+        }
+        AuthoritativeButtOutcome =
+            (ButtRiskOutcome)reader.ReadInt();
         _protocolCompatible =
             protocolMagic == ProtocolMagic
             && LifecycleEpoch > 0;
@@ -208,6 +317,10 @@ public sealed class TDBankOperationGameAction : GameAction
     private readonly ulong _requestId;
     private readonly int _lifecycleEpoch;
     private readonly bool _hostAuthorized;
+    private bool _hasAuthoritativeState;
+    private TDBankAuthoritativePlayerState? _actorState;
+    private TDBankAuthoritativePlayerState? _recipientState;
+    private ButtRiskOutcome _authoritativeButtOutcome;
 
     public override ulong OwnerId => _actor.NetId;
 
@@ -226,7 +339,12 @@ public sealed class TDBankOperationGameAction : GameAction
         GameActionType executionType = GameActionType.NonCombat,
         ulong requestId = 0,
         int lifecycleEpoch = 0,
-        bool hostAuthorized = true)
+        bool hostAuthorized = true,
+        bool hasAuthoritativeState = false,
+        TDBankAuthoritativePlayerState? actorState = null,
+        TDBankAuthoritativePlayerState? recipientState = null,
+        ButtRiskOutcome authoritativeButtOutcome =
+            ButtRiskOutcome.Normal)
     {
         _actor = actor ?? throw new ArgumentNullException(nameof(actor));
         _kind = kind;
@@ -249,6 +367,10 @@ public sealed class TDBankOperationGameAction : GameAction
             ? lifecycleEpoch
             : BankNetwork.CurrentLifecycleEpoch;
         _hostAuthorized = hostAuthorized;
+        _hasAuthoritativeState = hasAuthoritativeState;
+        _actorState = actorState;
+        _recipientState = recipientState;
+        _authoritativeButtOutcome = authoritativeButtOutcome;
         BeforeCancelled += OnCancelled;
     }
 
@@ -280,10 +402,7 @@ public sealed class TDBankOperationGameAction : GameAction
         {
 
 
-            if (isLocalActor || isLocalRecipient)
-            {
-                BankUiBridge.Refresh();
-            }
+            BankUiBridge.Refresh();
 
             if (isLocalActor)
             {
@@ -407,6 +526,8 @@ public sealed class TDBankOperationGameAction : GameAction
             return BankOperationResult.Fail(BankErrorCode.OperationUnavailable);
         }
 
+        ApplyAuthoritativeStateIfNeeded();
+
         return _kind switch
         {
             BankOperationKind.ApplyCard =>
@@ -418,7 +539,11 @@ public sealed class TDBankOperationGameAction : GameAction
             BankOperationKind.SellKidneys =>
                 await KkCompoundService.SellKidneys(_actor, _amount),
             BankOperationKind.SellButt =>
-                await KkCompoundService.SellButt(_actor),
+                await KkCompoundService.SellButt(
+                    _actor,
+                    _hasAuthoritativeState
+                        ? _authoritativeButtOutcome
+                        : null),
             _ =>
                 BankOperationResult.Fail(BankErrorCode.InvalidAccount),
         };
@@ -439,8 +564,51 @@ public sealed class TDBankOperationGameAction : GameAction
             : BankService.ETransfer(_actor, recipient, _amount);
     }
 
+    private void ApplyAuthoritativeStateIfNeeded()
+    {
+        if (!_hasAuthoritativeState
+            || _actorState is null
+            || !BankNetwork.IsClientPeer())
+        {
+            return;
+        }
+
+        _actorState.Apply(_actor);
+        if (_kind == BankOperationKind.ETransfer
+            && _recipientState is not null
+            && _actor.RunState.GetPlayer(_recipientId) is { } recipient)
+        {
+            _recipientState.Apply(recipient);
+        }
+    }
+
+    private void CaptureAuthoritativeStateIfNeeded()
+    {
+        if (_hasAuthoritativeState
+            || !_hostAuthorized
+            || !BankNetwork.IsHostPeer())
+        {
+            return;
+        }
+
+        _actorState = TDBankAuthoritativePlayerState.Capture(_actor);
+        _recipientState = _kind == BankOperationKind.ETransfer
+            ? _actor.RunState.GetPlayer(_recipientId) is { } recipient
+                ? TDBankAuthoritativePlayerState.Capture(recipient)
+                : null
+            : null;
+        _authoritativeButtOutcome =
+            _kind == BankOperationKind.SellButt
+                ? KkCompoundService.GetButtRiskOutcomeForNextSale(_actor)
+                : ButtRiskOutcome.Normal;
+        _hasAuthoritativeState = _actorState is not null
+            && (_kind != BankOperationKind.ETransfer
+                || _recipientState is not null);
+    }
+
     public override INetAction ToNetAction()
     {
+        CaptureAuthoritativeStateIfNeeded();
         return new TDBankNetOperationAction
         {
             Kind = _kind,
@@ -451,6 +619,10 @@ public sealed class TDBankOperationGameAction : GameAction
             ExecutionType = _executionType,
             RequestId = _requestId,
             HostAuthorized = _hostAuthorized,
+            HasAuthoritativeState = _hasAuthoritativeState,
+            ActorState = _actorState,
+            RecipientState = _recipientState,
+            AuthoritativeButtOutcome = _authoritativeButtOutcome,
         };
     }
 
@@ -475,6 +647,32 @@ public static class BankNetwork
     {
 
 
+    }
+
+    internal static bool IsHostPeer()
+    {
+        try
+        {
+            return RunManager.Instance?.NetService?.Type
+                == NetGameType.Host;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    internal static bool IsClientPeer()
+    {
+        try
+        {
+            return RunManager.Instance?.NetService?.Type
+                == NetGameType.Client;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     internal static int CurrentLifecycleEpoch =>
