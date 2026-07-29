@@ -119,11 +119,15 @@ internal static class InstallerStrings
                 ? "这里不像《杀戮尖塔 2》目录：缺少 SlayTheSpire2.exe、release_info.json 或 data 目录。"
                 : "This does not look like the Slay the Spire 2 folder: SlayTheSpire2.exe, release_info.json, or the data directory is missing.",
             ValidationStatus.Supported => language == UiLanguage.ZhCn
-                ? $"发现 public-beta {validation.Version}，尖塔金融监管机构点头了。"
-                : $"Found public-beta {validation.Version}. The Spire financial regulator approves.",
+                ? validation.Version == GameValidator.LatestVersion
+                    ? $"发现 Steam Latest Version {validation.Version}，尖塔金融监管机构点头了。"
+                    : $"发现 public-beta {validation.Version}，尖塔金融监管机构点头了。"
+                : validation.Version == GameValidator.LatestVersion
+                    ? $"Found Steam Latest Version {validation.Version}. The Spire financial regulator approves."
+                    : $"Found public-beta {validation.Version}. The Spire financial regulator approves.",
             ValidationStatus.UnsupportedVersion => language == UiLanguage.ZhCn
-                ? $"检测到 {validation.Version ?? "未知版本"}；本安装包只敢碰 {GameValidator.SupportedVersion}。请先在 Steam 切换或更新 public beta。"
-                : $"Detected {validation.Version ?? "an unknown version"}; this setup only dares touch {GameValidator.SupportedVersion}. Switch or update public beta in Steam first.",
+                ? $"检测到 {validation.Version ?? "未知版本"}；本安装包只支持 Steam Latest {GameValidator.LatestVersion} 和 public-beta {GameValidator.PublicBetaVersion}。请先在 Steam 切换或更新游戏分支。"
+                : $"Detected {validation.Version ?? "an unknown version"}; this setup supports Steam Latest {GameValidator.LatestVersion} and public-beta {GameValidator.PublicBetaVersion}. Switch or update the game branch in Steam first.",
             ValidationStatus.ReleaseInfoUnreadable => language == UiLanguage.ZhCn
                 ? $"release_info.json 无法读取：{validation.Detail}"
                 : $"Cannot read release_info.json: {validation.Detail}",

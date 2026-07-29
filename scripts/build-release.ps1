@@ -14,7 +14,19 @@ $gameData = Join-Path $gameRoot "data_sts2_windows_x86_64"
 if (!(Test-Path -LiteralPath (Join-Path $gameData "sts2.dll")) -or
     !(Test-Path -LiteralPath (Join-Path $gameData "0Harmony.dll")))
 {
-    throw "The selected public-beta game folder does not contain the required reference assemblies."
+    throw "The selected Slay the Spire 2 folder does not contain the required reference assemblies."
+}
+
+$releaseInfoPath = Join-Path $gameRoot "release_info.json"
+if (!(Test-Path -LiteralPath $releaseInfoPath))
+{
+    throw "The selected Slay the Spire 2 folder does not contain release_info.json."
+}
+
+$releaseInfo = Get-Content -LiteralPath $releaseInfoPath -Raw | ConvertFrom-Json
+if ($releaseInfo.version -ne "v0.107.1")
+{
+    throw "Universal releases must be compiled against the lowest supported baseline, Steam Latest v0.107.1. Detected $($releaseInfo.version)."
 }
 
 if ([string]::IsNullOrWhiteSpace($OutputDirectory))

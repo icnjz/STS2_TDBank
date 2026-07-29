@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Runs;
+using TDBank.TDBankCode.Compatibility;
 using TDBank.TDBankCode.Networking;
 using TDBank.TDBankCode.UI;
 
@@ -71,10 +72,10 @@ internal static class AbandonRunCompatibilityPatch
             break;
         }
 
-        if (!replaced)
+        if (!replaced && GameApiCompatibility.Uses64BitRng)
         {
             throw new InvalidOperationException(
-                "TD Bank could not locate the public-beta multiplayer "
+                "TD Bank could not locate the multiplayer "
                 + "outside-combat death guard.");
         }
 

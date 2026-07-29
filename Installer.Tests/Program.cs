@@ -58,6 +58,17 @@ try
 
     RunUninstallMatrix(Path.Combine(testRoot, "uninstall"));
 
+    var latestGame = CreateFakeGame(Path.Combine(testRoot, "latest"), "v0.107.1");
+    var latestValidation = GameValidator.Validate(latestGame);
+    Assert(latestValidation.IsGameDirectory, "Valid Steam Latest fixture was not recognized.");
+    Assert(latestValidation.IsSupportedVersion, "Supported Steam Latest version was rejected.");
+    Assert(
+        InstallerStrings.FormatValidation(UiLanguage.ZhCn, latestValidation).Contains("Latest Version"),
+        "Chinese Steam Latest validation omitted the channel.");
+    Assert(
+        InstallerStrings.FormatValidation(UiLanguage.En, latestValidation).Contains("Latest Version"),
+        "English Steam Latest validation omitted the channel.");
+
     var freshGame = CreateFakeGame(Path.Combine(testRoot, "fresh"), "v0.109.1");
     var validation = GameValidator.Validate(freshGame);
     Assert(validation.IsGameDirectory, "Valid fake game was not recognized.");

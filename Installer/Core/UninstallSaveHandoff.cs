@@ -16,7 +16,7 @@ internal static partial class UninstallSaveHandoff
         "tdbank_uninstall_sync_v1.receipt.json";
     private const string BackupFolderName =
         "cnj-tower-debt-save-backups";
-    private const int CurrentProgressSchema = 22;
+    private const int MaximumSupportedProgressSchema = 22;
     private const int MaximumMarkerFiles = 4096;
 
     private static readonly HashSet<string> DirectSaveNames =
@@ -319,7 +319,8 @@ internal static partial class UninstallSaveHandoff
             }
 
             var sourceIdentity = ReadProgressIdentity(sourceProgress);
-            if (sourceIdentity.SchemaVersion != CurrentProgressSchema)
+            if (!GameValidator.IsSupportedProgressSchema(
+                    sourceIdentity.SchemaVersion))
             {
                 throw new InvalidDataException(
                     $"Unsupported modded progress schema {sourceIdentity.SchemaVersion}: {sourceProgress}");
@@ -334,7 +335,8 @@ internal static partial class UninstallSaveHandoff
             if (File.Exists(targetProgress))
             {
                 var targetIdentity = ReadProgressIdentity(targetProgress);
-                if (targetIdentity.SchemaVersion is < 1 or > CurrentProgressSchema
+                if (targetIdentity.SchemaVersion is < 1
+                        or > MaximumSupportedProgressSchema
                     || !string.Equals(
                         sourceIdentity.UniqueId,
                         targetIdentity.UniqueId,

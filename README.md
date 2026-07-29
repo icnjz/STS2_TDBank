@@ -16,7 +16,7 @@
 
 TD Bank is a banking mod for Slay the Spire 2 created by cnj lab.
 
-The current release targets Steam **public-beta v0.109.1**. The game is still in public beta, so future updates may require the mod to be rebuilt or changed.
+The current release supports both Steam **default/latest v0.107.1** and **public-beta v0.109.1**. The game is still in public beta, so future updates may require the mod to be rebuilt or changed.
 
 ## Features
 
@@ -84,7 +84,8 @@ Every player in the same multiplayer lobby should use identical TD Bank and TDLi
 
 ### Requirements
 
-- A legally installed copy of Slay the Spire 2 Steam public-beta v0.109.1
+- A legally installed copy of Slay the Spire 2 Steam default/latest v0.107.1 as the minimum build baseline
+- Steam public-beta v0.109.1 for full dual-branch regression testing
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - Windows 10/11 x64
 - NuGet network access
@@ -97,6 +98,8 @@ Build TD Bank and TDLib, run the tests, and publish the complete Setup:
 .\scripts\build-release.ps1 `
   -Sts2Path "D:\SteamLibrary\steamapps\common\Slay the Spire 2"
 ```
+
+Point `-Sts2Path` at Steam default/latest v0.107.1 when producing release binaries. The same binaries are then regression-tested against public-beta v0.109.1.
 
 The default output is `artifacts/release-v0.1`, including Setup, licenses, third-party notices, and SHA-256 hashes.
 
@@ -116,6 +119,15 @@ dotnet run --project .\Tests\TDBank.LogicSmokeTests.csproj -c Release `
   /p:ModsPath="D:\TemporaryMods\"
 ```
 
+Test one already-built TD Bank/TDLib pair against either supported game's assemblies:
+
+```powershell
+dotnet run --project .\CompatibilityTests\TDBank.BinaryCompatibilitySmokeTests.csproj -c Release `
+  /p:Sts2Path="D:\SteamLibrary\steamapps\common\Slay the Spire 2" -- `
+  "D:\CandidateMods" `
+  "D:\SteamLibrary\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64"
+```
+
 The release script tests installation, rollback, save protection, and uninstall handoff using TD Bank and TDLib runtime files produced by the same build. This prevents the tests or Setup from embedding stale DLL files.
 
 ## Source layout
@@ -127,6 +139,7 @@ TDBank/Assets/               Logo, background, and six localized credit-card ima
 Installer/                   Windows installer and safe uninstaller
 Installer.Tests/             Installation, rollback, save, and uninstall tests
 Tests/                       Bank rules, UI, multiplayer, and compatibility tests
+CompatibilityTests/          Same-binary dual-branch Harmony compatibility test
 Tools/ArtworkAssetConverter/ Artwork conversion tool
 scripts/                     Reproducible release scripts
 ```
@@ -155,7 +168,7 @@ The project is provided “as is.” Compatibility with future public betas, eve
 
 TD Bank 是由 cnj lab 制作的《杀戮尖塔 2》银行 Mod。
 
-当前版本面向 Steam **public-beta v0.109.1**。游戏仍在公测，更新后可能需要重新编译或修改 Mod。
+当前版本同时支持 Steam **默认/latest v0.107.1** 与 **public-beta v0.109.1**。游戏仍在公测，更新后可能需要重新编译或修改 Mod。
 
 ## 功能
 
@@ -223,7 +236,8 @@ TDLib 的部分存档扩展代码及 `Sts2PathDiscovery.props` 改编自 BaseLib
 
 ### 要求
 
-- 合法安装的《杀戮尖塔 2》Steam public-beta v0.109.1
+- 合法安装的《杀戮尖塔 2》Steam 默认/latest v0.107.1，作为最低编译基线
+- Steam public-beta v0.109.1，用于完整的双分支回归测试
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - Windows 10/11 x64
 - NuGet 网络访问
@@ -236,6 +250,8 @@ TDLib 的部分存档扩展代码及 `Sts2PathDiscovery.props` 改编自 BaseLib
 .\scripts\build-release.ps1 `
   -Sts2Path "D:\SteamLibrary\steamapps\common\Slay the Spire 2"
 ```
+
+生成发布 DLL 时，`-Sts2Path` 必须指向 Steam 默认/latest v0.107.1；随后使用同一份 DLL 在 public-beta v0.109.1 上做回归验证。
 
 默认输出位于 `artifacts/release-v0.1`，包括 Setup、许可证、第三方声明和 SHA-256。
 
@@ -255,6 +271,15 @@ dotnet run --project .\Tests\TDBank.LogicSmokeTests.csproj -c Release `
   /p:ModsPath="D:\TemporaryMods\"
 ```
 
+让同一份已经编译好的 TD Bank/TDLib 在任一支持版本的游戏程序集上测试：
+
+```powershell
+dotnet run --project .\CompatibilityTests\TDBank.BinaryCompatibilitySmokeTests.csproj -c Release `
+  /p:Sts2Path="D:\SteamLibrary\steamapps\common\Slay the Spire 2" -- `
+  "D:\CandidateMods" `
+  "D:\SteamLibrary\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64"
+```
+
 发布脚本会使用同一次构建生成的 TD Bank 与 TDLib 运行文件执行安装器、回滚、存档保护和卸载交接测试，避免测试或 Setup 嵌入旧 DLL。
 
 ## 源码结构
@@ -266,6 +291,7 @@ TDBank/Assets/               Logo、背景和六张中英文信用卡图
 Installer/                   Windows 安装与安全卸载器
 Installer.Tests/             安装、回滚、存档及卸载测试
 Tests/                       银行规则、UI、联机和兼容性测试
+CompatibilityTests/          同一 DLL 的双分支 Harmony 兼容测试
 Tools/ArtworkAssetConverter/ 美术转换工具
 scripts/                     可复现发布脚本
 ```

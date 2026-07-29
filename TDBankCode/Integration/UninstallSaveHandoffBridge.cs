@@ -8,6 +8,7 @@ using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Saves;
+using TDBank.TDBankCode.Compatibility;
 
 namespace TDBank.TDBankCode.Integration;
 
@@ -21,7 +22,6 @@ internal static class UninstallSaveHandoffBridge
         "tdbank_uninstall_sync_v1.completed.json";
     internal const string ReceiptName =
         "tdbank_uninstall_sync_v1.receipt.json";
-    private const int CurrentProgressSchema = 22;
     private const int HistoryByteLimit = 5 * 1024 * 1024;
     private const int HistoryFileLimit = 100;
     private const int MaximumFiles = 4096;
@@ -382,7 +382,8 @@ internal static class UninstallSaveHandoffBridge
             RejectTreeReparsePoints(sourceRoot);
             var progress = Path.Combine(sourceRoot, "saves", "progress.save");
             var identity = ReadProgressIdentity(progress);
-            if (identity.SchemaVersion != CurrentProgressSchema
+            if (!GameApiCompatibility.IsSupportedProgressSchema(
+                    identity.SchemaVersion)
                 || !string.Equals(
                     identity.UniqueId,
                     profile.UniqueId,

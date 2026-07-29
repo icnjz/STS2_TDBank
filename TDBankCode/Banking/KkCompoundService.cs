@@ -1,6 +1,7 @@
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Random;
+using TDBank.TDBankCode.Compatibility;
 
 namespace TDBank.TDBankCode.Banking;
 
@@ -352,7 +353,7 @@ public static class KkCompoundService
         ulong seed = player.RunState.Rng.Seed;
         int slot = player.RunState.GetPlayerSlotIndex(player);
 
-        var rng = new Rng(
+        Rng rng = GameApiCompatibility.CreateRng(
             seed,
             FormattableString.Invariant(
                 $"td_bank_butt_risk_v1_slot_{slot}_sale_{nextSaleOrdinal}"));

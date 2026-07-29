@@ -414,7 +414,7 @@ internal static partial class SaveProtection
             if (root.ValueKind != JsonValueKind.Object
                 || !root.TryGetProperty("schema_version", out var schema)
                 || !schema.TryGetInt32(out var schemaVersion)
-                || schemaVersion != 22
+                || !GameValidator.IsSupportedProgressSchema(schemaVersion)
                 || !root.TryGetProperty("unique_id", out var uniqueId)
                 || uniqueId.ValueKind != JsonValueKind.String
                 || string.IsNullOrWhiteSpace(uniqueId.GetString()))

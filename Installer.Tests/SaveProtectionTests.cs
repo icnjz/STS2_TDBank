@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace CNJ.TowerDebt.Setup.Tests;
 
@@ -19,7 +20,7 @@ internal static class SaveProtectionTests
             Path.Combine(root, "missing-target"));
         ReplacesOnlyKnownBlankProfiles(
             Path.Combine(root, "blank-versus-established"));
-        RecognizesRealPublicBetaBlankAndFailsClosedOnUnknownSchema(
+        RecognizesRealDualBranchBlanksAndFailsClosedOnUnknownSchema(
             Path.Combine(root, "real-blank-fixture"));
         HandlesMultipleAccountsAndUnsafeNames(
             Path.Combine(root, "multiple-accounts"));
@@ -349,9 +350,22 @@ internal static class SaveProtectionTests
             "SP-19 reinstall rewrote the pending cloud-handoff marker");
     }
 
-    private static void RecognizesRealPublicBetaBlankAndFailsClosedOnUnknownSchema(
+    private static void RecognizesRealDualBranchBlanksAndFailsClosedOnUnknownSchema(
         string scenario)
     {
+        var schema21Root = NewSaveRoot(Path.Combine(scenario, "schema21"));
+        var schema21Account = AccountRoot(schema21Root, AccountA);
+        WriteText(Path.Combine(schema21Account, "profile.save"), """{"last_profile_id":1,"schema_version":2}""");
+        WriteProfile(schema21Account, "profile1", meaningful: true, includeRunEvidence: true);
+        WriteBlankFixture(
+            Path.Combine(schema21Account, "modded", "profile1"),
+            PublicLatestSchema21BlankFixture());
+
+        var schema21Result = SaveProtection.ProtectAndInitialize(schema21Root, "sp-latest-blank");
+        Assert(
+            schema21Result.Profiles.Single().Disposition == SaveProfileDisposition.Migrated,
+            "The Steam Latest schema-v21 blank structure was not recognized as blank.");
+
         var schema22Root = NewSaveRoot(Path.Combine(scenario, "schema22"));
         var schema22Account = AccountRoot(schema22Root, AccountA);
         WriteText(Path.Combine(schema22Account, "profile.save"), """{"last_profile_id":1,"schema_version":2}""");
@@ -688,6 +702,14 @@ internal static class SaveProtectionTests
           "wongo_points": 0
         }
         """;
+
+    private static string PublicLatestSchema21BlankFixture()
+    {
+        var root = JsonNode.Parse(PublicBetaSchema22BlankFixture())!.AsObject();
+        root["schema_version"] = 21;
+        root["character_stats"] = new JsonArray();
+        return root.ToJsonString();
+    }
 
     private static string MeaningfulProgress(int floorsClimbed) => ProgressJson(floorsClimbed);
 

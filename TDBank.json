@@ -4,7 +4,7 @@
   "author": "cnj lab",
   "description": "A bilingual comedy bank with dynamic A3-A10 comfort assists, per-floor compound savings, three credit tiers, automatic debt repayment, max-debt relic seizure, KK cash-for-health schemes, and multiplayer e-Transfer. / 一个会按进阶动态发放舒适辅助、但仍然极不负责的中英双语尖塔银行。",
   "version": "0.1.0",
-  "min_game_version": "0.109.1",
+  "min_game_version": "0.107.1",
   "has_pck": false,
   "has_dll": true,
   "dependencies": [

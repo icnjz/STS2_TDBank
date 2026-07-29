@@ -49,6 +49,7 @@
         <Compile Remove="shaders/**" />
         <Compile Remove="images/**" />
         <Compile Remove="Tests/**" />
+        <Compile Remove="CompatibilityTests/**" />
         <Compile Remove="TDLib/**" />
         <Compile Remove="Installer/**" />
         <Compile Remove="Installer.Tests/**" />
@@ -61,6 +62,7 @@
         <EmbeddedResource Remove="shaders/**" />
         <EmbeddedResource Remove="images/**" />
         <EmbeddedResource Remove="TDLib/**" />
+        <EmbeddedResource Remove="CompatibilityTests/**" />
         <EmbeddedResource Remove="Installer/**" />
         <EmbeddedResource Remove="Installer.Tests/**" />
         <EmbeddedResource Remove="LiveSaveRepair/**" />

@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
+using TDBank.TDBankCode.Compatibility;
 
 namespace TDBank.TDBankCode.Banking;
 
@@ -99,7 +100,7 @@ public static class CreditCeilingRelicLiquidationService
             }
         }
 
-        var rng = new Rng(
+        Rng rng = GameApiCompatibility.CreateRng(
             runState.Rng.Seed,
             $"td_bank_credit_ceiling_liquidation_v1_act_{runState.CurrentActIndex}"
             + $"_floor_{runState.TotalFloor}"

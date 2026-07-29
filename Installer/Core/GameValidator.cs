@@ -4,7 +4,19 @@ namespace CNJ.TowerDebt.Setup.Core;
 
 internal static class GameValidator
 {
-    public const string SupportedVersion = "v0.109.1";
+    public const string LatestVersion = "v0.107.1";
+    public const string PublicBetaVersion = "v0.109.1";
+    public const string SupportedVersionSummary = "v0.107.1 / v0.109.1";
+
+    private static readonly HashSet<string> SupportedVersions =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            LatestVersion,
+            PublicBetaVersion,
+        };
+
+    public static bool IsSupportedProgressSchema(int schemaVersion)
+        => schemaVersion is 21 or 22;
 
     public static GameValidation Validate(string? directory)
     {
@@ -44,7 +56,7 @@ internal static class GameValidator
             var version = ReadString(rootElement, "version");
             var branch = ReadString(rootElement, "branch");
             var commit = ReadString(rootElement, "commit");
-            var supported = string.Equals(version, SupportedVersion, StringComparison.OrdinalIgnoreCase);
+            var supported = version is not null && SupportedVersions.Contains(version);
             return new(
                 true,
                 supported,

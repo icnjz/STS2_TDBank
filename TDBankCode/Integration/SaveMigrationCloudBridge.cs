@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Saves;
-using MegaCrit.Sts2.Core.Saves.Managers;
+using TDBank.TDBankCode.Compatibility;
 
 namespace TDBank.TDBankCode.Integration;
 
@@ -65,7 +65,7 @@ public static class MigrationProgressClassifier
             JsonElement root = document.RootElement;
             if (root.ValueKind != JsonValueKind.Object
                 || !TryReadInt64(root, "schema_version", out long schema)
-                || schema != 22)
+                || !GameApiCompatibility.IsSupportedProgressSchema(schema))
             {
                 return Result.Unknown;
             }
@@ -136,6 +136,11 @@ public static class MigrationProgressClassifier
                 || characterStats.ValueKind != JsonValueKind.Array)
             {
                 return Result.Unknown;
+            }
+
+            if (characterStats.GetArrayLength() == 0)
+            {
+                return Result.Pristine;
             }
 
             if (characterStats.GetArrayLength() != 1)
@@ -584,7 +589,7 @@ internal static class SaveMigrationCloudBridge
 
         return profiles.All(profileId =>
         {
-            string path = ProgressSaveManager.GetProgressPathForProfile(
+            string path = GameApiCompatibility.GetProgressPathForProfile(
                 profileId,
                 forceModState: true);
             return files.Any(file =>
@@ -611,7 +616,7 @@ internal static class SaveMigrationCloudBridge
 
             for (int profileId = 1; profileId <= 3; profileId++)
             {
-                string progressPath = ProgressSaveManager.GetProgressPathForProfile(
+                string progressPath = GameApiCompatibility.GetProgressPathForProfile(
                     profileId,
                     forceModState: true);
                 if (cloud.FileExists(progressPath))
@@ -638,11 +643,11 @@ internal static class SaveMigrationCloudBridge
 
                 foreach (string runFile in new[]
                          {
-                             RunSaveManager.GetRunSavePath(
+                             GameApiCompatibility.GetRunSavePath(
                                  profileId,
                                  "current_run.save",
                                  forceModState: true),
-                             RunSaveManager.GetRunSavePath(
+                             GameApiCompatibility.GetRunSavePath(
                                  profileId,
                                  "current_run_mp.save",
                                  forceModState: true),
@@ -660,7 +665,7 @@ internal static class SaveMigrationCloudBridge
                     }
                 }
 
-                string historyPath = RunHistorySaveManager.GetHistoryPath(
+                string historyPath = GameApiCompatibility.GetHistoryPath(
                     profileId,
                     forceModState: true);
                 foreach (string historyFile in cloud.GetFilesInDirectory(historyPath)
