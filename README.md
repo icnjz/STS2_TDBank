@@ -31,6 +31,8 @@ The current release supports both Steam **default/latest v0.107.1** and **public
 
 This mod contains some dark humor and may not be suitable for everyone.
 
+Every gameplay value and random probability is published in [`BALANCE.md`](BALANCE.md), including the complete A0–A10 credit tables and Rear-End Risk Control outcome rates.
+
 ## Installation
 
 Download `TDBank_Setup_v0.1.2.exe` from this repository’s [Releases](../../releases).
@@ -184,6 +186,8 @@ TD Bank 是由 cnj lab 制作的《杀戮尖塔 2》银行 Mod。
 - 每项业务在游戏内都有独立规则说明。
 
 本 Mod 可能包含一点黑色幽默内容，不适合所有玩家。
+
+全部玩法数值和随机概率都已在 [`BALANCE.md`](BALANCE.md) 公开，包括 A0–A10 信用卡完整表格和“菊部风控”的每档结果概率。
 
 ## 安装
 
