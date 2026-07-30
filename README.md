@@ -2,7 +2,7 @@
   <img src="./TDBank/Assets/bank_logo.png" alt="TD Bank logo" width="180">
 </p>
 
-<h1 align="center">TD Bank v0.1.1</h1>
+<h1 align="center">TD Bank v0.1.2</h1>
 
 <p align="center"><strong>Turn today’s gold into tomorrow’s financial problems.</strong></p>
 
@@ -21,11 +21,11 @@ The current release supports both Steam **default/latest v0.107.1** and **public
 ## Features
 
 - Every new run requires account opening the first time the bank is used.
-- Native in-game Gold is the savings balance. Capped compound interest is paid at the start of each new map floor: 5%/50G on A0–A2, 6%/60G on A3–A5, 7%/70G on A6–A8, and 8%/80G on A9–A10.
-- Three credit-card tiers, automatic debt repayment, a first-debt grace period, tiered interest rates, card closure after maxing out debt, and relic liquidation.
+- Native in-game Gold is the savings balance. Capped compound interest becomes stricter with Ascension: 1.5%/10G on A0–A1, 1.25%/8G on A2–A3, 1%/7G on A4–A5, 0.75%/6G on A6–A7, and 0.5%/5G on A8–A10.
+- Three rebalanced credit-card tiers, automatic debt repayment, a first-debt grace period, tiered interest rates, card closure after maxing out debt, and relic liquidation.
 - Dynamic adjustments for A0–A10.
 - Multiplayer e-Transfer.
-- KK Compound cash-for-health services and hidden events.
+- KK Compound cash-for-health services and hidden events. Butt sales keep maximum HP intact, but after the third sale their current-HP cost rises while their payout falls.
 - Instant switching between English and Chinese.
 - Every banking service has its own in-game rules page.
 
@@ -33,7 +33,7 @@ This mod contains some dark humor and may not be suitable for everyone.
 
 ## Installation
 
-Download `TDBank_Setup_v0.1.1.exe` from this repository’s [Releases](../../releases).
+Download `TDBank_Setup_v0.1.2.exe` from this repository’s [Releases](../../releases).
 
 1. Fully exit Slay the Spire 2.
 2. Verify the SHA-256 published on the Release page. The current Setup is self-signed by `CNJ Tower Debt`; the signature verifies file integrity but is not a commercial trust certificate.
@@ -42,7 +42,7 @@ Download `TDBank_Setup_v0.1.1.exe` from this repository’s [Releases](../../rel
 
 Setup installs no Windows software. It only places these two mods in the game’s `mods` folder:
 
-- **TD Bank v0.1.1**
+- **TD Bank v0.1.2**
   Adds a bank to Slay the Spire 2 and changes gameplay.
 - **TDLib v0.1**  
   TD Bank’s dedicated save and multiplayer synchronization component. It only stores bank-account data and does not replace or affect BaseLib.
@@ -103,7 +103,7 @@ Build TD Bank and TDLib, run the tests, and publish the complete Setup:
 
 Point `-Sts2Path` at Steam default/latest v0.107.1 when producing release binaries. The same binaries are then regression-tested against public-beta v0.109.1.
 
-The default output is `artifacts/release-v0.1.1`, including Setup, licenses, third-party notices, and SHA-256 hashes.
+The default output is `artifacts/release-v0.1.2`, including Setup, licenses, third-party notices, and SHA-256 hashes.
 
 Build only the mods:
 
@@ -175,11 +175,11 @@ TD Bank 是由 cnj lab 制作的《杀戮尖塔 2》银行 Mod。
 ## 功能
 
 - 每个新局第一次使用银行时必须开户。
-- 游戏原生金币就是储蓄余额。每个新地图层开始时结算有上限的复利：A0–A2 为 5%/50G，A3–A5 为 6%/60G，A6–A8 为 7%/70G，A9–A10 为 8%/80G。
-- 三档信用卡、自动还债、首次欠款免息期、分级利率、刷爆后的停卡与圣遗物清算。
+- 游戏原生金币就是储蓄余额。每个新地图层开始时结算有上限的复利，并随进阶收紧：A0–A1 为 1.5%/10G，A2–A3 为 1.25%/8G，A4–A5 为 1%/7G，A6–A7 为 0.75%/6G，A8–A10 为 0.5%/5G。
+- 重新平衡的三档信用卡、自动还债、首次欠款免息期、分级利率、刷爆后的停卡与圣遗物清算。
 - A0–A10 动态调整。
 - 多人联机 e-Transfer。
-- KK 园区现金换生命业务和隐藏事件。
+- KK 园区现金换生命业务和隐藏事件。卖屁股不扣最大生命，但第 4 次起会越卖越伤、给得越少。
 - 中文与 English 随时切换。
 - 每项业务在游戏内都有独立规则说明。
 
@@ -187,7 +187,7 @@ TD Bank 是由 cnj lab 制作的《杀戮尖塔 2》银行 Mod。
 
 ## 安装
 
-推荐从本仓库的 [Releases](../../releases) 下载 `TDBank_Setup_v0.1.1.exe`。
+推荐从本仓库的 [Releases](../../releases) 下载 `TDBank_Setup_v0.1.2.exe`。
 
 1. 完全退出《杀戮尖塔 2》。
 2. 核对 Release 页面公布的 SHA-256。当前 Setup 由 `CNJ Tower Debt` 自签名；签名可以核对文件完整性，但不属于商业信任证书。
@@ -196,7 +196,7 @@ TD Bank 是由 cnj lab 制作的《杀戮尖塔 2》银行 Mod。
 
 本 Setup 不安装任何 Windows 软件，只把以下两个 Mod 放入游戏的 `mods` 文件夹：
 
-- **TD Bank v0.1.1**
+- **TD Bank v0.1.2**
   给《杀戮尖塔 2》增加一个银行，它会改变游戏玩法。
 - **TDLib v0.1**  
   TD Bank 专用的存档与多人同步组件。它只负责保存银行账户数据，不会替换或影响 BaseLib。
@@ -257,7 +257,7 @@ TDLib 的部分存档扩展代码及 `Sts2PathDiscovery.props` 改编自 BaseLib
 
 生成发布 DLL 时，`-Sts2Path` 必须指向 Steam 默认/latest v0.107.1；随后使用同一份 DLL 在 public-beta v0.109.1 上做回归验证。
 
-默认输出位于 `artifacts/release-v0.1.1`，包括 Setup、许可证、第三方声明和 SHA-256。
+默认输出位于 `artifacts/release-v0.1.2`，包括 Setup、许可证、第三方声明和 SHA-256。
 
 只构建 Mod：
 

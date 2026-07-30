@@ -54,10 +54,73 @@ public static class KkCompoundService
     public static int GetButtGoldValueForNextSale(Player player)
     {
         ArgumentNullException.ThrowIfNull(player);
-        int baseValue = GetButtGoldValue(player);
-        return BankStateStore.Get(player).ButtSalesCount >= 3
-            ? checked(baseValue + 20)
-            : baseValue;
+        return CalculateButtGoldValue(
+            GetButtGoldValue(player),
+            BankStateStore.Get(player).ButtSalesCount);
+    }
+
+    public static int GetButtHpCostForNextSale(Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        return CalculateButtHpCost(
+            GetButtHpCost(player),
+            BankStateStore.Get(player).ButtSalesCount);
+    }
+
+    public static int CalculateButtHpCost(
+        int baseHpCost,
+        int completedSales)
+    {
+        if (baseHpCost <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(baseHpCost));
+        }
+        if (completedSales < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(completedSales));
+        }
+
+        if (completedSales < 3)
+        {
+            return baseHpCost;
+        }
+        if (completedSales < 6)
+        {
+            return checked(baseHpCost + 3);
+        }
+        if (completedSales < 9)
+        {
+            return checked(baseHpCost + 7);
+        }
+
+        return checked(baseHpCost + 12 + (completedSales - 9) * 2);
+    }
+
+    public static int CalculateButtGoldValue(
+        int baseGoldValue,
+        int completedSales)
+    {
+        if (baseGoldValue <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(baseGoldValue));
+        }
+        if (completedSales < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(completedSales));
+        }
+
+        if (completedSales < 3)
+        {
+            return baseGoldValue;
+        }
+
+        int percent = completedSales switch
+        {
+            < 6 => 60,
+            < 9 => 35,
+            _ => 15,
+        };
+        return Math.Max(10, checked(baseGoldValue * percent / 100));
     }
 
     public static int GetMaximumSafeKidneyCount(Player player)
@@ -78,11 +141,10 @@ public static class KkCompoundService
     public static bool CanSafelySellButt(Player player)
     {
         ArgumentNullException.ThrowIfNull(player);
-        int hpCost = GetButtHpCost(player);
-        int maximumCost =
-            BankStateStore.Get(player).ButtSalesCount >= 3
-                ? checked(hpCost * 2)
-                : hpCost;
+        int hpCost = GetButtHpCostForNextSale(player);
+        int maximumCost = BankStateStore.Get(player).ButtSalesCount >= 3
+            ? checked(hpCost * 2)
+            : hpCost;
         return player.Creature.CurrentHp > maximumCost;
     }
 
@@ -256,10 +318,13 @@ public static class KkCompoundService
 
         Creature creature = player.Creature;
         int oldCurrentHp = creature.CurrentHp;
-        int hpCost = GetButtHpCost(player);
+        int hpCost;
         int maximumHpCost;
         try
         {
+            hpCost = CalculateButtHpCost(
+                GetButtHpCost(player),
+                snapshot.ButtSalesCount);
             maximumHpCost = snapshot.ButtSalesCount >= 3
                 ? checked(hpCost * 2)
                 : hpCost;

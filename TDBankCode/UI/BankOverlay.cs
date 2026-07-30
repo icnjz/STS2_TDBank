@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Godot;
 using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
+using TDBank.TDBankCode.Banking;
 
 namespace TDBank.TDBankCode.UI;
 
@@ -1186,6 +1187,8 @@ public sealed partial class BankOverlay : Control, IScreenContext
                 "butt_rules",
                 _snapshot.ButtHpCost,
                 _snapshot.ButtGoldValue,
+                _snapshot.ButtSalesCount + 1,
+                ButtSaleHpCost(),
                 ButtRepeatGoldValue()),
             BankUiTheme.Green,
             BankUiTheme.GreenSoft));
@@ -1231,7 +1234,7 @@ public sealed partial class BankOverlay : Control, IScreenContext
                 ? BankUiText.Get(
                     "sell_butt_button_repeat",
                     _snapshot.ButtSalesCount + 1,
-                    _snapshot.ButtHpCost,
+                    ButtSaleHpCost(),
                     ButtRepeatGoldValue())
                 : BankUiText.Get(
                     "sell_butt_button",
@@ -1247,8 +1250,8 @@ public sealed partial class BankOverlay : Control, IScreenContext
         sellButt.Pressed += () =>
         {
             int maximumHpCost = _snapshot.ButtSalesCount >= 3
-                ? _snapshot.ButtHpCost * 2
-                : _snapshot.ButtHpCost;
+                ? checked(ButtSaleHpCost() * 2)
+                : ButtSaleHpCost();
             if (_snapshot.CurrentHp <= maximumHpCost)
             {
                 BankUiBridge.NotifyImportant(BankUiText.Get("butt_fatal"));
@@ -1424,9 +1427,16 @@ public sealed partial class BankOverlay : Control, IScreenContext
 
     private int ButtRepeatGoldValue()
     {
-        return (int)Math.Min(
-            int.MaxValue,
-            Math.Max(0L, (long)_snapshot.ButtGoldValue + 20L));
+        return KkCompoundService.CalculateButtGoldValue(
+            _snapshot.ButtGoldValue,
+            _snapshot.ButtSalesCount);
+    }
+
+    private int ButtSaleHpCost()
+    {
+        return KkCompoundService.CalculateButtHpCost(
+            _snapshot.ButtHpCost,
+            _snapshot.ButtSalesCount);
     }
 
     private static int ClampToInt(long value)

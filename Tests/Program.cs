@@ -1313,18 +1313,18 @@ Expect(
     && BankService.GetSavingsPrincipal(observedGold) == 137,
     "A completed native gold gain did not update qualification and principal.");
 Expect(
-    BankService.AccrueSavingsInterest(observedGold, 501).Amount == 6
-    && observedGold.Gold == 143
+    BankService.AccrueSavingsInterest(observedGold, 501).Amount == 2
+    && observedGold.Gold == 139
     && BankService.GetSavingsPrincipal(observedGold) == 137
-    && BankService.GetSavingsInterest(observedGold) == 6
-    && BankService.GetSavingsInterestEarnedTotal(observedGold) == 6
-    && BankService.GetQualifyingEarned(observedGold) == 43
+    && BankService.GetSavingsInterest(observedGold) == 2
+    && BankService.GetSavingsInterestEarnedTotal(observedGold) == 2
+    && BankService.GetQualifyingEarned(observedGold) == 39
     && BankService.GetSavingsTenths(observedGold) == 0,
     "Savings-interest setup for native-loss reconciliation is incorrect.");
 int beforeFirstLoss = observedGold.Gold;
 observedGold.Gold = 131;
 Expect(
-    BankService.RecordNativeGoldLoss(observedGold, beforeFirstLoss).Amount == 12
+    BankService.RecordNativeGoldLoss(observedGold, beforeFirstLoss).Amount == 8
     && BankService.GetSavingsInterest(observedGold) == 0
     && BankService.GetSavingsPrincipal(observedGold) == 131,
     "Native loss did not consume accrued interest before principal.");
@@ -1333,7 +1333,7 @@ observedGold.Gold = 100;
 Expect(
     BankService.RecordNativeGoldLoss(observedGold, beforeSecondLoss).Amount == 31
     && BankService.GetSavingsInterest(observedGold) == 0
-    && BankService.GetSavingsInterestEarnedTotal(observedGold) == 6
+    && BankService.GetSavingsInterestEarnedTotal(observedGold) == 2
     && BankService.GetSavingsPrincipal(observedGold) == 100
     && BankService.GetSavingsBalance(observedGold) == observedGold.Gold,
     "Native loss did not reconcile unified savings components.");
@@ -1376,10 +1376,10 @@ _ = BankService.RecordNativeGoldLoss(
     MegaCrit.Sts2.Core.Entities.Gold.GoldLossType.Stolen);
 AccountState stolenState = BankStateStore.Get(stolenGold);
 Expect(
-    stolenState.StolenSavingsInterest == 5
-    && stolenState.StolenSavingsPrincipal == 45
+    stolenState.StolenSavingsInterest == 1
+    && stolenState.StolenSavingsPrincipal == 49
     && stolenState.SavingsInterest == 0
-    && stolenState.SavingsPrincipal == 55,
+    && stolenState.SavingsPrincipal == 51,
     "Stolen gold did not preserve removed interest/principal composition.");
 stolenGold.Gold += 50;
 _ = BankService.RecordNativeGoldGainAmount(
@@ -1387,7 +1387,7 @@ _ = BankService.RecordNativeGoldGainAmount(
     50,
     wasStolenBack: true);
 Expect(
-    BankService.GetSavingsInterest(stolenGold) == 5
+    BankService.GetSavingsInterest(stolenGold) == 1
     && BankService.GetSavingsPrincipal(stolenGold) == 100
     && BankService.GetQualifyingEarned(stolenGold)
         == qualificationBeforeTheft
@@ -1417,7 +1417,7 @@ _ = BankService.RecordNativeGoldGainAmount(
     wasStolenBack: true);
 Expect(
     BankService.GetSavingsInterest(escapedTheft) == 0
-    && BankService.GetSavingsPrincipal(escapedTheft) == 85
+    && BankService.GetSavingsPrincipal(escapedTheft) == 81
     && BankStateStore.Get(escapedTheft).StolenSavingsInterest == 0
     && BankStateStore.Get(escapedTheft).StolenSavingsPrincipal == 0,
     "An escaped thief's stale composition leaked into a later refund.");
@@ -1460,24 +1460,24 @@ BankOperationResult interestFloorOne =
     BankService.AccrueSavingsInterest(compoundInterest, 1101);
 Expect(
     interestFloorOne.Success
-    && interestFloorOne.Amount == 5
-    && compoundInterest.Gold == 105,
-    "The first unique floor did not pay 5% compound interest.");
+    && interestFloorOne.Amount == 1
+    && compoundInterest.Gold == 101,
+    "The first unique floor did not pay 1.5% compound interest.");
 Expect(
     BankService.AccrueSavingsInterest(compoundInterest, 1101).Error
         == BankErrorCode.AlreadyProcessed
-    && compoundInterest.Gold == 105,
+    && compoundInterest.Gold == 101,
     "The same savings floor token paid twice.");
 BankOperationResult interestFloorTwo =
     BankService.AccrueSavingsInterest(compoundInterest, 1102);
 Expect(
     interestFloorTwo.Success
-    && interestFloorTwo.Amount == 5
-    && compoundInterest.Gold == 110
+    && interestFloorTwo.Amount == 1
+    && compoundInterest.Gold == 102
     && BankService.GetSavingsPrincipal(compoundInterest) == 100
-    && BankService.GetSavingsInterest(compoundInterest) == 10
-    && BankService.GetSavingsInterestEarnedTotal(compoundInterest) == 10
-    && BankService.GetQualifyingEarned(compoundInterest) == 10
+    && BankService.GetSavingsInterest(compoundInterest) == 2
+    && BankService.GetSavingsInterestEarnedTotal(compoundInterest) == 2
+    && BankService.GetQualifyingEarned(compoundInterest) == 2
     && BankStateStore.Get(compoundInterest).SavingsInterestTurns == 2,
     "Savings interest did not compound on the next real floor.");
 
@@ -1544,143 +1544,143 @@ Expect(
 
 Expect(
     BankService.GetCreditLimit(CreditTier.VisaPoor) == 200
-    && BankService.GetCreditLimit(CreditTier.VisaMiddleClass) == 1000
-    && BankService.GetCreditLimit(CreditTier.VisaTycoon) == 2000
+    && BankService.GetCreditLimit(CreditTier.VisaMiddleClass) == 700
+    && BankService.GetCreditLimit(CreditTier.VisaTycoon) == 1200
     && BankService.GetMaximumDebt(CreditTier.VisaPoor) == 400
-    && BankService.GetMaximumDebt(CreditTier.VisaMiddleClass) == 2000
-    && BankService.GetMaximumDebt(CreditTier.VisaTycoon) == 4000,
+    && BankService.GetMaximumDebt(CreditTier.VisaMiddleClass) == 1400
+    && BankService.GetMaximumDebt(CreditTier.VisaTycoon) == 2400,
     "Credit limits or the 200% debt ceilings are incorrect.");
 Expect(
-    BankService.PoorQualification == 200
-    && BankService.MiddleClassQualification == 900
-    && BankService.TycoonQualification == 2200
-    && BankService.GetQualificationThreshold(CreditTier.VisaPoor) == 200
+    BankService.PoorQualification == 150
+    && BankService.MiddleClassQualification == 600
+    && BankService.TycoonQualification == 1600
+    && BankService.GetQualificationThreshold(CreditTier.VisaPoor) == 150
     && BankService.GetQualificationThreshold(
-        CreditTier.VisaMiddleClass) == 900
+        CreditTier.VisaMiddleClass) == 600
     && BankService.GetQualificationThreshold(
-        CreditTier.VisaTycoon) == 2200
-    && BankService.GetHighestEligibleTier(199) == CreditTier.None
-    && BankService.GetHighestEligibleTier(200) == CreditTier.VisaPoor
-    && BankService.GetHighestEligibleTier(899) == CreditTier.VisaPoor
-    && BankService.GetHighestEligibleTier(900)
+        CreditTier.VisaTycoon) == 1600
+    && BankService.GetHighestEligibleTier(149) == CreditTier.None
+    && BankService.GetHighestEligibleTier(150) == CreditTier.VisaPoor
+    && BankService.GetHighestEligibleTier(599) == CreditTier.VisaPoor
+    && BankService.GetHighestEligibleTier(600)
         == CreditTier.VisaMiddleClass
-    && BankService.GetHighestEligibleTier(2199)
+    && BankService.GetHighestEligibleTier(1599)
         == CreditTier.VisaMiddleClass
-    && BankService.GetHighestEligibleTier(2200)
+    && BankService.GetHighestEligibleTier(1600)
         == CreditTier.VisaTycoon,
-    "Balanced 200/900/2200 card qualification thresholds regressed.");
+    "Balanced 150/600/1600 card qualification thresholds regressed.");
 AscensionBankBenefits[] expectedAscensionBenefits =
 [
     new(
         0,
-        200, 900, 2200,
-        200, 1000, 2000,
+        150, 600, 1600,
+        200, 700, 1200,
         200, 3,
         2199, 2499, 2799,
-        500, 50,
+        150, 10,
         10, 200,
         5, 50,
         100, int.MaxValue),
     new(
         1,
-        175, 850, 2100,
-        225, 1050, 2100,
+        175, 650, 1700,
+        200, 700, 1200,
         200, 3,
         2199, 2499, 2799,
-        500, 50,
+        150, 10,
         10, 200,
         5, 50,
         100, int.MaxValue),
     new(
         2,
-        150, 800, 2000,
-        250, 1100, 2200,
-        200, 3,
-        2199, 2499, 2799,
-        500, 50,
+        200, 700, 1800,
+        200, 650, 1100,
+        190, 3,
+        2299, 2599, 2899,
+        125, 8,
         10, 200,
         5, 50,
         100, int.MaxValue),
     new(
         3,
-        0, 750, 1900,
-        300, 1200, 2400,
-        250, 6,
-        1599, 1899, 2199,
-        600, 60,
-        8, 300,
-        4, 80,
-        250, 6),
+        225, 800, 2000,
+        200, 650, 1100,
+        190, 2,
+        2299, 2599, 2899,
+        125, 8,
+        10, 200,
+        5, 50,
+        100, int.MaxValue),
     new(
         4,
-        0, 700, 1750,
-        325, 1300, 2600,
-        250, 6,
-        1549, 1849, 2149,
-        600, 60,
-        8, 320,
-        4, 85,
-        300, 6),
+        250, 900, 2200,
+        200, 600, 1000,
+        180, 2,
+        2399, 2699, 2999,
+        100, 7,
+        10, 200,
+        5, 50,
+        100, int.MaxValue),
     new(
         5,
-        0, 650, 1600,
-        350, 1400, 2800,
-        260, 7,
-        1499, 1799, 2099,
-        600, 60,
-        8, 340,
-        4, 90,
-        350, 5),
+        275, 1000, 2400,
+        200, 600, 1000,
+        180, 2,
+        2399, 2699, 2999,
+        100, 7,
+        10, 200,
+        5, 50,
+        100, int.MaxValue),
     new(
         6,
-        0, 600, 1450,
-        375, 1500, 3000,
-        270, 8,
-        1449, 1749, 2049,
-        700, 70,
-        7, 360,
-        4, 95,
-        400, 5),
+        300, 1100, 2600,
+        175, 550, 900,
+        170, 1,
+        2499, 2799, 3099,
+        75, 6,
+        10, 200,
+        5, 50,
+        100, int.MaxValue),
     new(
         7,
-        0, 550, 1300,
-        400, 1600, 3200,
-        280, 9,
-        1399, 1699, 1999,
-        700, 70,
-        7, 380,
-        3, 100,
-        450, 5),
+        325, 1200, 2800,
+        175, 550, 900,
+        170, 1,
+        2499, 2799, 3099,
+        75, 6,
+        10, 200,
+        5, 50,
+        100, int.MaxValue),
     new(
         8,
-        0, 500, 1150,
-        450, 1750, 3500,
-        290, 10,
-        1299, 1599, 1899,
-        700, 70,
-        6, 400,
-        3, 110,
-        500, 4),
+        350, 1300, 3000,
+        150, 500, 800,
+        160, 1,
+        2599, 2899, 3199,
+        50, 5,
+        10, 200,
+        5, 50,
+        100, int.MaxValue),
     new(
         9,
-        0, 450, 1000,
-        500, 1900, 3800,
-        300, 11,
-        1199, 1499, 1799,
-        800, 80,
-        5, 450,
-        2, 125,
-        600, 4),
+        375, 1400, 3200,
+        150, 450, 750,
+        150, 1,
+        2699, 2999, 3299,
+        50, 5,
+        10, 200,
+        5, 50,
+        100, int.MaxValue),
     new(
         10,
-        0, 400, 850,
-        600, 2200, 4400,
-        300, 12,
-        999, 1299, 1599,
-        800, 80,
-        5, 500,
-        2, 150,
-        750, 3),
+        400, 1500, 3500,
+        150, 450, 750,
+        150, 1,
+        2699, 2999, 3299,
+        50, 5,
+        10, 200,
+        5, 50,
+        100, int.MaxValue),
 ];
 for (var ascension = 0; ascension <= 10; ascension++)
 {
@@ -1699,28 +1699,28 @@ Expect(
     "Ascension benefit lookup no longer clamps outside the A0-A10 range.");
 Expect(
     AscensionBankBenefits.ForAscension(0)
-        .CalculateSavingsInterest(100) == 5
+        .CalculateSavingsInterest(100) == 1
     && AscensionBankBenefits.ForAscension(0)
-        .CalculateSavingsInterest(2000) == 50
+        .CalculateSavingsInterest(2000) == 10
     && AscensionBankBenefits.ForAscension(3)
-        .CalculateSavingsInterest(100) == 6
+        .CalculateSavingsInterest(100) == 1
     && AscensionBankBenefits.ForAscension(3)
-        .CalculateSavingsInterest(2000) == 60
+        .CalculateSavingsInterest(2000) == 8
     && AscensionBankBenefits.ForAscension(6)
-        .CalculateSavingsInterest(100) == 7
+        .CalculateSavingsInterest(200) == 1
     && AscensionBankBenefits.ForAscension(6)
-        .CalculateSavingsInterest(2000) == 70
+        .CalculateSavingsInterest(2000) == 6
     && AscensionBankBenefits.ForAscension(9)
-        .CalculateSavingsInterest(100) == 8
+        .CalculateSavingsInterest(200) == 1
     && AscensionBankBenefits.ForAscension(9)
-        .CalculateSavingsInterest(2000) == 80,
+        .CalculateSavingsInterest(2000) == 5,
     "Ascension savings rates or per-floor caps regressed.");
 
 BankCreditOffer[] expectedA0UiOffers =
 [
-    new(BankCreditTier.Starter, 200, 200, 400, 2199),
-    new(BankCreditTier.MiddleClass, 900, 1000, 2000, 2499),
-    new(BankCreditTier.NouveauRiche, 2200, 2000, 4000, 2799),
+    new(BankCreditTier.Starter, 150, 200, 400, 2199),
+    new(BankCreditTier.MiddleClass, 600, 700, 1400, 2499),
+    new(BankCreditTier.NouveauRiche, 1600, 1200, 2400, 2799),
 ];
 Expect(
     BankUiSnapshot.Empty.CreditOffers.SequenceEqual(expectedA0UiOffers),
@@ -1735,21 +1735,21 @@ Expect(
         new[]
         {
             new BankCreditOffer(
-                BankCreditTier.Starter, 0, 300, 750, 1599),
+                BankCreditTier.Starter, 225, 200, 380, 2299),
             new BankCreditOffer(
-                BankCreditTier.MiddleClass, 750, 1200, 3000, 1899),
+                BankCreditTier.MiddleClass, 800, 650, 1235, 2599),
             new BankCreditOffer(
-                BankCreditTier.NouveauRiche, 1900, 2400, 6000, 2199),
+                BankCreditTier.NouveauRiche, 2000, 1100, 2090, 2899),
         })
     && a10Ui.CreditOffers.SequenceEqual(
         new[]
         {
             new BankCreditOffer(
-                BankCreditTier.Starter, 0, 600, 1800, 999),
+                BankCreditTier.Starter, 400, 150, 225, 2699),
             new BankCreditOffer(
-                BankCreditTier.MiddleClass, 400, 2200, 6600, 1299),
+                BankCreditTier.MiddleClass, 1500, 450, 675, 2999),
             new BankCreditOffer(
-                BankCreditTier.NouveauRiche, 850, 4400, 13200, 1599),
+                BankCreditTier.NouveauRiche, 3500, 750, 1125, 3299),
         }),
     "BankUiSnapshot/CreditOffers do not carry the A3 or A10 dynamic terms.");
 
@@ -1762,22 +1762,22 @@ string a10OpeningCopy =
     InvokeOverlayPureMethod<string>(a10Ui, "OpeningRules");
 Expect(
     a3CreditCopy.Contains("当前 A3", StringComparison.Ordinal)
-    && a3CreditCopy.Contains("开户即批", StringComparison.Ordinal)
-    && a3CreditCopy.Contains("1,200 G", StringComparison.Ordinal)
-    && a3CreditCopy.Contains("6 个完成层", StringComparison.Ordinal)
-    && a3CreditCopy.Contains("15.99%", StringComparison.Ordinal)
-    && a3CreditCopy.Contains("每 250G", StringComparison.Ordinal)
-    && a3CreditCopy.Contains("最多 6 件", StringComparison.Ordinal)
-    && a3SavingsCopy.Contains("6%", StringComparison.Ordinal)
-    && a3SavingsCopy.Contains("最多 60G", StringComparison.Ordinal)
-    && a3SavingsCopy.Contains("6G", StringComparison.Ordinal)
+    && a3CreditCopy.Contains("225 G", StringComparison.Ordinal)
+    && a3CreditCopy.Contains("650 G", StringComparison.Ordinal)
+    && a3CreditCopy.Contains("2 个完成层", StringComparison.Ordinal)
+    && a3CreditCopy.Contains("22.99%", StringComparison.Ordinal)
+    && a3CreditCopy.Contains("每 100G", StringComparison.Ordinal)
+    && a3CreditCopy.Contains("不封顶", StringComparison.Ordinal)
+    && a3SavingsCopy.Contains("1.25%", StringComparison.Ordinal)
+    && a3SavingsCopy.Contains("最多 8G", StringComparison.Ordinal)
+    && a3SavingsCopy.Contains("1G", StringComparison.Ordinal)
     && a10OpeningCopy.Contains("当前 A10", StringComparison.Ordinal)
-    && a10OpeningCopy.Contains("12 层", StringComparison.Ordinal)
-    && a10OpeningCopy.Contains("9.99%", StringComparison.Ordinal)
-    && a10OpeningCopy.Contains("每 750G", StringComparison.Ordinal)
-    && a10OpeningCopy.Contains("最多 3 件", StringComparison.Ordinal)
-    && a10OpeningCopy.Contains("500G", StringComparison.Ordinal)
-    && a10OpeningCopy.Contains("第 4 次起 170G", StringComparison.Ordinal),
+    && a10OpeningCopy.Contains("1 层", StringComparison.Ordinal)
+    && a10OpeningCopy.Contains("26.99%", StringComparison.Ordinal)
+    && a10OpeningCopy.Contains("每 100G", StringComparison.Ordinal)
+    && a10OpeningCopy.Contains("不封顶", StringComparison.Ordinal)
+    && a10OpeningCopy.Contains("200G", StringComparison.Ordinal)
+    && a10OpeningCopy.Contains("第 4 次起越卖越伤", StringComparison.Ordinal),
     "Dynamic A3/A10 UI rules do not explain the effective snapshot terms.");
 
 
@@ -1789,40 +1789,41 @@ Expect(
         == expectedAscensionBenefits[3]
     && BankService.GetQualificationThreshold(
         a3Qualification,
-        CreditTier.VisaPoor) == 0
+        CreditTier.VisaPoor) == 225
     && BankService.GetQualificationThreshold(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 750
+        CreditTier.VisaMiddleClass) == 800
     && BankService.GetQualificationThreshold(
         a3Qualification,
-        CreditTier.VisaTycoon) == 1900
+        CreditTier.VisaTycoon) == 2000
+    && BankService.RecordGoldEarned(a3Qualification, 225).Success
     && BankService.ApplyForCreditCard(
         a3Qualification,
         CreditTier.VisaPoor).Success
     && BankService.GetCreditLimit(
         a3Qualification,
-        CreditTier.VisaPoor) == 300
+        CreditTier.VisaPoor) == 200
     && BankService.GetMaximumDebt(
         a3Qualification,
-        CreditTier.VisaPoor) == 750,
-    "A3 player did not receive instant starter approval and 300/750G "
+        CreditTier.VisaPoor) == 380,
+    "A3 player did not receive the 225G-qualified 200/380G "
     + "live credit terms.");
 Expect(
     BankService.ApplyForCreditCard(
         a3Qualification,
         CreditTier.VisaMiddleClass).Error
         == BankErrorCode.NotEligible
-    && BankService.RecordGoldEarned(a3Qualification, 750).Success
+    && BankService.RecordGoldEarned(a3Qualification, 575).Success
     && BankService.ApplyForCreditCard(
         a3Qualification,
         CreditTier.VisaMiddleClass).Success
     && BankService.GetCreditLimit(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 1200
+        CreditTier.VisaMiddleClass) == 650
     && BankService.GetMaximumDebt(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 3000,
-    "A3 live middle-card qualification or limit did not use 750/1200/3000G.");
+        CreditTier.VisaMiddleClass) == 1235,
+    "A3 live middle-card qualification or limit did not use 800/650/1235G.");
 
 Player a3Debt =
     OpenAscensionCardPlayer(3, CreditTier.VisaPoor, 9804);
@@ -1830,7 +1831,7 @@ Expect(
     BankService.TrySpend(a3Debt, 100).Success
     && BankService.GetCreditDebt(a3Debt) == 100,
     "A3 debt fixture could not charge its instant starter card.");
-for (var floor = 1; floor <= 6; floor++)
+for (var floor = 1; floor <= 2; floor++)
 {
     BankOperationResult graceResult =
         BankService.AccrueDebtInterest(a3Debt, 3000 + floor);
@@ -1841,26 +1842,26 @@ for (var floor = 1; floor <= 6; floor++)
         $"A3 first debt charged interest on grace floor {floor}.");
 }
 Expect(
-    BankService.AccrueDebtInterest(a3Debt, 3007).Amount == 16
-    && BankService.GetCreditDebt(a3Debt) == 116
+    BankService.AccrueDebtInterest(a3Debt, 3003).Amount == 23
+    && BankService.GetCreditDebt(a3Debt) == 123
     && BankService.GetDebtInterestBasisPoints(
         a3Debt,
-        CreditTier.VisaPoor) == 1599,
-    "A3 debt did not charge ceil(100 * 15.99%) after six free floors.");
+        CreditTier.VisaPoor) == 2299,
+    "A3 debt did not charge ceil(100 * 22.99%) after two free floors.");
 
 Player a3Savings = OpenAscensionPlayer(3, 100, 9805);
 BankOperationResult a3Interest =
     BankService.AccrueSavingsInterest(a3Savings, 3101);
 Expect(
-    a3Interest == BankOperationResult.Ok(6, 0)
-    && a3Savings.Gold == 106
-    && BankService.GetSavingsInterest(a3Savings) == 6
-    && BankService.GetQualifyingEarned(a3Savings) == 6
+    a3Interest == BankOperationResult.Ok(1, 0)
+    && a3Savings.Gold == 101
+    && BankService.GetSavingsInterest(a3Savings) == 1
+    && BankService.GetQualifyingEarned(a3Savings) == 1
     && BankService.CalculateNextSavingsInterest(
         a3Savings,
         100,
-        0) == 6,
-    "A3 live savings did not pay capped qualifying 6% interest.");
+        0) == 1,
+    "A3 live savings did not pay capped qualifying 1.25% interest.");
 
 Player a3Kk = OpenAscensionPlayer(3, 0, 9806, 50, 70);
 BankOperationResult a3Kidney =
@@ -1868,13 +1869,13 @@ BankOperationResult a3Kidney =
 BankOperationResult a3Butt =
     await KkCompoundService.SellButt(a3Kk);
 Expect(
-    a3Kidney == BankOperationResult.Ok(300, 0)
-    && a3Butt == BankOperationResult.Ok(80, 0)
-    && a3Kk.Creature.CurrentHp == 38
-    && a3Kk.Creature.MaxHp == 62
-    && a3Kk.Gold == 380
+    a3Kidney == BankOperationResult.Ok(200, 0)
+    && a3Butt == BankOperationResult.Ok(50, 0)
+    && a3Kk.Creature.CurrentHp == 35
+    && a3Kk.Creature.MaxHp == 60
+    && a3Kk.Gold == 250
     && BankService.GetQualifyingEarned(a3Kk) == 0,
-    "A3 live KK terms did not apply -8/-8/+300G kidney and -4/+80G butt.");
+    "A3 live KK terms did not apply the fixed -10/-10/+200G kidney and -5/+50G butt.");
 
 Player a10Qualification = OpenAscensionPlayer(10, 0, 9810);
 Expect(
@@ -1883,43 +1884,44 @@ Expect(
         == expectedAscensionBenefits[10]
     && BankService.GetQualificationThreshold(
         a10Qualification,
-        CreditTier.VisaPoor) == 0
+        CreditTier.VisaPoor) == 400
     && BankService.GetQualificationThreshold(
         a10Qualification,
-        CreditTier.VisaMiddleClass) == 400
+        CreditTier.VisaMiddleClass) == 1500
     && BankService.GetQualificationThreshold(
         a10Qualification,
-        CreditTier.VisaTycoon) == 850
+        CreditTier.VisaTycoon) == 3500
+    && BankService.RecordGoldEarned(a10Qualification, 400).Success
     && BankService.ApplyForCreditCard(
         a10Qualification,
         CreditTier.VisaPoor).Success
     && BankService.GetCreditLimit(
         a10Qualification,
-        CreditTier.VisaPoor) == 600
+        CreditTier.VisaPoor) == 150
     && BankService.GetMaximumDebt(
         a10Qualification,
-        CreditTier.VisaPoor) == 1800,
-    "A10 player did not receive instant starter approval and 600/1800G "
+        CreditTier.VisaPoor) == 225,
+    "A10 player did not receive the 400G-qualified 150/225G "
     + "live credit terms.");
 Expect(
-    BankService.RecordGoldEarned(a10Qualification, 850).Success
+    BankService.RecordGoldEarned(a10Qualification, 3100).Success
     && BankService.ApplyForCreditCard(
         a10Qualification,
         CreditTier.VisaTycoon).Success
     && BankService.GetCreditLimit(
         a10Qualification,
-        CreditTier.VisaTycoon) == 4400
+        CreditTier.VisaTycoon) == 750
     && BankService.GetMaximumDebt(
         a10Qualification,
-        CreditTier.VisaTycoon) == 13200,
-    "A10 live tycoon qualification or limit did not use 850/4400/13200G.");
+        CreditTier.VisaTycoon) == 1125,
+    "A10 live tycoon qualification or limit did not use 3500/750/1125G.");
 
 Player a10Debt =
     OpenAscensionCardPlayer(10, CreditTier.VisaPoor, 9811);
 Expect(
     BankService.TrySpend(a10Debt, 100).Success,
     "A10 debt fixture could not charge its instant starter card.");
-for (var floor = 1; floor <= 12; floor++)
+for (var floor = 1; floor <= 1; floor++)
 {
     BankOperationResult graceResult =
         BankService.AccrueDebtInterest(a10Debt, 10000 + floor);
@@ -1930,26 +1932,26 @@ for (var floor = 1; floor <= 12; floor++)
         $"A10 first debt charged interest on grace floor {floor}.");
 }
 Expect(
-    BankService.AccrueDebtInterest(a10Debt, 10013).Amount == 10
-    && BankService.GetCreditDebt(a10Debt) == 110
+    BankService.AccrueDebtInterest(a10Debt, 10002).Amount == 27
+    && BankService.GetCreditDebt(a10Debt) == 127
     && BankService.GetDebtInterestBasisPoints(
         a10Debt,
-        CreditTier.VisaPoor) == 999,
-    "A10 debt did not charge ceil(100 * 9.99%) after twelve free floors.");
+        CreditTier.VisaPoor) == 2699,
+    "A10 debt did not charge ceil(100 * 26.99%) after one free floor.");
 
 Player a10Savings = OpenAscensionPlayer(10, 2000, 9812);
 BankOperationResult a10Interest =
     BankService.AccrueSavingsInterest(a10Savings, 10101);
 Expect(
-    a10Interest == BankOperationResult.Ok(80, 0)
-    && a10Savings.Gold == 2080
-    && BankService.GetSavingsInterest(a10Savings) == 80
-    && BankService.GetQualifyingEarned(a10Savings) == 80
+    a10Interest == BankOperationResult.Ok(5, 0)
+    && a10Savings.Gold == 2005
+    && BankService.GetSavingsInterest(a10Savings) == 5
+    && BankService.GetQualifyingEarned(a10Savings) == 5
     && BankService.CalculateNextSavingsInterest(
         a10Savings,
         2000,
-        0) == 80,
-    "A10 live savings did not respect the capped 8%/80G terms.");
+        0) == 5,
+    "A10 live savings did not respect the capped 0.5%/5G terms.");
 
 Player a10Kk = OpenAscensionPlayer(10, 0, 9813, 50, 70);
 BankOperationResult a10Kidney =
@@ -1965,20 +1967,20 @@ ButtRiskOutcome a10FourthOutcome =
 a10ButtResults[3] =
     await KkCompoundService.SellButt(a10Kk);
 int a10FourthGold =
-    a10FourthOutcome == ButtRiskOutcome.Unpaid ? 0 : 170;
+    a10FourthOutcome == ButtRiskOutcome.Unpaid ? 0 : 30;
 int a10FourthHp =
-    a10FourthOutcome == ButtRiskOutcome.Hemorrhage ? 4 : 2;
+    a10FourthOutcome == ButtRiskOutcome.Hemorrhage ? 16 : 8;
 Expect(
-    a10Kidney == BankOperationResult.Ok(500, 0)
+    a10Kidney == BankOperationResult.Ok(200, 0)
     && a10ButtResults.Take(3).All(result =>
-        result == BankOperationResult.Ok(150, 0))
+        result == BankOperationResult.Ok(50, 0))
     && a10ButtResults[3] == BankOperationResult.Ok(
         a10FourthGold,
         0,
         a10FourthOutcome)
-    && a10Kk.Creature.CurrentHp == 39 - a10FourthHp
-    && a10Kk.Creature.MaxHp == 65
-    && a10Kk.Gold == 950 + a10FourthGold
+    && a10Kk.Creature.CurrentHp == 25 - a10FourthHp
+    && a10Kk.Creature.MaxHp == 60
+    && a10Kk.Gold == 350 + a10FourthGold
     && BankStateStore.Get(a10Kk).ButtSalesCount == 4
     && BankService.GetQualifyingEarned(a10Kk) == 0,
     "A10 live KK terms or the deterministic fourth-sale risk regressed.");
@@ -2146,14 +2148,14 @@ BankStateStore.Set(
 BankOperationResult debtPaidByInterest =
     BankService.AccrueSavingsInterest(interestPaysDebt, 1601);
 Expect(
-    debtPaidByInterest == BankOperationResult.Ok(0, 5)
+    debtPaidByInterest == BankOperationResult.Ok(0, 1)
     && interestPaysDebt.Gold == 100
-    && BankService.GetCreditDebt(interestPaysDebt) == 25
+    && BankService.GetCreditDebt(interestPaysDebt) == 29
     && BankService.GetSavingsInterest(interestPaysDebt) == 0,
     "Savings interest did not automatically repay debt first.");
 Expect(
-    BankService.GetQualifyingEarned(interestPaysDebt) == 305
-    && BankService.GetSavingsInterestEarnedTotal(interestPaysDebt) == 5,
+    BankService.GetQualifyingEarned(interestPaysDebt) == 301
+    && BankService.GetSavingsInterestEarnedTotal(interestPaysDebt) == 1,
     "Debt-paid savings interest did not count as issued interest and qualification.");
 
 
@@ -2365,9 +2367,9 @@ _ = BankService.ETransfer(
     15);
 Expect(
     BankService.GetSavingsInterest(compositionSender) == 0
-    && BankService.GetSavingsPrincipal(compositionSender) == 90
-    && BankService.GetSavingsInterest(compositionRecipient) == 5
-    && BankService.GetSavingsPrincipal(compositionRecipient) == 10,
+    && BankService.GetSavingsPrincipal(compositionSender) == 86
+    && BankService.GetSavingsInterest(compositionRecipient) == 1
+    && BankService.GetSavingsPrincipal(compositionRecipient) == 14,
     "e-Transfer laundered already-earned interest into principal.");
 MethodInfo[] eTransferMethods = typeof(BankService)
     .GetMethods(BindingFlags.Public | BindingFlags.Static)
@@ -2507,10 +2509,10 @@ try
         && kidneyCurrentHpSignals == 1
         && kidneyMaxHpSignals == 1
         && isolatedHemorrhageResult == BankOperationResult.Ok(
-            70,
+            30,
             0,
             ButtRiskOutcome.Hemorrhage)
-        && isolatedHemorrhage.Creature.CurrentHp == 10
+        && isolatedHemorrhage.Creature.CurrentHp == 4
         && hemorrhageCurrentHpSignals == 1
         && HealthHookProbe.CallCount == 0,
         "KK health costs triggered gameplay HP hooks or failed to notify "
@@ -2685,15 +2687,29 @@ Expect(
         KkCompoundService.ResolveButtRiskOutcome(2, 10, roll)
             == ButtRiskOutcome.Normal),
     "The first three butt sales are not guaranteed safe.");
+Expect(
+    KkCompoundService.CalculateButtHpCost(5, 2) == 5
+    && KkCompoundService.CalculateButtHpCost(5, 3) == 8
+    && KkCompoundService.CalculateButtHpCost(5, 6) == 12
+    && KkCompoundService.CalculateButtHpCost(5, 9) == 17
+    && KkCompoundService.CalculateButtHpCost(5, 10) == 19
+    && KkCompoundService.CalculateButtGoldValue(50, 2) == 50
+    && KkCompoundService.CalculateButtGoldValue(50, 3) == 30
+    && KkCompoundService.CalculateButtGoldValue(50, 6) == 17
+    && KkCompoundService.CalculateButtGoldValue(50, 9) == 10
+    && KkCompoundService.CalculateButtGoldValue(80, 3) == 48
+    && KkCompoundService.CalculateButtGoldValue(80, 6) == 28
+    && KkCompoundService.CalculateButtGoldValue(80, 9) == 12,
+    "Repeated butt-sale HP escalation or payout decay regressed.");
 
 Player repeatCustomer =
-    OpenAscensionPlayer(0, 0, 30, 31, 60);
+    OpenAscensionPlayer(0, 0, 30, 32, 60);
 BankOperationResult[] repeatCustomerResults = new BankOperationResult[4];
 for (var sale = 0; sale < 3; sale++)
 {
     Expect(
         KkCompoundService.GetButtGoldValueForNextSale(
-            repeatCustomer) == (sale < 3 ? 50 : 70),
+            repeatCustomer) == 50,
         $"A0 butt-sale preview is wrong before sale {sale + 1}.");
     repeatCustomerResults[sale] =
         await KkCompoundService.SellButt(repeatCustomer);
@@ -2709,11 +2725,11 @@ repeatCustomerResults[3] =
 IReadOnlyDictionary<string, int> gameRngCountersAfter =
     SnapshotRunRngCounters(repeatCustomer.RunState);
 int repeatFourthGold =
-    repeatFourthOutcome == ButtRiskOutcome.Unpaid ? 0 : 70;
+    repeatFourthOutcome == ButtRiskOutcome.Unpaid ? 0 : 30;
 int repeatFourthHp =
-    repeatFourthOutcome == ButtRiskOutcome.Hemorrhage ? 10 : 5;
+    repeatFourthOutcome == ButtRiskOutcome.Hemorrhage ? 16 : 8;
 Expect(
-    repeatCustomer.Creature.CurrentHp == 16 - repeatFourthHp
+    repeatCustomer.Creature.CurrentHp == 17 - repeatFourthHp
     && repeatCustomer.Gold == 150 + repeatFourthGold
     && repeatCustomerResults.Take(3).All(result =>
         result == BankOperationResult.Ok(50, 0))
@@ -2752,7 +2768,7 @@ Expect(
         0,
         0,
         ButtRiskOutcome.Unpaid)
-    && unpaidCustomer.Creature.CurrentHp == 15
+    && unpaidCustomer.Creature.CurrentHp == 12
     && unpaidCustomer.Gold == 0
     && BankStateStore.Get(unpaidCustomer).ButtSalesCount == 4,
     "The unpaid event changed after state reload, paid gold, or failed "
@@ -2762,18 +2778,18 @@ Player hemorrhageCustomer = OpenFourthButtSaleFixture(
     ButtRiskOutcome.Hemorrhage,
     ascensionLevel: 0,
     gold: 0,
-    currentHp: 11,
+    currentHp: 17,
     maxHp: 60,
     firstNetId: 40000);
 BankOperationResult hemorrhageSale =
     await KkCompoundService.SellButt(hemorrhageCustomer);
 Expect(
     hemorrhageSale == BankOperationResult.Ok(
-        70,
+        30,
         0,
         ButtRiskOutcome.Hemorrhage)
     && hemorrhageCustomer.Creature.CurrentHp == 1
-    && hemorrhageCustomer.Gold == 70
+    && hemorrhageCustomer.Gold == 30
     && BankStateStore.Get(hemorrhageCustomer).ButtSalesCount == 4,
     "The hemorrhage event did not charge double HP, preserve payout, "
     + "leave one HP, and count the valid sale.");
@@ -2983,16 +2999,16 @@ var wireWriter = new PacketWriter();
 operationPayloads[3].Serialize(wireWriter);
 Expect(
     wireWriter.BytePosition == 45,
-    $"TDBB request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
+    $"TDBC request packets must retain the 45-byte frame shape, actual {wireWriter.BytePosition}.");
 var wireReader = new PacketReader();
 wireReader.Reset(wireWriter.Buffer);
 _ = wireReader.ReadInt();
 _ = wireReader.ReadInt();
 Expect(
     wireReader.ReadInt() == TDBankNetOperationAction.ProtocolMagic
-    && TDBankNetOperationAction.ProtocolMagic == 0x54444242
+    && TDBankNetOperationAction.ProtocolMagic == 0x54444243
     && wireReader.ReadInt() == BankNetwork.CurrentLifecycleEpoch,
-    "The operation packet does not carry TDBB and the lifecycle epoch.");
+    "The operation packet does not carry TDBC and the lifecycle epoch.");
 
 Player threePeerHost = OpenAscensionPlayer(
     0,
@@ -3509,11 +3525,11 @@ Expect(
     "The update modal action is not reachable by mouse, touch, or keyboard.");
 Expect(
     BankUiBridge.TryGetNewerVersion(
-        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.2"}"""),
+        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.3"}"""),
         out string newerVersion)
-    && newerVersion == "v0.1.2"
+    && newerVersion == "v0.1.3"
     && !BankUiBridge.TryGetNewerVersion(
-        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.1"}"""),
+        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.2"}"""),
         out _)
     && uiBridgeSource.Contains(
         "private static bool _updateCheckStarted;",
@@ -3684,6 +3700,8 @@ string chineseButtRules = BankUiText.Get(
     "butt_rules",
     a0Ui.ButtHpCost,
     a0Ui.ButtGoldValue,
+    a0Ui.ButtSalesCount + 1,
+    InvokeOverlayPureMethod<int>(a0Ui, "ButtSaleHpCost"),
     a0RepeatButtGold);
 string chineseCreditLocked = BankUiText.Get(
     "credit_locked_blurb",
@@ -3716,13 +3734,13 @@ Expect(
     && BankUiText.Get("open_account_forced_agree") ==
         "被迫同意并开户"
     && chineseOpening.Contains("当前 A0", StringComparison.Ordinal)
-    && chineseOpening.Contains("5%", StringComparison.Ordinal)
-    && chineseOpening.Contains("每层最多 50G", StringComparison.Ordinal)
+    && chineseOpening.Contains("1.5%", StringComparison.Ordinal)
+    && chineseOpening.Contains("每层最多 10G", StringComparison.Ordinal)
     && chineseOpening.Contains(
-        "200 G / 900 G / 2,200 G",
+        "150 G / 600 G / 1,600 G",
         StringComparison.Ordinal)
     && chineseOpening.Contains(
-        "400 G / 2,000 G / 4,000 G",
+        "400 G / 1,400 G / 2,400 G",
         StringComparison.Ordinal)
     && chineseOpening.Contains("免息 3 层", StringComparison.Ordinal)
     && chineseOpening.Contains(
@@ -3738,7 +3756,7 @@ Expect(
         "每份肾 -10 当前及最大生命换 200G",
         StringComparison.Ordinal)
     && chineseOpening.Contains(
-        "前三次 50G、第 4 次起 70G",
+        "前三次每次 -5 当前生命换 50G",
         StringComparison.Ordinal)
     && chineseOpeningCreditExample.Contains(
         "法外狂徒张三",
@@ -3770,7 +3788,7 @@ Expect(
         "100G",
         StringComparison.Ordinal)
     && chineseSavingsRules.Contains(
-        "5G",
+        "1G",
         StringComparison.Ordinal)
     && chineseSavingsRules.Contains(
         "每个新地图层开始时",
@@ -3782,8 +3800,8 @@ Expect(
         "计入办卡累计",
         StringComparison.Ordinal)
     && BankUiText.Get("interest_turns") == "已发息层数"
-    && BankUiText.Get("savings_interest_notice", 10, 0, 5, 50)
-        == "TD储蓄利息：+10G\n当前进阶 A0：5%，本层最多 50G"
+    && BankUiText.Get("savings_interest_notice", 10, 0, "1.5", 10)
+        == "TD储蓄利息：+10G\n当前进阶 A0：1.5%，本层最多 10G"
     && chineseCreditExample.Contains(
         "张三",
         StringComparison.Ordinal)
@@ -3800,7 +3818,7 @@ Expect(
         "游戏事件损失金币不会制造债务",
         StringComparison.Ordinal)
     && chineseCreditRules.Contains(
-        "400 G / 2,000 G / 4,000 G",
+        "400 G / 1,400 G / 2,400 G",
         StringComparison.Ordinal)
     && chineseCreditRules.Contains(
         "只有开户后的原生游戏金币和储蓄利息",
@@ -3836,13 +3854,13 @@ Expect(
         "第 4 次",
         StringComparison.Ordinal)
     && chineseButtRules.Contains(
-        "前三次 50G",
+        "前三次每次 -5 当前生命换 50G",
         StringComparison.Ordinal)
     && chineseButtRules.Contains(
-        "第 4 次起 70G",
+        "当前第 4 次报价：-8 HP / +30G",
         StringComparison.Ordinal)
     && chineseButtRules.Contains(
-        "扣完生命必须大于 0",
+        "当前生命必须大于 0",
         StringComparison.Ordinal)
     && BankUiText.Get("kidney_fatal").Contains(
         "暴毙",
@@ -3876,20 +3894,20 @@ Expect(
         StringComparison.Ordinal)
     && BankUiText.Get("sell_kidney_button", 600) ==
         "卖肾获得 600G"
-    && a0RepeatButtGold == 70
-    && a10RepeatButtGold == 170
+    && a0RepeatButtGold == 30
+    && a10RepeatButtGold == 30
     && BankUiText.Get(
         "sell_butt_button_repeat",
         4,
-        a0Ui.ButtHpCost,
+        InvokeOverlayPureMethod<int>(a0Ui, "ButtSaleHpCost"),
         a0RepeatButtGold)
-        == "第 4 次卖屁股：-5 HP / +70G"
+        == "第 4 次卖屁股：-8 HP / +30G"
     && BankUiText.Get(
         "sell_butt_button_repeat",
         4,
-        a10Ui.ButtHpCost,
+        InvokeOverlayPureMethod<int>(a10Ui, "ButtSaleHpCost"),
         a10RepeatButtGold)
-        == "第 4 次卖屁股：-2 HP / +170G"
+        == "第 4 次卖屁股：-8 HP / +30G"
     && !string.Join(
         "\n",
         chineseSavingsRules,
@@ -3985,6 +4003,8 @@ string englishButtRules = BankUiText.Get(
     "butt_rules",
     a0Ui.ButtHpCost,
     a0Ui.ButtGoldValue,
+    a0Ui.ButtSalesCount + 1,
+    InvokeOverlayPureMethod<int>(a0Ui, "ButtSaleHpCost"),
     a0RepeatButtGold);
 string englishCreditLocked = BankUiText.Get(
     "credit_locked_blurb",
@@ -4016,7 +4036,7 @@ Expect(
     && englishOpening.Contains("24.99%", StringComparison.Ordinal)
     && englishOpening.Contains("27.99%", StringComparison.Ordinal)
     && englishOpening.Contains(
-        "400 G / 2,000 G / 4,000 G",
+        "400 G / 1,400 G / 2,400 G",
         StringComparison.Ordinal)
     && englishOpening.Contains(
         "relic",
@@ -4034,7 +4054,7 @@ Expect(
         "native paid events",
         StringComparison.OrdinalIgnoreCase)
     && englishOpening.Contains(
-        "200 G / 900 G / 2,200 G",
+        "150 G / 600 G / 1,600 G",
         StringComparison.Ordinal)
     && englishSavings.Contains(
         "compound interest",
@@ -4046,8 +4066,8 @@ Expect(
         "map-floor end",
         StringComparison.OrdinalIgnoreCase)
     && BankUiText.Get("interest_turns") == "Floors paid"
-    && BankUiText.Get("savings_interest_notice", 10, 0, 5, 50)
-        == "TD savings interest: +10G\nAscension A0: 5%, up to 50G this floor"
+    && BankUiText.Get("savings_interest_notice", 10, 0, "1.5", 10)
+        == "TD savings interest: +10G\nAscension A0: 1.5%, up to 10G this floor"
     && englishCredit.Contains(
         "Only native-game gold and savings interest earned after opening",
         StringComparison.OrdinalIgnoreCase)
@@ -4098,10 +4118,10 @@ Expect(
         "both HP values must remain above 0",
         StringComparison.OrdinalIgnoreCase)
     && englishButtRules.Contains(
-        "for 50G on the first three sales",
+        "first three sales cost 5 current HP for 50G",
         StringComparison.OrdinalIgnoreCase)
     && englishButtRules.Contains(
-        "70G from sale four onward",
+        "Current sale #4: -8 HP / +30G",
         StringComparison.OrdinalIgnoreCase)
     && BankUiText.Get("butt_risk_explanation").Contains(
         "special events",

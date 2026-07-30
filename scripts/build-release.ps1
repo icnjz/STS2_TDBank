@@ -31,7 +31,7 @@ if ($releaseInfo.version -ne "v0.107.1")
 
 if ([string]::IsNullOrWhiteSpace($OutputDirectory))
 {
-    $OutputDirectory = Join-Path $repositoryRoot "artifacts\release-v0.1.1"
+    $OutputDirectory = Join-Path $repositoryRoot "artifacts\release-v0.1.2"
 }
 
 $releaseRoot = [System.IO.Path]::GetFullPath($OutputDirectory)
@@ -84,7 +84,7 @@ try
         Invoke-DotNet build "TDBank.csproj" "-c" $Configuration "--no-restore" "/p:Sts2Path=$gameRoot" "/p:ModsPath=$modsPath"
         Invoke-DotNet run "--project" "Tests\TDBank.LogicSmokeTests.csproj" "-c" $Configuration "--no-restore" "/p:Sts2Path=$gameRoot" "/p:ModsPath=$testModsPath"
         Invoke-DotNet build "Installer.Tests\TDBank.Setup.Tests.csproj" "-c" $Configuration "--no-restore" "/p:PayloadRoot=$runtimeRoot" "/p:TargetPlatformSdkPath=$platformSdkPath" "/p:TargetPlatformDisplayName=Windows"
-        Invoke-DotNet run "--project" "Installer.Tests\TDBank.Setup.Tests.csproj" "-c" $Configuration "--no-build" "/p:TargetPlatformSdkPath=$platformSdkPath" "/p:TargetPlatformDisplayName=Windows"
+        Invoke-DotNet run "--project" "Installer.Tests\TDBank.Setup.Tests.csproj" "-c" $Configuration "--no-build" "/p:TargetPlatformSdkPath=$platformSdkPath" "/p:TargetPlatformDisplayName=Windows" "--" "--test-ignore-live-game"
         Invoke-DotNet publish "Installer\TDBank.Setup.csproj" "-c" $Configuration "-r" "win-x64" "--self-contained" "true" "--no-restore" "-o" $setupRoot "/p:PayloadRoot=$runtimeRoot" "/p:SetupIconPath=$generatedIcon" "/p:TargetPlatformSdkPath=$platformSdkPath" "/p:TargetPlatformDisplayName=Windows"
     }
     finally

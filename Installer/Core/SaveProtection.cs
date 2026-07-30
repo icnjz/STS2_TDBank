@@ -866,7 +866,7 @@ internal static partial class SaveProtection
         {
             schemaVersion = 1,
             installer = "CNJ Tower Debt Setup",
-            packageVersion = "v0.1.1",
+            packageVersion = "v0.1.2",
             createdAtUtc = DateTimeOffset.UtcNow,
             saveRoot,
             accountsScanned,

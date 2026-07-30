@@ -2,7 +2,7 @@
   "version": 1,
   "dependencies": {
     "net9.0-windows7.0": {
-      "TDBank_Setup_v0.1.1": {
+      "TDBank_Setup_v0.1.2": {
         "type": "Project"
       }
     },

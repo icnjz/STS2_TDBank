@@ -86,13 +86,13 @@ public static class BankService
     public const int TycoonDebtInterestBasisPoints = 2799;
     public const int MaximumDebtLimitMultiplier = 2;
 
-    public const int PoorQualification = 200;
-    public const int MiddleClassQualification = 900;
-    public const int TycoonQualification = 2200;
+    public const int PoorQualification = 150;
+    public const int MiddleClassQualification = 600;
+    public const int TycoonQualification = 1600;
 
     public const int PoorCreditLimit = 200;
-    public const int MiddleClassCreditLimit = 1000;
-    public const int TycoonCreditLimit = 2000;
+    public const int MiddleClassCreditLimit = 700;
+    public const int TycoonCreditLimit = 1200;
 
     private static readonly object Gate = new();
     public static AccountState GetState(Player player) => BankStateStore.Get(player);

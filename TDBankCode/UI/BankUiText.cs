@@ -45,12 +45,12 @@ internal static class BankUiText
             "1. 储蓄：{1}\n" +
             "2. 信用卡：开户后办卡累计从 0G 开始，三档资格为 {2}；额度为 {3}；最大欠款为 {4}。整局第一次欠款免息 {5} 层，此后按三档每层 {6} 复利并向上取整。商店和原生付费事件可自动刷卡；游戏事件损失金币不会制造债务。所有金币入账先还债。刷爆时先扣光现有正金币，剩余欠款由抄家结清，金币不会变负，永久停卡，并且{7}\n" +
             "3. e-Transfer 可给已开户队友转账；到账先还收款人的债，不累计办卡资格。\n" +
-            "4. KK 园区：每份肾 -{8} 当前及最大生命换 {9}G；卖屁股标价为每次 -{10} 当前生命，前三次 {11}G、第 4 次起 {12}G。园区收入不累计办卡资格。",
+            "4. KK 园区：每份肾 -{8} 当前及最大生命换 {9}G；卖屁股前三次每次 -{10} 当前生命换 {11}G，第 4 次起越卖越伤、给得越少，并可能触发菊部风控。园区收入不累计办卡资格。",
             "Account rules (current A{0})\n\n" +
             "1. Savings: {1}\n" +
             "2. Credit: qualification starts at 0G after opening. Tier requirements are {2}; limits are {3}; maximum debts are {4}. The run's first debt gets {5} interest-free floors, then compounds by tier at {6} per completed floor, rounded up. Merchants and native paid events can charge the card automatically; gold lost to game events cannot create debt. Every deposit pays debt first. Maxing out takes all positive gold, settles the rest through foreclosure without making gold negative, closes the card forever, and {7}\n" +
             "3. e-Transfer sends gold to teammates with accounts. It repays their debt first and never counts toward qualification.\n" +
-            "4. KK Compound: each kidney costs {8} current and maximum HP for {9}G. Butt sales are listed at {10} current HP for {11}G for the first three, then {12}G from sale four onward. KK proceeds never count toward qualification."),
+            "4. KK Compound: each kidney costs {8} current and maximum HP for {9}G. The first three butt sales cost {10} current HP for {11}G each; from sale four onward, HP costs rise, payouts fall, and Rear-End Risk Control may trigger. KK proceeds never count toward qualification."),
         ["opening_credit_example"] = (
             "例：法外狂徒张三第一次欠 100G。前 {0} 个完成层利息为 0；第 {1} 层结束按最低卡 {2}% 收 {3}G，欠款变 {4}G；下一层再收 {5}G。还清再欠没有第二次免息，TD 的计算器只朝自己有利的方向取整。",
             "Example: outlaw Zhang San's first debt is 100G. The first {0} completed floors add 0 interest. At the end of floor {1}, the starter card charges {2}%: {3}G, making the debt {4}G. The next floor adds {5}G. Paying it off and borrowing again grants no second grace period; TD only rounds in TD's favor."),
@@ -79,8 +79,8 @@ internal static class BankUiText
             "每个新地图层开始时结算一次；不是战斗回合。",
             "Settles once at the start of each new map floor, not per combat turn."),
         ["savings_rules"] = (
-            "每个新地图层开始时按当前进阶发放复利，向下取整。A0–A2：5%，每层最多 50G；A3–A5：6%，每层最多 60G；A6–A8：7%，每层最多 70G；A9–A10：8%，每层最多 80G。\n当前 A{0}：{1}%，每层最多 {2}G。例：带着 100G 进入下层时预计获得 {3}G。利息加入余额继续计息；有信用卡欠款时优先自动还债，实际发放的利息计入办卡累计。",
-            "At the start of each new map floor, compound interest is paid for the current Ascension and rounded down. A0–A2: 5%, up to 50G per floor; A3–A5: 6%, up to 60G; A6–A8: 7%, up to 70G; A9–A10: 8%, up to 80G.\nCurrent A{0}: {1}%, up to {2}G per floor. Example: entering the next floor with 100G is estimated to pay {3}G. Interest joins the balance and compounds later; active credit debt is repaid first, and interest actually paid counts toward card qualification."),
+            "每个新地图层开始时按当前进阶发放复利，向下取整。A0–A1：1.5%，每层最多 10G；A2–A3：1.25%，最多 8G；A4–A5：1%，最多 7G；A6–A7：0.75%，最多 6G；A8–A10：0.5%，最多 5G。\n当前 A{0}：{1}%，每层最多 {2}G。例：带着 100G 进入下层时预计获得 {3}G。利息加入余额继续计息；有信用卡欠款时优先自动还债，实际发放的利息计入办卡累计。",
+            "At the start of each new map floor, compound interest is paid for the current Ascension and rounded down. A0–A1: 1.5%, up to 10G per floor; A2–A3: 1.25%, up to 8G; A4–A5: 1%, up to 7G; A6–A7: 0.75%, up to 6G; A8–A10: 0.5%, up to 5G.\nCurrent A{0}: {1}%, up to {2}G per floor. Example: entering the next floor with 100G is estimated to pay {3}G. Interest joins the balance and compounds later; active credit debt is repaid first, and interest actually paid counts toward card qualification."),
         ["principal"] = ("计息本金", "Interest principal"),
         ["interest_earned"] = ("已获得利息（累计）", "Interest earned (cumulative)"),
         ["interest_turns"] = ("已发息层数", "Floors paid"),
@@ -162,8 +162,8 @@ internal static class BankUiText
         ["kk_title"] = ("KK园区缅甸总部", "KK Compound — Myanmar Headquarters"),
         ["kk_tagline"] = ("走投无路了嘛兄弟？专业团队助您翻身！", "Out of options, brother? Our professional team will turn your life around!"),
         ["kk_rules"] = (
-            "当前 A{0} 园区价目：每份肾 -{1} 当前及最大生命，换 {2}G；卖屁股标价为每次 -{3} 当前生命，前三次 {4}G，第 4 次起 {5}G。生命扣完必须仍大于 0。园区扣血只改真实血条，不计入战斗受伤/失血记录，也不会立即触发卡牌、能力或圣遗物；园区金币不触发原生“获得金币”效果。扣完后的血量和金币仍是真实数值，后续游戏照常读取。园区收入不算办卡资格；拔网线也接不回肾。",
-            "Current A{0} price list: each kidney costs {1} current and maximum HP for {2}G. Butt sales are listed at {3} current HP for {4}G for the first three sales, then {5}G from sale four onward. HP must remain above 0. KK deductions change the real HP bar but do not enter combat damage/HP-loss history or immediately trigger cards, powers, or relics; KK gold does not trigger native “gain Gold” effects. The resulting HP and Gold remain real values that later game rules can read normally. KK income does not count toward qualification; unplugging cannot restore a kidney."),
+            "当前 A{0} 园区价目：每份肾 -{1} 当前及最大生命，换 {2}G；卖屁股前三次每次 -{3} 当前生命换 {4}G，第 4 次起越卖越伤、给得越少。生命扣完必须仍大于 0。园区扣血只改真实血条，不计入战斗受伤/失血记录，也不会立即触发卡牌、能力或圣遗物；园区金币不触发原生“获得金币”效果。扣完后的血量和金币仍是真实数值，后续游戏照常读取。园区收入不算办卡资格；拔网线也接不回肾。",
+            "Current A{0} price list: each kidney costs {1} current and maximum HP for {2}G. The first three butt sales cost {3} current HP for {4}G each; from sale four onward, HP costs rise and payouts fall. HP must remain above 0. KK deductions change the real HP bar but do not enter combat damage/HP-loss history or immediately trigger cards, powers, or relics; KK gold does not trigger native “gain Gold” effects. The resulting HP and Gold remain real values that later game rules can read normally. KK income does not count toward qualification; unplugging cannot restore a kidney."),
         ["current_hp"] = ("当前生命", "Current HP"),
         ["max_hp"] = ("最大生命", "Maximum HP"),
         ["hp_value"] = ("{0} HP", "{0} HP"),
@@ -195,8 +195,8 @@ internal static class BankUiText
             "这次这个嫖客有点大，您正在经历大出血！\n\n-{0} HP　+{1}G\n其中 {2}G 自动还债，{3}G 进入余额。",
             "This customer was a bit much. You are experiencing massive bleeding!\n\n-{0} HP  +{1}G\n{2}G repaid debt and {3}G entered the balance."),
         ["butt_rules"] = (
-            "标价：当前生命 -{0}，最大生命不变；前三次 {1}G，第 4 次起 {2}G。扣完生命必须大于 0。熟客价听起来更贵，其实贵的是尊严。",
-            "Listed price: {0} current HP, maximum HP unchanged, for {1}G on the first three sales and {2}G from sale four onward. HP must remain above 0. The loyalty rate sounds expensive; dignity costs extra."),
+            "前三次每次 -{0} 当前生命换 {1}G；第 4 次起越卖越伤、给得越少。当前第 {2} 次报价：-{3} HP / +{4}G。最大生命不变，扣完当前生命必须大于 0。",
+            "The first three sales cost {0} current HP for {1}G each. From sale four onward, HP costs rise and payouts fall. Current sale #{2}: -{3} HP / +{4}G. Maximum HP is unchanged, and current HP must remain above 0."),
         ["sell_butt_button"] = ("卖屁股：-{0} HP / +{1}G", "Sell your butt: -{0} HP / +{1}G"),
         ["sell_butt_button_repeat"] = (
             "第 {0} 次卖屁股：-{1} HP / +{2}G",

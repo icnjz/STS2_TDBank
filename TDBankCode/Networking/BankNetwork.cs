@@ -75,7 +75,7 @@ public struct TDBankNetOperationAction : INetAction, IPacketSerializable
 
 
 
-    internal const int ProtocolMagic = 0x54444242;
+    internal const int ProtocolMagic = 0x54444243;
 
     public BankOperationKind Kind;
     public CreditTier Tier;
@@ -422,17 +422,27 @@ public sealed class TDBankOperationGameAction : GameAction
                     && _kind == BankOperationKind.SellButt
                     && result.ButtOutcome == ButtRiskOutcome.Unpaid)
                 {
+                    int completedSalesBefore = Math.Max(
+                        0,
+                        BankService.GetSnapshot(_actor).ButtSalesCount - 1);
                     BankUiBridge.NotifyButtFreeloader(
-                        KkCompoundService.GetButtHpCost(_actor));
+                        KkCompoundService.CalculateButtHpCost(
+                            KkCompoundService.GetButtHpCost(_actor),
+                            completedSalesBefore));
                 }
                 else if (result.Success
                     && _kind == BankOperationKind.SellButt
                     && result.ButtOutcome
                         == ButtRiskOutcome.Hemorrhage)
                 {
+                    int completedSalesBefore = Math.Max(
+                        0,
+                        BankService.GetSnapshot(_actor).ButtSalesCount - 1);
                     BankUiBridge.NotifyButtHemorrhage(
                         checked(
-                            KkCompoundService.GetButtHpCost(_actor) * 2),
+                            KkCompoundService.CalculateButtHpCost(
+                                KkCompoundService.GetButtHpCost(_actor),
+                                completedSalesBefore) * 2),
                         checked(result.SecondaryAmount + result.Amount),
                         result.SecondaryAmount,
                         result.Amount);
