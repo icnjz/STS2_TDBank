@@ -52,22 +52,22 @@ try
         }
 
         Console.WriteLine(
-            "TD Bank Setup v0.1.2 uninstall/save-preservation matrix passed.");
+            "TD Bank Setup v0.1.3 uninstall/save-preservation matrix passed.");
         return;
     }
 
     RunUninstallMatrix(Path.Combine(testRoot, "uninstall"));
 
-    var latestGame = CreateFakeGame(Path.Combine(testRoot, "latest"), "v0.107.1");
+    var latestGame = CreateFakeGame(Path.Combine(testRoot, "latest"), "v0.110.0");
     var latestValidation = GameValidator.Validate(latestGame);
     Assert(latestValidation.IsGameDirectory, "Valid Steam Latest fixture was not recognized.");
     Assert(latestValidation.IsSupportedVersion, "Supported Steam Latest version was rejected.");
     Assert(
-        InstallerStrings.FormatValidation(UiLanguage.ZhCn, latestValidation).Contains("Latest Version"),
-        "Chinese Steam Latest validation omitted the channel.");
+        InstallerStrings.FormatValidation(UiLanguage.ZhCn, latestValidation).Contains("LTS"),
+        "Chinese verified-version validation omitted the LTS result.");
     Assert(
-        InstallerStrings.FormatValidation(UiLanguage.En, latestValidation).Contains("Latest Version"),
-        "English Steam Latest validation omitted the channel.");
+        InstallerStrings.FormatValidation(UiLanguage.En, latestValidation).Contains("LTS"),
+        "English verified-version validation omitted the LTS result.");
 
     var freshGame = CreateFakeGame(Path.Combine(testRoot, "fresh"), "v0.109.1");
     var validation = GameValidator.Validate(freshGame);
@@ -75,10 +75,10 @@ try
     Assert(validation.IsSupportedVersion, "Supported public-beta version was rejected.");
     Assert(validation.Status == ValidationStatus.Supported, "Supported validation status was incorrect.");
     Assert(
-        InstallerStrings.FormatValidation(UiLanguage.ZhCn, validation).Contains("监管机构"),
+        InstallerStrings.FormatValidation(UiLanguage.ZhCn, validation).Contains("LTS"),
         "Chinese supported-version validation was not localized.");
     Assert(
-        InstallerStrings.FormatValidation(UiLanguage.En, validation).Contains("regulator"),
+        InstallerStrings.FormatValidation(UiLanguage.En, validation).Contains("LTS"),
         "English supported-version validation was not localized.");
 
     var reportedStages = new List<InstallStage>();
@@ -284,7 +284,18 @@ try
         "Newer TDLib DLL was overwritten.");
     AssertTDBankPayload(newerGame);
 
-    var unsupportedGame = CreateFakeGame(Path.Combine(testRoot, "unsupported"), "v9.9.9");
+    var futureGame = CreateFakeGame(Path.Combine(testRoot, "future"), "v9.9.9");
+    var future = GameValidator.Validate(futureGame);
+    Assert(future.IsGameDirectory, "Future fake game directory was not recognized.");
+    Assert(future.IsSupportedVersion, "Future game version was not accepted in LTS mode.");
+    Assert(
+        future.Status == ValidationStatus.ForwardCompatible,
+        "Future validation status was not forward-compatible.");
+    Assert(
+        InstallerStrings.FormatValidation(UiLanguage.En, future).Contains("forward-compatible"),
+        "English future-version message omitted LTS forward compatibility.");
+
+    var unsupportedGame = CreateFakeGame(Path.Combine(testRoot, "unsupported"), "v0.106.9");
     var unsupported = GameValidator.Validate(unsupportedGame);
     Assert(unsupported.IsGameDirectory, "Unsupported fake game directory should still be recognized.");
     Assert(!unsupported.IsSupportedVersion, "Unsupported game version was accepted.");
@@ -292,7 +303,7 @@ try
         unsupported.Status == ValidationStatus.UnsupportedVersion,
         "Unsupported validation status was incorrect.");
     Assert(
-        InstallerStrings.FormatValidation(UiLanguage.En, unsupported).Contains("v9.9.9"),
+        InstallerStrings.FormatValidation(UiLanguage.En, unsupported).Contains("v0.106.9"),
         "English unsupported-version message omitted the detected version.");
 
     Console.WriteLine("TD Bank setup transactional and bilingual tests passed.");
@@ -368,11 +379,11 @@ static void AssertInstallerVersion(string game)
     var statePath = Path.Combine(game, "mods", "TDBank", "install-state.json");
     using var state = JsonDocument.Parse(File.ReadAllText(statePath));
     Assert(
-        state.RootElement.GetProperty("packageVersion").GetString() == "v0.1.2",
-        "Installer state did not record package version v0.1.2.");
+        state.RootElement.GetProperty("packageVersion").GetString() == "v0.1.3",
+        "Installer state did not record package version v0.1.3.");
     Assert(
-        state.RootElement.GetProperty("installerVersion").GetString() == "v0.1.2",
-        "Installer state did not record setup version v0.1.2.");
+        state.RootElement.GetProperty("installerVersion").GetString() == "v0.1.3",
+        "Installer state did not record setup version v0.1.3.");
 }
 
 static void AssertTDLibOwnershipState(
@@ -481,8 +492,8 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
     using (var manifest = JsonDocument.Parse(EmbeddedPayload.Read(manifestFile)))
     {
         Assert(
-            manifest.RootElement.GetProperty("version").GetString() == "0.1.2",
-            "Embedded TD Bank manifest is not 0.1.2.");
+            manifest.RootElement.GetProperty("version").GetString() == "0.1.3",
+            "Embedded TD Bank manifest is not 0.1.3.");
         Assert(
             manifest.RootElement.GetProperty("author").GetString() == "cnj lab",
             "Embedded TD Bank manifest must spell the user-visible author cnj lab in lowercase.");
@@ -547,8 +558,8 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
     File.WriteAllBytes(embeddedDllPath, EmbeddedPayload.Read(dllFile));
     Assert(
         AssemblyName.GetAssemblyName(embeddedDllPath).Version
-            == new Version(0, 1, 2, 0),
-        "Embedded TD Bank DLL assembly version is not 0.1.2.0.");
+            == new Version(0, 1, 3, 0),
+        "Embedded TD Bank DLL assembly version is not 0.1.3.0.");
     var tdBankReferences = Assembly.Load(EmbeddedPayload.Read(dllFile))
         .GetReferencedAssemblies();
     Assert(
@@ -576,8 +587,8 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
         "Embedded TDLib DLL identity or BaseLib isolation is incorrect.");
     Assert(
         typeof(TransactionInstaller).Assembly.GetName().Version
-            == new Version(0, 1, 2, 0),
-        "Installer assembly version is not 0.1.2.0.");
+            == new Version(0, 1, 3, 0),
+        "Installer assembly version is not 0.1.3.0.");
     Assert(
         string.Equals(
             typeof(TransactionInstaller).Assembly
@@ -2169,7 +2180,7 @@ static void AssertUiLanguageSwitchPreservesState()
 
                 form.SetLanguage(UiLanguage.ZhCn);
                 Assert(
-                    form.Text.Contains("Setup v0.1.2", StringComparison.Ordinal)
+                    form.Text.Contains("Setup v0.1.3", StringComparison.Ordinal)
                     && form.Text.Contains("卸载器", StringComparison.Ordinal),
                     "Chinese switch did not update the setup/uninstall window title.");
                 Assert(pathBox.Text == preservedPath, "Chinese switch changed the selected path.");
@@ -2180,7 +2191,7 @@ static void AssertUiLanguageSwitchPreservesState()
 
                 form.SetLanguage(UiLanguage.En);
                 Assert(
-                    form.Text.Contains("Setup v0.1.2", StringComparison.Ordinal)
+                    form.Text.Contains("Setup v0.1.3", StringComparison.Ordinal)
                     && !ContainsHanCharacter(form.Text),
                     "English switch did not update the setup/uninstall window title.");
                 Assert(pathBox.Text == preservedPath, "English switch changed the selected path.");

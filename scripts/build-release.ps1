@@ -3,7 +3,8 @@ param(
     [string]$Sts2Path,
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
-    [string]$OutputDirectory = ""
+    [string]$OutputDirectory = "",
+    [string[]]$RegressionSts2Paths = @()
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,7 +32,7 @@ if ($releaseInfo.version -ne "v0.107.1")
 
 if ([string]::IsNullOrWhiteSpace($OutputDirectory))
 {
-    $OutputDirectory = Join-Path $repositoryRoot "artifacts\release-v0.1.2"
+    $OutputDirectory = Join-Path $repositoryRoot "artifacts\release-v0.1.3-lts"
 }
 
 $releaseRoot = [System.IO.Path]::GetFullPath($OutputDirectory)
@@ -56,6 +57,8 @@ $platformSdkRoot = Join-Path $workRoot "platform-sdk"
 $platformSdkPath = $platformSdkRoot.TrimEnd("\", "/") + [System.IO.Path]::DirectorySeparatorChar
 $modsPath = $runtimeRoot.TrimEnd("\", "/") + [System.IO.Path]::DirectorySeparatorChar
 $testModsPath = $testModsRoot.TrimEnd("\", "/") + [System.IO.Path]::DirectorySeparatorChar
+$verifiedVersions = [System.Collections.Generic.List[string]]::new()
+$verifiedVersions.Add("$($releaseInfo.version) ($($releaseInfo.commit)) baseline")
 
 New-Item -ItemType Directory -Path $runtimeRoot, $testModsRoot, $setupRoot, $platformSdkRoot | Out-Null
 
@@ -83,6 +86,22 @@ try
         Invoke-DotNet restore "Installer.Tests\TDBank.Setup.Tests.csproj" "--locked-mode" "/p:TargetPlatformSdkPath=$platformSdkPath" "/p:TargetPlatformDisplayName=Windows"
         Invoke-DotNet build "TDBank.csproj" "-c" $Configuration "--no-restore" "/p:Sts2Path=$gameRoot" "/p:ModsPath=$modsPath"
         Invoke-DotNet run "--project" "Tests\TDBank.LogicSmokeTests.csproj" "-c" $Configuration "--no-restore" "/p:Sts2Path=$gameRoot" "/p:ModsPath=$testModsPath"
+        foreach ($regressionPath in $RegressionSts2Paths)
+        {
+            $regressionRoot = [System.IO.Path]::GetFullPath($regressionPath)
+            $regressionData = Join-Path $regressionRoot "data_sts2_windows_x86_64"
+            $regressionInfoPath = Join-Path $regressionRoot "release_info.json"
+            if (!(Test-Path -LiteralPath (Join-Path $regressionData "sts2.dll")) -or
+                !(Test-Path -LiteralPath $regressionInfoPath))
+            {
+                throw "Regression game path is incomplete: $regressionRoot"
+            }
+
+            $regressionInfo = Get-Content -LiteralPath $regressionInfoPath -Raw | ConvertFrom-Json
+            Invoke-DotNet restore "CompatibilityTests\TDBank.BinaryCompatibilitySmokeTests.csproj" "/p:Sts2Path=$regressionRoot"
+            Invoke-DotNet run "--project" "CompatibilityTests\TDBank.BinaryCompatibilitySmokeTests.csproj" "-c" $Configuration "--no-restore" "/p:Sts2Path=$regressionRoot" "--" $runtimeRoot $regressionData
+            $verifiedVersions.Add("$($regressionInfo.version) ($($regressionInfo.commit)) binary compatibility")
+        }
         Invoke-DotNet build "Installer.Tests\TDBank.Setup.Tests.csproj" "-c" $Configuration "--no-restore" "/p:PayloadRoot=$runtimeRoot" "/p:TargetPlatformSdkPath=$platformSdkPath" "/p:TargetPlatformDisplayName=Windows"
         Invoke-DotNet run "--project" "Installer.Tests\TDBank.Setup.Tests.csproj" "-c" $Configuration "--no-build" "/p:TargetPlatformSdkPath=$platformSdkPath" "/p:TargetPlatformDisplayName=Windows" "--" "--test-ignore-live-game"
         Invoke-DotNet publish "Installer\TDBank.Setup.csproj" "-c" $Configuration "-r" "win-x64" "--self-contained" "true" "--no-restore" "-o" $setupRoot "/p:PayloadRoot=$runtimeRoot" "/p:SetupIconPath=$generatedIcon" "/p:TargetPlatformSdkPath=$platformSdkPath" "/p:TargetPlatformDisplayName=Windows"
@@ -99,6 +118,20 @@ try
     $dotnetRoot = Split-Path -Parent (Get-Command dotnet).Source
     Copy-Item -LiteralPath (Join-Path $dotnetRoot "LICENSE.txt") -Destination (Join-Path $releaseRoot "DOTNET-LICENSE.txt")
     Copy-Item -LiteralPath (Join-Path $dotnetRoot "ThirdPartyNotices.txt") -Destination (Join-Path $releaseRoot "DOTNET-ThirdPartyNotices.txt")
+
+    [System.IO.File]::WriteAllLines(
+        (Join-Path $releaseRoot "LTS-COMPATIBILITY.txt"),
+        @(
+            "TD Bank v0.1.3 LTS"
+            "Minimum accepted game version: v0.107.1"
+            "Verified builds:"
+        ) + $verifiedVersions + @(
+            ""
+            "Newer semantic game versions are accepted by Setup in forward-compatible mode."
+            "Unknown future save schemas are preserved fail-closed and are never rewritten."
+            "If Harmony patch targets drift, TD Bank and TDLib self-disable instead of crashing the game."
+        ),
+        [System.Text.UTF8Encoding]::new($false))
 
     $hashLines = Get-ChildItem -LiteralPath $releaseRoot -Recurse -File |
         Sort-Object FullName |

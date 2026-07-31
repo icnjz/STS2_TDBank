@@ -3525,11 +3525,11 @@ Expect(
     "The update modal action is not reachable by mouse, touch, or keyboard.");
 Expect(
     BankUiBridge.TryGetNewerVersion(
-        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.3"}"""),
+        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.4"}"""),
         out string newerVersion)
-    && newerVersion == "v0.1.3"
+    && newerVersion == "v0.1.4"
     && !BankUiBridge.TryGetNewerVersion(
-        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.2"}"""),
+        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.3"}"""),
         out _)
     && uiBridgeSource.Contains(
         "private static bool _updateCheckStarted;",
@@ -4233,9 +4233,11 @@ Expect(
 Expect(
     GameApiCompatibility.IsSupportedProgressSchema(21)
     && GameApiCompatibility.IsSupportedProgressSchema(22)
+    && GameApiCompatibility.IsSupportedProgressSchema(23)
+    && GameApiCompatibility.IsSupportedProgressSchema(24)
     && !GameApiCompatibility.IsSupportedProgressSchema(20)
-    && !GameApiCompatibility.IsSupportedProgressSchema(23),
-    "The dual-branch progress-schema allowlist regressed.");
+    && !GameApiCompatibility.IsSupportedProgressSchema(25),
+    "The LTS progress-schema allowlist regressed.");
 Expect(
     MigrationProgressClassifier.Classify(
         pristineProgress.Replace(
@@ -4248,7 +4250,7 @@ Expect(
     MigrationProgressClassifier.Classify(
         pristineProgress.Replace(
             "\"schema_version\": 22",
-            "\"schema_version\": 23",
+            "\"schema_version\": 25",
             StringComparison.Ordinal))
         == MigrationProgressClassifier.Result.Unknown,
     "An unfamiliar progress schema must fail closed.");

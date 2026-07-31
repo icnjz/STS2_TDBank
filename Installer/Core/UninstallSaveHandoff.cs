@@ -16,7 +16,7 @@ internal static partial class UninstallSaveHandoff
         "tdbank_uninstall_sync_v1.receipt.json";
     private const string BackupFolderName =
         "cnj-tower-debt-save-backups";
-    private const int MaximumSupportedProgressSchema = 22;
+    private const int MaximumSupportedProgressSchema = 24;
     private const int MaximumMarkerFiles = 4096;
 
     private static readonly HashSet<string> DirectSaveNames =

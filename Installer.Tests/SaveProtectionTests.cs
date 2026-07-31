@@ -168,18 +168,18 @@ internal static class SaveProtectionTests
         WriteText(Path.Combine(accountRoot, "profile.save"), """{"selected_profile":2}""");
 
         WriteProfile(accountRoot, "profile1", meaningful: true, includeRunEvidence: false);
-        var schema23Target = WriteProfile(
+        var schema25Target = WriteProfile(
             Path.Combine(accountRoot, "modded"),
             "profile1",
             meaningful: false,
             includeRunEvidence: false);
-        var schema23 = CapturedSchema22PristineProgress().Replace(
+        var schema25 = CapturedSchema22PristineProgress().Replace(
             "\"schema_version\": 22",
-            "\"schema_version\": 23",
+            "\"schema_version\": 25",
             StringComparison.Ordinal);
-        WriteText(Path.Combine(schema23Target, "saves", "progress.save"), schema23);
-        WriteText(Path.Combine(schema23Target, "saves", "progress.save.backup"), schema23);
-        var schema23Before = SnapshotTree(schema23Target);
+        WriteText(Path.Combine(schema25Target, "saves", "progress.save"), schema25);
+        WriteText(Path.Combine(schema25Target, "saves", "progress.save.backup"), schema25);
+        var schema25Before = SnapshotTree(schema25Target);
 
         WriteProfile(accountRoot, "profile2", meaningful: true, includeRunEvidence: false);
         WriteProfile(accountRoot, "profile4", meaningful: true, includeRunEvidence: false);
@@ -189,11 +189,11 @@ internal static class SaveProtectionTests
 
         Assert(
             byName["profile1"].Disposition == SaveProfileDisposition.PreservedEstablished,
-            "SP schema-23 target was treated as a replaceable blank profile.");
+            "SP schema-25 target was treated as a replaceable blank profile.");
         AssertTreeExact(
-            schema23Before,
-            schema23Target,
-            "SP schema-23 fail-closed target");
+            schema25Before,
+            schema25Target,
+            "SP schema-25 fail-closed target");
         Assert(
             byName["profile4"].Disposition == SaveProfileDisposition.SkippedUnsafe,
             "SP profile4 was not reported as unsupported.");
@@ -379,21 +379,38 @@ internal static class SaveProtectionTests
             schema22Result.Profiles.Single().Disposition == SaveProfileDisposition.Migrated,
             "The real 1,138-byte public-beta blank structure was not recognized as blank.");
 
-        var schema23Root = NewSaveRoot(Path.Combine(scenario, "schema23"));
-        var schema23Account = AccountRoot(schema23Root, AccountB);
-        WriteText(Path.Combine(schema23Account, "profile.save"), """{"last_profile_id":1,"schema_version":2}""");
-        WriteProfile(schema23Account, "profile1", meaningful: true, includeRunEvidence: false);
-        var unknownSchemaTarget = WriteBlankFixture(
-            Path.Combine(schema23Account, "modded", "profile1"),
+        var schema24Root = NewSaveRoot(Path.Combine(scenario, "schema24"));
+        var schema24Account = AccountRoot(schema24Root, AccountB);
+        WriteText(Path.Combine(schema24Account, "profile.save"), """{"last_profile_id":1,"schema_version":2}""");
+        WriteProfile(schema24Account, "profile1", meaningful: true, includeRunEvidence: false);
+        WriteBlankFixture(
+            Path.Combine(schema24Account, "modded", "profile1"),
             PublicBetaSchema22BlankFixture().Replace(
                 "\"schema_version\": 22",
-                "\"schema_version\": 23",
+                "\"schema_version\": 24",
+                StringComparison.Ordinal));
+
+        var schema24Result = SaveProtection.ProtectAndInitialize(schema24Root, "sp-schema24");
+        Assert(
+            schema24Result.Profiles.Single().Disposition
+                == SaveProfileDisposition.Migrated,
+            "The v0.110.0 schema-v24 blank structure was not recognized as blank.");
+
+        var schema25Root = NewSaveRoot(Path.Combine(scenario, "schema25"));
+        var schema25Account = AccountRoot(schema25Root, AccountB);
+        WriteText(Path.Combine(schema25Account, "profile.save"), """{"last_profile_id":1,"schema_version":2}""");
+        WriteProfile(schema25Account, "profile1", meaningful: true, includeRunEvidence: false);
+        var unknownSchemaTarget = WriteBlankFixture(
+            Path.Combine(schema25Account, "modded", "profile1"),
+            PublicBetaSchema22BlankFixture().Replace(
+                "\"schema_version\": 22",
+                "\"schema_version\": 25",
                 StringComparison.Ordinal));
         var unknownBefore = SnapshotTree(unknownSchemaTarget);
 
-        var schema23Result = SaveProtection.ProtectAndInitialize(schema23Root, "sp-unknown-schema");
+        var schema25Result = SaveProtection.ProtectAndInitialize(schema25Root, "sp-unknown-schema");
         Assert(
-            schema23Result.Profiles.Single().Disposition
+            schema25Result.Profiles.Single().Disposition
                 == SaveProfileDisposition.PreservedEstablished,
             "An unknown future progress schema was not preserved fail-closed.");
         AssertTreeExact(
@@ -401,7 +418,7 @@ internal static class SaveProtectionTests
             unknownSchemaTarget,
             "Unknown-schema target");
         Assert(
-            !File.Exists(MarkerPath(schema23Account)),
+            !File.Exists(MarkerPath(schema25Account)),
             "Unknown-schema target incorrectly authorized a cloud handoff marker.");
     }
 

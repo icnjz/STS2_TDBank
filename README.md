@@ -2,7 +2,7 @@
   <img src="./TDBank/Assets/bank_logo.png" alt="TD Bank logo" width="180">
 </p>
 
-<h1 align="center">TD Bank v0.1.2</h1>
+<h1 align="center">TD Bank v0.1.3 LTS</h1>
 
 <p align="center"><strong>Turn today’s gold into tomorrow’s financial problems.</strong></p>
 
@@ -16,7 +16,9 @@
 
 TD Bank is a banking mod for Slay the Spire 2 created by cnj lab.
 
-The current release supports both Steam **default/latest v0.107.1** and **public-beta v0.109.1**. The game is still in public beta, so future updates may require the mod to be rebuilt or changed.
+The LTS release uses **v0.107.1 as its minimum binary baseline** and is verified against **v0.109.1 and v0.110.0**. Setup accepts newer semantic game versions in forward-compatible mode. If a future build changes required APIs, TD Bank and TDLib disable themselves instead of crashing the game; unknown future save schemas are preserved without rewriting.
+
+No mod can truthfully guarantee compatibility with every unknown future game update. LTS means broad forward compatibility, dual-build regression testing, and fail-safe behavior when an update is genuinely breaking.
 
 ## Features
 
@@ -35,7 +37,7 @@ Every gameplay value and random probability is published in [`BALANCE.md`](BALAN
 
 ## Installation
 
-Download `TDBank_Setup_v0.1.2.exe` from this repository’s [Releases](../../releases).
+Download `TDBank_Setup_v0.1.3.exe` from this repository’s [Releases](../../releases).
 
 1. Fully exit Slay the Spire 2.
 2. Verify the SHA-256 published on the Release page. The current Setup is self-signed by `CNJ Tower Debt`; the signature verifies file integrity but is not a commercial trust certificate.
@@ -44,7 +46,7 @@ Download `TDBank_Setup_v0.1.2.exe` from this repository’s [Releases](../../rel
 
 Setup installs no Windows software. It only places these two mods in the game’s `mods` folder:
 
-- **TD Bank v0.1.2**
+- **TD Bank v0.1.3 LTS**
   Adds a bank to Slay the Spire 2 and changes gameplay.
 - **TDLib v0.1**  
   TD Bank’s dedicated save and multiplayer synchronization component. It only stores bank-account data and does not replace or affect BaseLib.
@@ -88,8 +90,8 @@ Every player in the same multiplayer lobby should use identical TD Bank and TDLi
 
 ### Requirements
 
-- A legally installed copy of Slay the Spire 2 Steam default/latest v0.107.1 as the minimum build baseline
-- Steam public-beta v0.109.1 for full dual-branch regression testing
+- A legally obtained copy of Slay the Spire 2 v0.107.1 as the minimum build baseline
+- Slay the Spire 2 v0.110.0 or newer installed separately for regression testing
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - Windows 10/11 x64
 - NuGet network access
@@ -100,12 +102,13 @@ Build TD Bank and TDLib, run the tests, and publish the complete Setup:
 
 ```powershell
 .\scripts\build-release.ps1 `
-  -Sts2Path "D:\SteamLibrary\steamapps\common\Slay the Spire 2"
+  -Sts2Path "D:\SteamContent\v0.107.1" `
+  -RegressionSts2Paths "D:\SteamLibrary\steamapps\common\Slay the Spire 2"
 ```
 
-Point `-Sts2Path` at Steam default/latest v0.107.1 when producing release binaries. The same binaries are then regression-tested against public-beta v0.109.1.
+Point `-Sts2Path` at the v0.107.1 minimum baseline when producing release binaries. Pass current or future installations through `-RegressionSts2Paths` to run the exact release DLLs against those game assemblies.
 
-The default output is `artifacts/release-v0.1.2`, including Setup, licenses, third-party notices, and SHA-256 hashes.
+The default output is `artifacts/release-v0.1.3-lts`, including Setup, licenses, third-party notices, the verified-build report, and SHA-256 hashes.
 
 Build only the mods:
 
@@ -172,7 +175,9 @@ The project is provided “as is.” Compatibility with future public betas, eve
 
 TD Bank 是由 cnj lab 制作的《杀戮尖塔 2》银行 Mod。
 
-当前版本同时支持 Steam **默认/latest v0.107.1** 与 **public-beta v0.109.1**。游戏仍在公测，更新后可能需要重新编译或修改 Mod。
+LTS 版以 **v0.107.1 作为最低二进制基线**，并已在 **v0.109.1 与 v0.110.0** 上验证。Setup 会以向前兼容模式接受更高的正常版本号。若未来更新真的改坏必要 API，TD Bank 与 TDLib 会安全停用，而不是拖着游戏一起崩；未知的未来存档 schema 会原样保留，不会被改写。
+
+任何 Mod 都不可能诚实保证未知的未来更新永远兼容。这里的 LTS 指尽量向前兼容、跨版本回归测试，以及遇到真正破坏性更新时安全失败。
 
 ## 功能
 
@@ -191,7 +196,7 @@ TD Bank 是由 cnj lab 制作的《杀戮尖塔 2》银行 Mod。
 
 ## 安装
 
-推荐从本仓库的 [Releases](../../releases) 下载 `TDBank_Setup_v0.1.2.exe`。
+推荐从本仓库的 [Releases](../../releases) 下载 `TDBank_Setup_v0.1.3.exe`。
 
 1. 完全退出《杀戮尖塔 2》。
 2. 核对 Release 页面公布的 SHA-256。当前 Setup 由 `CNJ Tower Debt` 自签名；签名可以核对文件完整性，但不属于商业信任证书。
@@ -200,7 +205,7 @@ TD Bank 是由 cnj lab 制作的《杀戮尖塔 2》银行 Mod。
 
 本 Setup 不安装任何 Windows 软件，只把以下两个 Mod 放入游戏的 `mods` 文件夹：
 
-- **TD Bank v0.1.2**
+- **TD Bank v0.1.3 LTS**
   给《杀戮尖塔 2》增加一个银行，它会改变游戏玩法。
 - **TDLib v0.1**  
   TD Bank 专用的存档与多人同步组件。它只负责保存银行账户数据，不会替换或影响 BaseLib。
@@ -244,8 +249,8 @@ TDLib 的部分存档扩展代码及 `Sts2PathDiscovery.props` 改编自 BaseLib
 
 ### 要求
 
-- 合法安装的《杀戮尖塔 2》Steam 默认/latest v0.107.1，作为最低编译基线
-- Steam public-beta v0.109.1，用于完整的双分支回归测试
+- 合法取得的《杀戮尖塔 2》v0.107.1，作为最低编译基线
+- 另备《杀戮尖塔 2》v0.110.0 或更新版本，用于回归测试
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - Windows 10/11 x64
 - NuGet 网络访问
@@ -256,12 +261,13 @@ TDLib 的部分存档扩展代码及 `Sts2PathDiscovery.props` 改编自 BaseLib
 
 ```powershell
 .\scripts\build-release.ps1 `
-  -Sts2Path "D:\SteamLibrary\steamapps\common\Slay the Spire 2"
+  -Sts2Path "D:\SteamContent\v0.107.1" `
+  -RegressionSts2Paths "D:\SteamLibrary\steamapps\common\Slay the Spire 2"
 ```
 
-生成发布 DLL 时，`-Sts2Path` 必须指向 Steam 默认/latest v0.107.1；随后使用同一份 DLL 在 public-beta v0.109.1 上做回归验证。
+生成发布 DLL 时，`-Sts2Path` 必须指向最低基线 v0.107.1；把当前版或未来版本传给 `-RegressionSts2Paths`，脚本会用同一份发布 DLL 对这些游戏程序集做兼容测试。
 
-默认输出位于 `artifacts/release-v0.1.2`，包括 Setup、许可证、第三方声明和 SHA-256。
+默认输出位于 `artifacts/release-v0.1.3-lts`，包括 Setup、许可证、第三方声明、已验证版本报告和 SHA-256。
 
 只构建 Mod：
 

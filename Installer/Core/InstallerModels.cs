@@ -6,6 +6,7 @@ internal enum ValidationStatus
     InvalidPath,
     MissingGameFiles,
     Supported,
+    ForwardCompatible,
     UnsupportedVersion,
     ReleaseInfoUnreadable,
 }

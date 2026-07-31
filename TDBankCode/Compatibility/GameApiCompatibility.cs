@@ -32,7 +32,7 @@ internal static class GameApiCompatibility
         Rng64StringConstructor is not null;
 
     public static bool IsSupportedProgressSchema(long schemaVersion)
-        => schemaVersion is 21 or 22;
+        => schemaVersion is >= 21 and <= 24;
 
     public static Rng CreateRng(ulong seed, string scope)
     {

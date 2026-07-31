@@ -166,17 +166,30 @@ internal static class UninstallSaveHandoffTests
             schema21Preparation.RequiresGameHandoff,
             "Steam Latest schema-v21 modded progress was rejected.");
 
-        var schema23Root = NewSaveRoot(Path.Combine(scenario, "schema23"));
-        var schema23Account = AccountRoot(schema23Root);
+        var schema24Root = NewSaveRoot(Path.Combine(scenario, "schema24"));
+        var schema24Account = AccountRoot(schema24Root);
         WriteProfile(
-            Path.Combine(schema23Account, "modded", "profile1"),
+            Path.Combine(schema24Account, "modded", "profile1"),
             UniqueId,
             progressMarker: "modded",
-            schemaVersion: 23);
+            schemaVersion: 24);
+        var schema24Preparation =
+            UninstallSaveHandoff.Prepare(schema24Root, "schema24");
+        Assert(
+            schema24Preparation.RequiresGameHandoff,
+            "v0.110.0 schema-v24 modded progress was rejected.");
+
+        var schema25Root = NewSaveRoot(Path.Combine(scenario, "schema25"));
+        var schema25Account = AccountRoot(schema25Root);
+        WriteProfile(
+            Path.Combine(schema25Account, "modded", "profile1"),
+            UniqueId,
+            progressMarker: "modded",
+            schemaVersion: 25);
         AssertThrows<InvalidDataException>(
-            () => UninstallSaveHandoff.Prepare(schema23Root, "schema23"),
+            () => UninstallSaveHandoff.Prepare(schema25Root, "schema25"),
             "Unknown future modded schema did not fail closed.");
-        AssertNoProtocolMarker(schema23Account);
+        AssertNoProtocolMarker(schema25Account);
 
         var collisionRoot = NewSaveRoot(Path.Combine(scenario, "history"));
         var collisionAccount = AccountRoot(collisionRoot);

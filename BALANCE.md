@@ -1,6 +1,6 @@
-# TD Bank v0.1.2 — Complete Balance Data
+# TD Bank v0.1.3 LTS — Complete Balance Data
 
-This document publishes every gameplay number and random probability used by TD Bank v0.1.2. English appears first; the complete Chinese version follows below.
+This document publishes every gameplay number and random probability used by TD Bank v0.1.3 LTS. English appears first; the complete Chinese version follows below.
 
 ## English
 

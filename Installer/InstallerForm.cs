@@ -13,6 +13,7 @@ internal sealed class InstallerForm : Form
     private static readonly Color Muted = Color.FromArgb(90, 111, 101);
     private static readonly Color SoftGreen = Color.FromArgb(223, 243, 232);
     private static readonly Color Red = Color.FromArgb(190, 54, 54);
+    private static readonly Color Amber = Color.FromArgb(165, 104, 0);
     private const uint WmNcLButtonDown = 0x00A1;
     private const int HtCaption = 2;
     private static readonly TimeSpan SaveHandoffTimeout =
@@ -468,10 +469,18 @@ internal sealed class InstallerForm : Form
     private void RenderValidation()
     {
         _validationLabel.Text = InstallerStrings.FormatValidation(_language, _validation);
-        _validationLabel.ForeColor = _validation.IsSupportedVersion ? TdGreen : Red;
-        _validationLabel.BackColor = _validation.IsSupportedVersion
-            ? Color.FromArgb(239, 249, 243)
-            : Color.FromArgb(255, 239, 239);
+        var forwardCompatible =
+            _validation.Status == ValidationStatus.ForwardCompatible;
+        _validationLabel.ForeColor = forwardCompatible
+            ? Amber
+            : _validation.IsSupportedVersion
+                ? TdGreen
+                : Red;
+        _validationLabel.BackColor = forwardCompatible
+            ? Color.FromArgb(255, 248, 225)
+            : _validation.IsSupportedVersion
+                ? Color.FromArgb(239, 249, 243)
+                : Color.FromArgb(255, 239, 239);
     }
 
     private void SetStatus(UiText text, params object?[] arguments)

@@ -119,15 +119,14 @@ internal static class InstallerStrings
                 ? "这里不像《杀戮尖塔 2》目录：缺少 SlayTheSpire2.exe、release_info.json 或 data 目录。"
                 : "This does not look like the Slay the Spire 2 folder: SlayTheSpire2.exe, release_info.json, or the data directory is missing.",
             ValidationStatus.Supported => language == UiLanguage.ZhCn
-                ? validation.Version == GameValidator.LatestVersion
-                    ? $"发现 Steam Latest Version {validation.Version}，尖塔金融监管机构点头了。"
-                    : $"发现 public-beta {validation.Version}，尖塔金融监管机构点头了。"
-                : validation.Version == GameValidator.LatestVersion
-                    ? $"Found Steam Latest Version {validation.Version}. The Spire financial regulator approves."
-                    : $"Found public-beta {validation.Version}. The Spire financial regulator approves.",
+                ? $"已验证游戏版本 {validation.Version}，LTS 兼容检查通过。"
+                : $"Verified game version {validation.Version}. LTS compatibility check passed.",
+            ValidationStatus.ForwardCompatible => language == UiLanguage.ZhCn
+                ? $"检测到更新的游戏版本 {validation.Version}；将使用 LTS 向前兼容模式。安装前会完整备份，若游戏 API 已改变，TD Bank 会安全停用而不是硬崩。"
+                : $"Detected newer game version {validation.Version}. LTS forward-compatible mode will be used. Setup creates a full backup; if game APIs changed, TD Bank disables itself instead of crashing.",
             ValidationStatus.UnsupportedVersion => language == UiLanguage.ZhCn
-                ? $"检测到 {validation.Version ?? "未知版本"}；本安装包只支持 Steam Latest {GameValidator.LatestVersion} 和 public-beta {GameValidator.PublicBetaVersion}。请先在 Steam 切换或更新游戏分支。"
-                : $"Detected {validation.Version ?? "an unknown version"}; this setup supports Steam Latest {GameValidator.LatestVersion} and public-beta {GameValidator.PublicBetaVersion}. Switch or update the game branch in Steam first.",
+                ? $"检测到 {validation.Version ?? "未知版本"}；LTS 最低支持 {GameValidator.MinimumVersion}。请先在 Steam 更新游戏。"
+                : $"Detected {validation.Version ?? "an unknown version"}; LTS requires {GameValidator.MinimumVersion} or newer. Update the game in Steam first.",
             ValidationStatus.ReleaseInfoUnreadable => language == UiLanguage.ZhCn
                 ? $"release_info.json 无法读取：{validation.Detail}"
                 : $"Cannot read release_info.json: {validation.Detail}",
@@ -341,8 +340,8 @@ internal static class InstallerStrings
     {
         return text switch
         {
-            UiText.WindowTitle => "TD Bank v0.1.2 — Tower Debt Setup v0.1.2 一键安装/卸载器",
-            UiText.HeaderTitle => "Tower Debt Setup v0.1.2 — 安装 / 销户",
+            UiText.WindowTitle => "TD Bank v0.1.3 LTS — Tower Debt Setup v0.1.3 一键安装/卸载器",
+            UiText.HeaderTitle => "Tower Debt Setup v0.1.3 LTS — 安装 / 销户",
             UiText.HeaderTagline => "把今天的金币，变成明天的财务问题。",
             UiText.Disclaimer =>
                 "本安装包由 cnj lab 制作。\r\n" +
@@ -353,7 +352,7 @@ internal static class InstallerStrings
             UiText.Browse => "人工指定营业厅",
             UiText.PayloadSummary =>
                 "本 Setup 不安装任何 Windows 软件，只把以下两个 Mod 放入游戏的 mods 文件夹：\r\n" +
-                "• TD Bank v0.1.2\r\n" +
+                "• TD Bank v0.1.3 LTS\r\n" +
                 "给《杀戮尖塔 2》增加一个银行，它会改变游戏玩法。\r\n" +
                 "• TDLib v0.1\r\n" +
                 "TD Bank 专用的存档与多人同步组件。它只负责保存银行账户数据，不会替换或影响 BaseLib。\r\n" +
@@ -414,7 +413,7 @@ internal static class InstallerStrings
             UiText.SuccessBaseRepaired => "TDLib 已备份并升级或修复为 v0.1。",
             UiText.SuccessDialogBody =>
                 "放贷成功！\r\n\r\n{0}\r\n" +
-                "TD Bank v0.1.2 已安装并通过 SHA-256 核对。\r\n" +
+                "TD Bank v0.1.3 LTS 已安装并通过 SHA-256 核对。\r\n" +
                 "本版整体收紧储蓄、信用卡和 KK 园区数值。储蓄复利从 A0–A1 的 1.5%/10G 逐步降到 A8–A10 的 0.5%/5G；低进阶更容易申请中产卡，高进阶则逐步提高门槛并降低额度。\r\n" +
                 "进游戏首次点开 TD 图标后，请看完规则并勾选两项；“同意并开户”和“被迫同意并开户”都会完成开户。\r\n\r\n" +
                 "存档处理：{1}\r\n\r\n" +
@@ -434,8 +433,8 @@ internal static class InstallerStrings
     {
         return text switch
         {
-            UiText.WindowTitle => "TD Bank v0.1.2 — Tower Debt Setup v0.1.2",
-            UiText.HeaderTitle => "Tower Debt Setup v0.1.2 — Install / Uninstall",
+            UiText.WindowTitle => "TD Bank v0.1.3 LTS — Tower Debt Setup v0.1.3",
+            UiText.HeaderTitle => "Tower Debt Setup v0.1.3 LTS — Install / Uninstall",
             UiText.HeaderTagline => "Turn today’s gold into tomorrow’s financial problems.",
             UiText.Disclaimer =>
                 "This installer was made by cnj lab.\r\n" +
@@ -446,7 +445,7 @@ internal static class InstallerStrings
             UiText.Browse => "Choose Folder",
             UiText.PayloadSummary =>
                 "This Setup installs no Windows software. It only places the following two mods in the game’s mods folder:\r\n" +
-                "• TD Bank v0.1.2\r\n" +
+                "• TD Bank v0.1.3 LTS\r\n" +
                 "Adds a bank to Slay the Spire 2 and changes gameplay.\r\n" +
                 "• TDLib v0.1\r\n" +
                 "TD Bank’s dedicated save and multiplayer-sync component. It only stores bank-account data and does not replace or affect BaseLib.\r\n" +
@@ -507,7 +506,7 @@ internal static class InstallerStrings
             UiText.SuccessBaseRepaired => "TDLib was backed up and upgraded or repaired to v0.1.",
             UiText.SuccessDialogBody =>
                 "Loan approved!\r\n\r\n{0}\r\n" +
-                "TD Bank v0.1.2 was installed and verified with SHA-256.\r\n" +
+                "TD Bank v0.1.3 LTS was installed and verified with SHA-256.\r\n" +
                 "This version tightens Savings, credit, and KK values overall. Savings fall from 1.5%/10G on A0–A1 to 0.5%/5G on A8–A10; low Ascension gets easier middle-card access, while later Ascensions raise requirements and reduce limits.\r\n" +
                 "In game, open TD for the first time, read the rules, and check both boxes. Both “Agree and open” and “Forced to agree and open” complete account opening.\r\n\r\n" +
                 "Save handling: {1}\r\n\r\n" +

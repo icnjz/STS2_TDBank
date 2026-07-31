@@ -15,5 +15,8 @@
       <HintPath>$(Sts2DataDir)\0Harmony.dll</HintPath>
       <Private>true</Private>
     </Reference>
+    <None Include="$(Sts2DataDir)\Sentry*.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>
