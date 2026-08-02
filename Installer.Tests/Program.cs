@@ -558,7 +558,7 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
     File.WriteAllBytes(embeddedDllPath, EmbeddedPayload.Read(dllFile));
     Assert(
         AssemblyName.GetAssemblyName(embeddedDllPath).Version
-            == new Version(0, 1, 3, 0),
+            == new Version(0, 1, 4, 0),
         "Embedded TD Bank DLL assembly version is not 0.1.4.0.");
     var tdBankReferences = Assembly.Load(EmbeddedPayload.Read(dllFile))
         .GetReferencedAssemblies();
@@ -587,7 +587,7 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
         "Embedded TDLib DLL identity or BaseLib isolation is incorrect.");
     Assert(
         typeof(TransactionInstaller).Assembly.GetName().Version
-            == new Version(0, 1, 3, 0),
+            == new Version(0, 1, 4, 0),
         "Installer assembly version is not 0.1.4.0.");
     Assert(
         string.Equals(
