@@ -174,9 +174,9 @@ public readonly record struct AscensionBankBenefits(
         return tier switch
         {
             CreditTier.None => 0,
-            CreditTier.VisaPoor => PoorQualification,
-            CreditTier.VisaMiddleClass => MiddleClassQualification,
-            CreditTier.VisaTycoon => TycoonQualification,
+            CreditTier.BisaPoor => PoorQualification,
+            CreditTier.BisaMiddleClass => MiddleClassQualification,
+            CreditTier.BisaTycoon => TycoonQualification,
             _ => throw UnknownTier(tier),
         };
     }
@@ -186,9 +186,9 @@ public readonly record struct AscensionBankBenefits(
         return tier switch
         {
             CreditTier.None => 0,
-            CreditTier.VisaPoor => PoorCreditLimit,
-            CreditTier.VisaMiddleClass => MiddleClassCreditLimit,
-            CreditTier.VisaTycoon => TycoonCreditLimit,
+            CreditTier.BisaPoor => PoorCreditLimit,
+            CreditTier.BisaMiddleClass => MiddleClassCreditLimit,
+            CreditTier.BisaTycoon => TycoonCreditLimit,
             _ => throw UnknownTier(tier),
         };
     }
@@ -205,10 +205,10 @@ public readonly record struct AscensionBankBenefits(
         return tier switch
         {
             CreditTier.None => 0,
-            CreditTier.VisaPoor => PoorDebtInterestBasisPoints,
-            CreditTier.VisaMiddleClass =>
+            CreditTier.BisaPoor => PoorDebtInterestBasisPoints,
+            CreditTier.BisaMiddleClass =>
                 MiddleClassDebtInterestBasisPoints,
-            CreditTier.VisaTycoon => TycoonDebtInterestBasisPoints,
+            CreditTier.BisaTycoon => TycoonDebtInterestBasisPoints,
             _ => throw UnknownTier(tier),
         };
     }

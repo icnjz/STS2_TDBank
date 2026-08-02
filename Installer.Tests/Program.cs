@@ -52,7 +52,7 @@ try
         }
 
         Console.WriteLine(
-            "TD Bank Setup v0.1.3 uninstall/save-preservation matrix passed.");
+            "TD Bank Setup v0.1.4 uninstall/save-preservation matrix passed.");
         return;
     }
 
@@ -379,11 +379,11 @@ static void AssertInstallerVersion(string game)
     var statePath = Path.Combine(game, "mods", "TDBank", "install-state.json");
     using var state = JsonDocument.Parse(File.ReadAllText(statePath));
     Assert(
-        state.RootElement.GetProperty("packageVersion").GetString() == "v0.1.3",
-        "Installer state did not record package version v0.1.3.");
+        state.RootElement.GetProperty("packageVersion").GetString() == "v0.1.4",
+        "Installer state did not record package version v0.1.4.");
     Assert(
-        state.RootElement.GetProperty("installerVersion").GetString() == "v0.1.3",
-        "Installer state did not record setup version v0.1.3.");
+        state.RootElement.GetProperty("installerVersion").GetString() == "v0.1.4",
+        "Installer state did not record setup version v0.1.4.");
 }
 
 static void AssertTDLibOwnershipState(
@@ -460,17 +460,17 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
 {
     var expectedCardAssets = new HashSet<string>(
         [
-            "visa_broke_zh.png",
-            "visa_middle_zh.png",
-            "visa_rich_zh.png",
-            "visa_broke_en.png",
-            "visa_middle_en.png",
-            "visa_rich_en.png",
+            "bisa_broke_zh.png",
+            "bisa_middle_zh.png",
+            "bisa_rich_zh.png",
+            "bisa_broke_en.png",
+            "bisa_middle_en.png",
+            "bisa_rich_en.png",
         ],
         StringComparer.OrdinalIgnoreCase);
     var embeddedCardAssets = EmbeddedPayload.Files
         .Where(file => Path.GetFileName(file.RelativePath)
-            .StartsWith("visa_", StringComparison.OrdinalIgnoreCase))
+            .StartsWith("bisa_", StringComparison.OrdinalIgnoreCase))
         .Select(file => Path.GetFileName(file.RelativePath))
         .ToHashSet(StringComparer.OrdinalIgnoreCase);
     Assert(
@@ -492,8 +492,8 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
     using (var manifest = JsonDocument.Parse(EmbeddedPayload.Read(manifestFile)))
     {
         Assert(
-            manifest.RootElement.GetProperty("version").GetString() == "0.1.3",
-            "Embedded TD Bank manifest is not 0.1.3.");
+            manifest.RootElement.GetProperty("version").GetString() == "0.1.4",
+            "Embedded TD Bank manifest is not 0.1.4.");
         Assert(
             manifest.RootElement.GetProperty("author").GetString() == "cnj lab",
             "Embedded TD Bank manifest must spell the user-visible author cnj lab in lowercase.");
@@ -559,7 +559,7 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
     Assert(
         AssemblyName.GetAssemblyName(embeddedDllPath).Version
             == new Version(0, 1, 3, 0),
-        "Embedded TD Bank DLL assembly version is not 0.1.3.0.");
+        "Embedded TD Bank DLL assembly version is not 0.1.4.0.");
     var tdBankReferences = Assembly.Load(EmbeddedPayload.Read(dllFile))
         .GetReferencedAssemblies();
     Assert(
@@ -588,7 +588,7 @@ static void AssertEmbeddedReleaseVersions(string testRoot)
     Assert(
         typeof(TransactionInstaller).Assembly.GetName().Version
             == new Version(0, 1, 3, 0),
-        "Installer assembly version is not 0.1.3.0.");
+        "Installer assembly version is not 0.1.4.0.");
     Assert(
         string.Equals(
             typeof(TransactionInstaller).Assembly
@@ -2180,7 +2180,7 @@ static void AssertUiLanguageSwitchPreservesState()
 
                 form.SetLanguage(UiLanguage.ZhCn);
                 Assert(
-                    form.Text.Contains("Setup v0.1.3", StringComparison.Ordinal)
+                    form.Text.Contains("Setup v0.1.4", StringComparison.Ordinal)
                     && form.Text.Contains("卸载器", StringComparison.Ordinal),
                     "Chinese switch did not update the setup/uninstall window title.");
                 Assert(pathBox.Text == preservedPath, "Chinese switch changed the selected path.");
@@ -2191,7 +2191,7 @@ static void AssertUiLanguageSwitchPreservesState()
 
                 form.SetLanguage(UiLanguage.En);
                 Assert(
-                    form.Text.Contains("Setup v0.1.3", StringComparison.Ordinal)
+                    form.Text.Contains("Setup v0.1.4", StringComparison.Ordinal)
                     && !ContainsHanCharacter(form.Text),
                     "English switch did not update the setup/uninstall window title.");
                 Assert(pathBox.Text == preservedPath, "English switch changed the selected path.");

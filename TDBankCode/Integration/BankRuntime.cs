@@ -355,19 +355,19 @@ public static class BankRuntime
                 BankCreditTier.Starter,
                 benefits.PoorQualification,
                 benefits.PoorCreditLimit,
-                benefits.GetMaximumDebt(CreditTier.VisaPoor),
+                benefits.GetMaximumDebt(CreditTier.BisaPoor),
                 benefits.PoorDebtInterestBasisPoints),
             new(
                 BankCreditTier.MiddleClass,
                 benefits.MiddleClassQualification,
                 benefits.MiddleClassCreditLimit,
-                benefits.GetMaximumDebt(CreditTier.VisaMiddleClass),
+                benefits.GetMaximumDebt(CreditTier.BisaMiddleClass),
                 benefits.MiddleClassDebtInterestBasisPoints),
             new(
                 BankCreditTier.NouveauRiche,
                 benefits.TycoonQualification,
                 benefits.TycoonCreditLimit,
-                benefits.GetMaximumDebt(CreditTier.VisaTycoon),
+                benefits.GetMaximumDebt(CreditTier.BisaTycoon),
                 benefits.TycoonDebtInterestBasisPoints),
         ];
         var teammates = runState.Players
@@ -460,9 +460,9 @@ public static class BankRuntime
     {
         BankNetwork.SubmitApplyCard(tier switch
         {
-            BankCreditTier.Starter => CreditTier.VisaPoor,
-            BankCreditTier.MiddleClass => CreditTier.VisaMiddleClass,
-            BankCreditTier.NouveauRiche => CreditTier.VisaTycoon,
+            BankCreditTier.Starter => CreditTier.BisaPoor,
+            BankCreditTier.MiddleClass => CreditTier.BisaMiddleClass,
+            BankCreditTier.NouveauRiche => CreditTier.BisaTycoon,
             _ => CreditTier.None,
         });
     }
@@ -523,9 +523,9 @@ public static class BankRuntime
         return tier switch
         {
             CreditTier.None => null,
-            CreditTier.VisaPoor => BankCreditTier.Starter,
-            CreditTier.VisaMiddleClass => BankCreditTier.MiddleClass,
-            CreditTier.VisaTycoon => BankCreditTier.NouveauRiche,
+            CreditTier.BisaPoor => BankCreditTier.Starter,
+            CreditTier.BisaMiddleClass => BankCreditTier.MiddleClass,
+            CreditTier.BisaTycoon => BankCreditTier.NouveauRiche,
             _ => null,
         };
     }

@@ -34,9 +34,9 @@ internal static class BankUiAssets
         var languageSuffix = isChinese ? "zh" : "en";
         return tier switch
         {
-            BankCreditTier.Starter => $"visa_broke_{languageSuffix}.png",
-            BankCreditTier.MiddleClass => $"visa_middle_{languageSuffix}.png",
-            BankCreditTier.NouveauRiche => $"visa_rich_{languageSuffix}.png",
+            BankCreditTier.Starter => $"bisa_broke_{languageSuffix}.png",
+            BankCreditTier.MiddleClass => $"bisa_middle_{languageSuffix}.png",
+            BankCreditTier.NouveauRiche => $"bisa_rich_{languageSuffix}.png",
             _ => null,
         };
     }

@@ -6,12 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>CNJ.TowerDebt.Setup</RootNamespace>
-    <AssemblyName>TDBank_Setup_v0.1.3</AssemblyName>
-    <Version>0.1.3</Version>
+    <AssemblyName>TDBank_Setup_v0.1.4</AssemblyName>
+    <Version>0.1.4</Version>
     <Company>cnj lab</Company>
     <Authors>cnj lab</Authors>
     <Product>TD Bank — Tower Debt Installer / 一键安装器</Product>
-    <Description>Installs or safely removes TD Bank v0.1.3 LTS and its dedicated TDLib dependency while protecting vanilla and modded saves.</Description>
+    <Description>Installs or safely removes TD Bank v0.1.4 LTS and its dedicated TDLib dependency while protecting vanilla and modded saves.</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <SetupIconPath Condition="'$(SetupIconPath)' == ''">$(MSBuildProjectDirectory)\setup.ico</SetupIconPath>
     <ApplicationIcon>$(SetupIconPath)</ApplicationIcon>
@@ -39,18 +39,18 @@
                       LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bank_logo.png" />
     <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bank_background.png"
                       LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bank_background.png" />
-    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_broke_zh.png"
-                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_broke_zh.png" />
-    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_middle_zh.png"
-                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_middle_zh.png" />
-    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_rich_zh.png"
-                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_rich_zh.png" />
-    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_broke_en.png"
-                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_broke_en.png" />
-    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_middle_en.png"
-                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_middle_en.png" />
-    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\visa_rich_en.png"
-                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_rich_en.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bisa_broke_zh.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_broke_zh.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bisa_middle_zh.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_middle_zh.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bisa_rich_zh.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_rich_zh.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bisa_broke_en.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_broke_en.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bisa_middle_en.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_middle_en.png" />
+    <EmbeddedResource Include="$(PayloadRoot)\TDBank\Assets\bisa_rich_en.png"
+                      LogicalName="CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_rich_en.png" />
     <EmbeddedResource Include="$(PayloadRoot)\TDLib\TDLib.dll"
                       LogicalName="CNJ.TowerDebt.Setup.Payload.TDLib.TDLib.dll" />
     <EmbeddedResource Include="$(PayloadRoot)\TDLib\TDLib.json"

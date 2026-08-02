@@ -340,8 +340,8 @@ internal static class InstallerStrings
     {
         return text switch
         {
-            UiText.WindowTitle => "TD Bank v0.1.3 LTS — Tower Debt Setup v0.1.3 一键安装/卸载器",
-            UiText.HeaderTitle => "Tower Debt Setup v0.1.3 LTS — 安装 / 销户",
+            UiText.WindowTitle => "TD Bank v0.1.4 LTS — Tower Debt Setup v0.1.4 一键安装/卸载器",
+            UiText.HeaderTitle => "Tower Debt Setup v0.1.4 LTS — 安装 / 销户",
             UiText.HeaderTagline => "把今天的金币，变成明天的财务问题。",
             UiText.Disclaimer =>
                 "本安装包由 cnj lab 制作。\r\n" +
@@ -352,7 +352,7 @@ internal static class InstallerStrings
             UiText.Browse => "人工指定营业厅",
             UiText.PayloadSummary =>
                 "本 Setup 不安装任何 Windows 软件，只把以下两个 Mod 放入游戏的 mods 文件夹：\r\n" +
-                "• TD Bank v0.1.3 LTS\r\n" +
+                "• TD Bank v0.1.4 LTS\r\n" +
                 "给《杀戮尖塔 2》增加一个银行，它会改变游戏玩法。\r\n" +
                 "• TDLib v0.1\r\n" +
                 "TD Bank 专用的存档与多人同步组件。它只负责保存银行账户数据，不会替换或影响 BaseLib。\r\n" +
@@ -413,7 +413,7 @@ internal static class InstallerStrings
             UiText.SuccessBaseRepaired => "TDLib 已备份并升级或修复为 v0.1。",
             UiText.SuccessDialogBody =>
                 "放贷成功！\r\n\r\n{0}\r\n" +
-                "TD Bank v0.1.3 LTS 已安装并通过 SHA-256 核对。\r\n" +
+                "TD Bank v0.1.4 LTS 已安装并通过 SHA-256 核对。\r\n" +
                 "本版整体收紧储蓄、信用卡和 KK 园区数值。储蓄复利从 A0–A1 的 1.5%/10G 逐步降到 A8–A10 的 0.5%/5G；低进阶更容易申请中产卡，高进阶则逐步提高门槛并降低额度。\r\n" +
                 "进游戏首次点开 TD 图标后，请看完规则并勾选两项；“同意并开户”和“被迫同意并开户”都会完成开户。\r\n\r\n" +
                 "存档处理：{1}\r\n\r\n" +
@@ -433,8 +433,8 @@ internal static class InstallerStrings
     {
         return text switch
         {
-            UiText.WindowTitle => "TD Bank v0.1.3 LTS — Tower Debt Setup v0.1.3",
-            UiText.HeaderTitle => "Tower Debt Setup v0.1.3 LTS — Install / Uninstall",
+            UiText.WindowTitle => "TD Bank v0.1.4 LTS — Tower Debt Setup v0.1.4",
+            UiText.HeaderTitle => "Tower Debt Setup v0.1.4 LTS — Install / Uninstall",
             UiText.HeaderTagline => "Turn today’s gold into tomorrow’s financial problems.",
             UiText.Disclaimer =>
                 "This installer was made by cnj lab.\r\n" +
@@ -445,7 +445,7 @@ internal static class InstallerStrings
             UiText.Browse => "Choose Folder",
             UiText.PayloadSummary =>
                 "This Setup installs no Windows software. It only places the following two mods in the game’s mods folder:\r\n" +
-                "• TD Bank v0.1.3 LTS\r\n" +
+                "• TD Bank v0.1.4 LTS\r\n" +
                 "Adds a bank to Slay the Spire 2 and changes gameplay.\r\n" +
                 "• TDLib v0.1\r\n" +
                 "TD Bank’s dedicated save and multiplayer-sync component. It only stores bank-account data and does not replace or affect BaseLib.\r\n" +
@@ -506,7 +506,7 @@ internal static class InstallerStrings
             UiText.SuccessBaseRepaired => "TDLib was backed up and upgraded or repaired to v0.1.",
             UiText.SuccessDialogBody =>
                 "Loan approved!\r\n\r\n{0}\r\n" +
-                "TD Bank v0.1.3 LTS was installed and verified with SHA-256.\r\n" +
+                "TD Bank v0.1.4 LTS was installed and verified with SHA-256.\r\n" +
                 "This version tightens Savings, credit, and KK values overall. Savings fall from 1.5%/10G on A0–A1 to 0.5%/5G on A8–A10; low Ascension gets easier middle-card access, while later Ascensions raise requirements and reduce limits.\r\n" +
                 "In game, open TD for the first time, read the rules, and check both boxes. Both “Agree and open” and “Forced to agree and open” complete account opening.\r\n\r\n" +
                 "Save handling: {1}\r\n\r\n" +

@@ -10,12 +10,12 @@ The runtime loads a shared logo, background, and six localized card images from 
 | --- | ---: | --- |
 | `bank_logo.png` | 1:1 | 共用银行 Logo |
 | `bank_background.png` | 约 16:9 | 共用银行背景 |
-| `visa_broke_zh.png` | 约 1.6:1 | 中文 Visa 穷逼 |
-| `visa_middle_zh.png` | 约 1.6:1 | 中文 Visa 中产 |
-| `visa_rich_zh.png` | 约 1.6:1 | 中文 Visa 暴发户 |
-| `visa_broke_en.png` | 约 1.6:1 | English Visa Broke |
-| `visa_middle_en.png` | 约 1.6:1 | English Visa Middle Class |
-| `visa_rich_en.png` | 约 1.6:1 | English Visa Nouveau Riche |
+| `bisa_broke_zh.png` | 约 1.6:1 | 中文 BISA 穷逼 |
+| `bisa_middle_zh.png` | 约 1.6:1 | 中文 BISA 中产 |
+| `bisa_rich_zh.png` | 约 1.6:1 | 中文 BISA 暴发户 |
+| `bisa_broke_en.png` | 约 1.6:1 | English BISA Broke |
+| `bisa_middle_en.png` | 约 1.6:1 | English BISA Middle Class |
+| `bisa_rich_en.png` | 约 1.6:1 | English BISA Nouveau Riche |
 
 ## 要求
 

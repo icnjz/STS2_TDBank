@@ -2,7 +2,7 @@
     <Import Project=".\Sts2PathDiscovery.props"/>
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
-        <Version>0.1.3</Version>
+        <Version>0.1.4</Version>
         <ImplicitUsings>true</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -82,12 +82,12 @@
         <None Include="TDBank/**" />
         <BankAsset Include="TDBank/Assets/bank_logo.png" />
         <BankAsset Include="TDBank/Assets/bank_background.png" />
-        <BankAsset Include="TDBank/Assets/visa_broke_zh.png" />
-        <BankAsset Include="TDBank/Assets/visa_middle_zh.png" />
-        <BankAsset Include="TDBank/Assets/visa_rich_zh.png" />
-        <BankAsset Include="TDBank/Assets/visa_broke_en.png" />
-        <BankAsset Include="TDBank/Assets/visa_middle_en.png" />
-        <BankAsset Include="TDBank/Assets/visa_rich_en.png" />
+        <BankAsset Include="TDBank/Assets/bisa_broke_zh.png" />
+        <BankAsset Include="TDBank/Assets/bisa_middle_zh.png" />
+        <BankAsset Include="TDBank/Assets/bisa_rich_zh.png" />
+        <BankAsset Include="TDBank/Assets/bisa_broke_en.png" />
+        <BankAsset Include="TDBank/Assets/bisa_middle_en.png" />
+        <BankAsset Include="TDBank/Assets/bisa_rich_en.png" />
     </ItemGroup>
 
     <Target Name="CheckDependencyPaths" >

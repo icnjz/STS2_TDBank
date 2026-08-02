@@ -5,9 +5,9 @@ namespace TDBank.TDBankCode.Banking;
 public enum CreditTier
 {
     None = 0,
-    VisaPoor = 1,
-    VisaMiddleClass = 2,
-    VisaTycoon = 3,
+    BisaPoor = 1,
+    BisaMiddleClass = 2,
+    BisaTycoon = 3,
 }
 
 public sealed class AccountState : IPacketSerializable
@@ -203,7 +203,7 @@ public sealed class AccountState : IPacketSerializable
         CreditTier = Math.Clamp(
             CreditTier,
             (int)Banking.CreditTier.None,
-            (int)Banking.CreditTier.VisaTycoon);
+            (int)Banking.CreditTier.BisaTycoon);
         CreditDebt = Math.Max(0, CreditDebt);
         LastDebtInterestCharge = Math.Max(0, LastDebtInterestCharge);
         DebtCycleFloors = Math.Max(0, DebtCycleFloors);
@@ -232,7 +232,7 @@ public sealed class AccountState : IPacketSerializable
 
         else if (CreditDebt > 0 && CreditTier == (int)Banking.CreditTier.None)
         {
-            CreditTier = (int)Banking.CreditTier.VisaPoor;
+            CreditTier = (int)Banking.CreditTier.BisaPoor;
         }
 
         if (CreditDebt > 0)

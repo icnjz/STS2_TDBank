@@ -967,7 +967,7 @@ public sealed partial class BankOverlay : Control, IScreenContext
             var td = BankUiTheme.Label("TD", compact ? 28 : 23, Colors.White);
             td.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             brandRow.AddChild(td);
-            brandRow.AddChild(BankUiTheme.Label("VISA-ish", compact ? 17 : 14, new Color(1, 1, 1, 0.8f)));
+            brandRow.AddChild(BankUiTheme.Label("BISA-ish", compact ? 17 : 14, new Color(1, 1, 1, 0.8f)));
             fallbackCopy.AddChild(brandRow);
 
             var spacer = new Control

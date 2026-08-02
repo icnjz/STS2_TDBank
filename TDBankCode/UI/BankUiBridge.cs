@@ -13,7 +13,7 @@ namespace TDBank.TDBankCode.UI;
 public static class BankUiBridge
 {
     private const string LayerName = "TDBankUiLayer";
-    private const string CurrentVersion = "0.1.3";
+    private const string CurrentVersion = "0.1.4";
     private const string LatestReleaseApi =
         "https://api.github.com/repos/icnjz/STS2_TDBank/releases/latest";
     private const string LatestReleasePage =

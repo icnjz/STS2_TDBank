@@ -32,7 +32,7 @@ if ($releaseInfo.version -ne "v0.107.1")
 
 if ([string]::IsNullOrWhiteSpace($OutputDirectory))
 {
-    $OutputDirectory = Join-Path $repositoryRoot "artifacts\release-v0.1.3-lts"
+    $OutputDirectory = Join-Path $repositoryRoot "artifacts\release-v0.1.4"
 }
 
 $releaseRoot = [System.IO.Path]::GetFullPath($OutputDirectory)
@@ -122,7 +122,7 @@ try
     [System.IO.File]::WriteAllLines(
         (Join-Path $releaseRoot "LTS-COMPATIBILITY.txt"),
         @(
-            "TD Bank v0.1.3 LTS"
+            "TD Bank v0.1.4 LTS"
             "Minimum accepted game version: v0.107.1"
             "Verified builds:"
         ) + $verifiedVersions + @(

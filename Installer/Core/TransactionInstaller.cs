@@ -345,8 +345,8 @@ internal static class TransactionInstaller
         var state = new
         {
             installer = "CNJ Tower Debt Setup",
-            installerVersion = "v0.1.3",
-            packageVersion = "v0.1.3",
+            installerVersion = "v0.1.4",
+            packageVersion = "v0.1.4",
             installedAt = DateTimeOffset.Now,
             gameVersion = validation.Version,
             tdLibAction = tdLibAction.ToString(),

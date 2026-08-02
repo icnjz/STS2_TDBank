@@ -346,19 +346,19 @@ static BankUiSnapshot UiSnapshotFor(
                 BankCreditTier.Starter,
                 benefits.PoorQualification,
                 benefits.PoorCreditLimit,
-                benefits.GetMaximumDebt(CreditTier.VisaPoor),
+                benefits.GetMaximumDebt(CreditTier.BisaPoor),
                 benefits.PoorDebtInterestBasisPoints),
             new(
                 BankCreditTier.MiddleClass,
                 benefits.MiddleClassQualification,
                 benefits.MiddleClassCreditLimit,
-                benefits.GetMaximumDebt(CreditTier.VisaMiddleClass),
+                benefits.GetMaximumDebt(CreditTier.BisaMiddleClass),
                 benefits.MiddleClassDebtInterestBasisPoints),
             new(
                 BankCreditTier.NouveauRiche,
                 benefits.TycoonQualification,
                 benefits.TycoonCreditLimit,
-                benefits.GetMaximumDebt(CreditTier.VisaTycoon),
+                benefits.GetMaximumDebt(CreditTier.BisaTycoon),
                 benefits.TycoonDebtInterestBasisPoints),
         ],
         DebtGraceFloorCount = benefits.DebtGraceFloorCount,
@@ -973,7 +973,7 @@ if (accountStateTypeInfo is not null)
         QualifyingEarned = 1234,
         SavingsPrincipal = 567,
         SavingsInterest = 89,
-        CreditTier = (int)CreditTier.VisaMiddleClass,
+        CreditTier = (int)CreditTier.BisaMiddleClass,
         CreditDebt = 321,
         BankAccountOpened = 1,
         ButtSalesCount = 4,
@@ -1091,7 +1091,7 @@ Expect(
         == BankErrorCode.OperationUnavailable
     && BankService.ApplyForCreditCard(
         unopened,
-        CreditTier.VisaPoor).Error
+        CreditTier.BisaPoor).Error
         == BankErrorCode.OperationUnavailable,
     "A deposit, spend, or card application ran before account opening.");
 Player preOpenRecipient = OpenPlayer(0, 100);
@@ -1155,7 +1155,7 @@ Player freshRunPlayerTwo = OpenPlayer(125, 103);
 BankStateStore.Get(freshRunPlayerOne).QualifyingEarned = 999;
 BankStateStore.Get(freshRunPlayerOne).ButtSalesCount = 4;
 BankStateStore.Get(freshRunPlayerTwo).CreditTier =
-    (int)CreditTier.VisaPoor;
+    (int)CreditTier.BisaPoor;
 BankStateStore.Get(freshRunPlayerTwo).CreditDebt = 50;
 RunState freshSyntheticRun = AttachSyntheticRunState(
     7,
@@ -1296,7 +1296,7 @@ Expect(
     && requalifiedLegacy.Success
     && BankService.ApplyForCreditCard(
         legacyClosed,
-        CreditTier.VisaTycoon).Success,
+        CreditTier.BisaTycoon).Success,
     "A schema<5 retired closure marker incorrectly kept the card closed.");
 
 
@@ -1526,11 +1526,11 @@ VerifyExactGainGoldPatchCanApply();
 VerifyEventCreditAvailabilityPatchCanApply();
 
 Player eventCredit = OpenCardPlayer(
-    CreditTier.VisaPoor,
+    CreditTier.BisaPoor,
     9901,
     gold: 25);
 Player eventCreditClamp = OpenCardPlayer(
-    CreditTier.VisaTycoon,
+    CreditTier.BisaTycoon,
     9902,
     gold: int.MaxValue);
 Expect(
@@ -1543,31 +1543,31 @@ Expect(
     + "or clamp purchasing power to the vanilla int range.");
 
 Expect(
-    BankService.GetCreditLimit(CreditTier.VisaPoor) == 200
-    && BankService.GetCreditLimit(CreditTier.VisaMiddleClass) == 700
-    && BankService.GetCreditLimit(CreditTier.VisaTycoon) == 1200
-    && BankService.GetMaximumDebt(CreditTier.VisaPoor) == 400
-    && BankService.GetMaximumDebt(CreditTier.VisaMiddleClass) == 1400
-    && BankService.GetMaximumDebt(CreditTier.VisaTycoon) == 2400,
+    BankService.GetCreditLimit(CreditTier.BisaPoor) == 200
+    && BankService.GetCreditLimit(CreditTier.BisaMiddleClass) == 700
+    && BankService.GetCreditLimit(CreditTier.BisaTycoon) == 1200
+    && BankService.GetMaximumDebt(CreditTier.BisaPoor) == 400
+    && BankService.GetMaximumDebt(CreditTier.BisaMiddleClass) == 1400
+    && BankService.GetMaximumDebt(CreditTier.BisaTycoon) == 2400,
     "Credit limits or the 200% debt ceilings are incorrect.");
 Expect(
     BankService.PoorQualification == 150
     && BankService.MiddleClassQualification == 600
     && BankService.TycoonQualification == 1600
-    && BankService.GetQualificationThreshold(CreditTier.VisaPoor) == 150
+    && BankService.GetQualificationThreshold(CreditTier.BisaPoor) == 150
     && BankService.GetQualificationThreshold(
-        CreditTier.VisaMiddleClass) == 600
+        CreditTier.BisaMiddleClass) == 600
     && BankService.GetQualificationThreshold(
-        CreditTier.VisaTycoon) == 1600
+        CreditTier.BisaTycoon) == 1600
     && BankService.GetHighestEligibleTier(149) == CreditTier.None
-    && BankService.GetHighestEligibleTier(150) == CreditTier.VisaPoor
-    && BankService.GetHighestEligibleTier(599) == CreditTier.VisaPoor
+    && BankService.GetHighestEligibleTier(150) == CreditTier.BisaPoor
+    && BankService.GetHighestEligibleTier(599) == CreditTier.BisaPoor
     && BankService.GetHighestEligibleTier(600)
-        == CreditTier.VisaMiddleClass
+        == CreditTier.BisaMiddleClass
     && BankService.GetHighestEligibleTier(1599)
-        == CreditTier.VisaMiddleClass
+        == CreditTier.BisaMiddleClass
     && BankService.GetHighestEligibleTier(1600)
-        == CreditTier.VisaTycoon,
+        == CreditTier.BisaTycoon,
     "Balanced 150/600/1600 card qualification thresholds regressed.");
 AscensionBankBenefits[] expectedAscensionBenefits =
 [
@@ -1789,44 +1789,44 @@ Expect(
         == expectedAscensionBenefits[3]
     && BankService.GetQualificationThreshold(
         a3Qualification,
-        CreditTier.VisaPoor) == 225
+        CreditTier.BisaPoor) == 225
     && BankService.GetQualificationThreshold(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 800
+        CreditTier.BisaMiddleClass) == 800
     && BankService.GetQualificationThreshold(
         a3Qualification,
-        CreditTier.VisaTycoon) == 2000
+        CreditTier.BisaTycoon) == 2000
     && BankService.RecordGoldEarned(a3Qualification, 225).Success
     && BankService.ApplyForCreditCard(
         a3Qualification,
-        CreditTier.VisaPoor).Success
+        CreditTier.BisaPoor).Success
     && BankService.GetCreditLimit(
         a3Qualification,
-        CreditTier.VisaPoor) == 200
+        CreditTier.BisaPoor) == 200
     && BankService.GetMaximumDebt(
         a3Qualification,
-        CreditTier.VisaPoor) == 380,
+        CreditTier.BisaPoor) == 380,
     "A3 player did not receive the 225G-qualified 200/380G "
     + "live credit terms.");
 Expect(
     BankService.ApplyForCreditCard(
         a3Qualification,
-        CreditTier.VisaMiddleClass).Error
+        CreditTier.BisaMiddleClass).Error
         == BankErrorCode.NotEligible
     && BankService.RecordGoldEarned(a3Qualification, 575).Success
     && BankService.ApplyForCreditCard(
         a3Qualification,
-        CreditTier.VisaMiddleClass).Success
+        CreditTier.BisaMiddleClass).Success
     && BankService.GetCreditLimit(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 650
+        CreditTier.BisaMiddleClass) == 650
     && BankService.GetMaximumDebt(
         a3Qualification,
-        CreditTier.VisaMiddleClass) == 1235,
+        CreditTier.BisaMiddleClass) == 1235,
     "A3 live middle-card qualification or limit did not use 800/650/1235G.");
 
 Player a3Debt =
-    OpenAscensionCardPlayer(3, CreditTier.VisaPoor, 9804);
+    OpenAscensionCardPlayer(3, CreditTier.BisaPoor, 9804);
 Expect(
     BankService.TrySpend(a3Debt, 100).Success
     && BankService.GetCreditDebt(a3Debt) == 100,
@@ -1846,7 +1846,7 @@ Expect(
     && BankService.GetCreditDebt(a3Debt) == 123
     && BankService.GetDebtInterestBasisPoints(
         a3Debt,
-        CreditTier.VisaPoor) == 2299,
+        CreditTier.BisaPoor) == 2299,
     "A3 debt did not charge ceil(100 * 22.99%) after two free floors.");
 
 Player a3Savings = OpenAscensionPlayer(3, 100, 9805);
@@ -1884,40 +1884,40 @@ Expect(
         == expectedAscensionBenefits[10]
     && BankService.GetQualificationThreshold(
         a10Qualification,
-        CreditTier.VisaPoor) == 400
+        CreditTier.BisaPoor) == 400
     && BankService.GetQualificationThreshold(
         a10Qualification,
-        CreditTier.VisaMiddleClass) == 1500
+        CreditTier.BisaMiddleClass) == 1500
     && BankService.GetQualificationThreshold(
         a10Qualification,
-        CreditTier.VisaTycoon) == 3500
+        CreditTier.BisaTycoon) == 3500
     && BankService.RecordGoldEarned(a10Qualification, 400).Success
     && BankService.ApplyForCreditCard(
         a10Qualification,
-        CreditTier.VisaPoor).Success
+        CreditTier.BisaPoor).Success
     && BankService.GetCreditLimit(
         a10Qualification,
-        CreditTier.VisaPoor) == 150
+        CreditTier.BisaPoor) == 150
     && BankService.GetMaximumDebt(
         a10Qualification,
-        CreditTier.VisaPoor) == 225,
+        CreditTier.BisaPoor) == 225,
     "A10 player did not receive the 400G-qualified 150/225G "
     + "live credit terms.");
 Expect(
     BankService.RecordGoldEarned(a10Qualification, 3100).Success
     && BankService.ApplyForCreditCard(
         a10Qualification,
-        CreditTier.VisaTycoon).Success
+        CreditTier.BisaTycoon).Success
     && BankService.GetCreditLimit(
         a10Qualification,
-        CreditTier.VisaTycoon) == 750
+        CreditTier.BisaTycoon) == 750
     && BankService.GetMaximumDebt(
         a10Qualification,
-        CreditTier.VisaTycoon) == 1125,
+        CreditTier.BisaTycoon) == 1125,
     "A10 live tycoon qualification or limit did not use 3500/750/1125G.");
 
 Player a10Debt =
-    OpenAscensionCardPlayer(10, CreditTier.VisaPoor, 9811);
+    OpenAscensionCardPlayer(10, CreditTier.BisaPoor, 9811);
 Expect(
     BankService.TrySpend(a10Debt, 100).Success,
     "A10 debt fixture could not charge its instant starter card.");
@@ -1936,7 +1936,7 @@ Expect(
     && BankService.GetCreditDebt(a10Debt) == 127
     && BankService.GetDebtInterestBasisPoints(
         a10Debt,
-        CreditTier.VisaPoor) == 2699,
+        CreditTier.BisaPoor) == 2699,
     "A10 debt did not charge ceil(100 * 26.99%) after one free floor.");
 
 Player a10Savings = OpenAscensionPlayer(10, 2000, 9812);
@@ -1986,7 +1986,7 @@ Expect(
     "A10 live KK terms or the deterministic fourth-sale risk regressed.");
 
 Player perTransactionLimit =
-    OpenCardPlayer(CreditTier.VisaPoor, 9903);
+    OpenCardPlayer(CreditTier.BisaPoor, 9903);
 Expect(
     BankService.TrySpend(perTransactionLimit, 201).Error
         == BankErrorCode.CreditLimitExceeded
@@ -1999,7 +1999,7 @@ Expect(
 
 
 
-Player grace = OpenCardPlayer(CreditTier.VisaPoor, 12);
+Player grace = OpenCardPlayer(CreditTier.BisaPoor, 12);
 Expect(
     BankService.TrySpend(grace, 100).Success
     && BankService.GetCreditDebt(grace) == 100,
@@ -2022,8 +2022,8 @@ Expect(
     && poorFloorFour.Amount == 22
     && BankService.GetCreditDebt(grace) == 122
     && BankService.GetDebtInterestBasisPoints(
-        CreditTier.VisaPoor) == 2199,
-    "Visa Poor floor four did not charge ceil(100 * 21.99%).");
+        CreditTier.BisaPoor) == 2199,
+    "Bisa Poor floor four did not charge ceil(100 * 21.99%).");
 Expect(
     BankService.AccrueDebtInterest(grace, 1204).Error
         == BankErrorCode.AlreadyProcessed
@@ -2034,7 +2034,7 @@ BankOperationResult poorCompound =
 Expect(
     poorCompound.Amount == 27
     && BankService.GetCreditDebt(grace) == 149,
-    "Visa Poor did not compound ceil(122 * 21.99%).");
+    "Bisa Poor did not compound ceil(122 * 21.99%).");
 
 
 _ = BankService.RecordGoldEarned(
@@ -2044,8 +2044,8 @@ _ = BankService.RecordGoldEarned(
 Expect(
     BankService.ApplyForCreditCard(
         grace,
-        CreditTier.VisaMiddleClass).Success,
-    "Outstanding debt could not upgrade to Visa Middle-Class.");
+        CreditTier.BisaMiddleClass).Success,
+    "Outstanding debt could not upgrade to Bisa Middle-Class.");
 BankOperationResult upgradedRate =
     BankService.AccrueDebtInterest(grace, 1206);
 Expect(
@@ -2053,7 +2053,7 @@ Expect(
     && BankService.GetCreditDebt(grace) == 187
     && BankService.GetDebtCycleFloors(grace) == 6
     && BankService.GetDebtInterestBasisPoints(
-        CreditTier.VisaMiddleClass) == 2499,
+        CreditTier.BisaMiddleClass) == 2499,
     "An upgraded debt cycle did not use ceil(149 * 24.99%).");
 BankOperationResult clearedCycle =
     BankService.DepositGold(
@@ -2076,7 +2076,7 @@ Expect(
     && BankService.GetDebtCycleFloors(grace) == 4,
     "A later debt cycle incorrectly received a second grace period.");
 
-Player tycoonRate = OpenCardPlayer(CreditTier.VisaTycoon, 13);
+Player tycoonRate = OpenCardPlayer(CreditTier.BisaTycoon, 13);
 _ = BankService.TrySpend(tycoonRate, 100);
 _ = BankService.AccrueDebtInterest(tycoonRate, 1301);
 _ = BankService.AccrueDebtInterest(tycoonRate, 1302);
@@ -2085,12 +2085,12 @@ Expect(
     BankService.AccrueDebtInterest(tycoonRate, 1304).Amount == 28
     && BankService.GetCreditDebt(tycoonRate) == 128
     && BankService.GetDebtInterestBasisPoints(
-        CreditTier.VisaTycoon) == 2799,
-    "Visa Tycoon did not charge ceil(100 * 27.99%) on floor four.");
+        CreditTier.BisaTycoon) == 2799,
+    "Bisa Tycoon did not charge ceil(100 * 27.99%) on floor four.");
 
 
 
-Player incomePriority = OpenCardPlayer(CreditTier.VisaPoor, 14);
+Player incomePriority = OpenCardPlayer(CreditTier.BisaPoor, 14);
 _ = BankService.TrySpend(incomePriority, 80);
 int incomeQualification =
     BankService.GetQualifyingEarned(incomePriority);
@@ -2111,7 +2111,7 @@ Expect(
         == incomeQualification + 60,
     "Incoming gold did not pay debt first or qualification used the wrong source.");
 
-Player nativeDebt = OpenCardPlayer(CreditTier.VisaPoor, 15);
+Player nativeDebt = OpenCardPlayer(CreditTier.BisaPoor, 15);
 _ = BankService.TrySpend(nativeDebt, 80);
 int nativeDebtQualification =
     BankService.GetQualifyingEarned(nativeDebt);
@@ -2142,7 +2142,7 @@ BankStateStore.Set(
         QualificationInitialized = 1,
         QualifyingEarned = 300,
         SavingsPrincipal = 100,
-        CreditTier = (int)CreditTier.VisaMiddleClass,
+        CreditTier = (int)CreditTier.BisaMiddleClass,
         CreditDebt = 30,
     });
 BankOperationResult debtPaidByInterest =
@@ -2161,7 +2161,7 @@ Expect(
 
 
 
-Player directCeiling = OpenCardPlayer(CreditTier.VisaPoor, 17);
+Player directCeiling = OpenCardPlayer(CreditTier.BisaPoor, 17);
 BankOperationResult directCeilingFirst =
     BankService.TrySpend(directCeiling, 200);
 BankOperationResult directCeilingSpend =
@@ -2178,7 +2178,7 @@ Expect(
     && BankService.GetPendingRelicLiquidationDebt(directCeiling) == 400
     && BankService.ApplyForCreditCard(
         directCeiling,
-        CreditTier.VisaPoor).Error
+        CreditTier.BisaPoor).Error
         == BankErrorCode.CreditPermanentlyClosed,
     "Direct TrySpend at the 200% ceiling did not settle without negative gold and permanently close.");
 Expect(
@@ -2229,7 +2229,7 @@ BankStateStore.Set(
         UnifiedSavingsInitialized = 1,
         QualificationInitialized = 1,
         QualifyingEarned = 200,
-        CreditTier = (int)CreditTier.VisaPoor,
+        CreditTier = (int)CreditTier.BisaPoor,
         CreditDebt = 390,
         DebtCycleFloors = 3,
         DebtGraceUsed = 1,
@@ -2248,7 +2248,7 @@ Expect(
 
 
 
-Player nativeCeiling = OpenCardPlayer(CreditTier.VisaPoor, 19);
+Player nativeCeiling = OpenCardPlayer(CreditTier.BisaPoor, 19);
 _ = BankService.TrySpend(nativeCeiling, 200);
 BankOperationResult nativeAdvance =
     BankService.AdvanceCreditForPurchase(nativeCeiling, 200);
@@ -2307,7 +2307,7 @@ BankStateStore.Set(
         BankAccountOpened = 1,
         UnifiedSavingsInitialized = 1,
         QualificationInitialized = 1,
-        CreditTier = (int)CreditTier.VisaPoor,
+        CreditTier = (int)CreditTier.BisaPoor,
         CreditDebt = 390,
         DebtCycleFloors = 3,
         DebtGraceUsed = 1,
@@ -2337,7 +2337,7 @@ Expect(
 
 
 Player sender = OpenPlayer(100, 21);
-Player recipient = OpenCardPlayer(CreditTier.VisaPoor, 22);
+Player recipient = OpenCardPlayer(CreditTier.BisaPoor, 22);
 _ = BankService.TrySpend(recipient, 50);
 int senderQualification =
     BankService.GetQualifyingEarned(sender);
@@ -2592,7 +2592,7 @@ try
             transferTarget,
             10);
     Player internalCeiling =
-        OpenCardPlayer(CreditTier.VisaPoor, 2906);
+        OpenCardPlayer(CreditTier.BisaPoor, 2906);
     BankOperationResult internalFirstCharge =
         BankService.TrySpend(internalCeiling, 200);
     BankOperationResult internalCeilingCharge =
@@ -2814,7 +2814,7 @@ Expect(
     + "preflight or mutated a rejected transaction.");
 
 Player organDebt = OpenCardPlayer(
-    CreditTier.VisaTycoon,
+    CreditTier.BisaTycoon,
     31,
     gold: 0,
     currentHp: 50,
@@ -2873,7 +2873,7 @@ var accountPacketSource = new AccountState
     SavingsInterest = 45,
     SavingsTenths = 6,
     SavingsInterestTurns = 7,
-    CreditTier = (int)CreditTier.VisaMiddleClass,
+    CreditTier = (int)CreditTier.BisaMiddleClass,
     CreditDebt = 123,
     LastDebtInterestCharge = 31,
     LastSavingsTurnToken = 987,
@@ -2935,7 +2935,7 @@ TDBankNetOperationAction[] operationPayloads =
     new()
     {
         Kind = BankOperationKind.ApplyCard,
-        Tier = CreditTier.VisaPoor,
+        Tier = CreditTier.BisaPoor,
         LifecycleEpoch = BankNetwork.CurrentLifecycleEpoch,
         Amount = 0,
         RecipientId = 0,
@@ -3525,11 +3525,11 @@ Expect(
     "The update modal action is not reachable by mouse, touch, or keyboard.");
 Expect(
     BankUiBridge.TryGetNewerVersion(
-        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.4"}"""),
+        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.5"}"""),
         out string newerVersion)
-    && newerVersion == "v0.1.4"
+    && newerVersion == "v0.1.5"
     && !BankUiBridge.TryGetNewerVersion(
-        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.3"}"""),
+        Encoding.UTF8.GetBytes("""{"tag_name":"v0.1.4"}"""),
         out _)
     && uiBridgeSource.Contains(
         "private static bool _updateCheckStarted;",
@@ -3628,9 +3628,9 @@ MethodInfo localizedCardFileName =
         "LocalizedCardFileName");
 var localizedCardFiles = new[]
 {
-    (BankCreditTier.Starter, "visa_broke_zh.png", "visa_broke_en.png"),
-    (BankCreditTier.MiddleClass, "visa_middle_zh.png", "visa_middle_en.png"),
-    (BankCreditTier.NouveauRiche, "visa_rich_zh.png", "visa_rich_en.png"),
+    (BankCreditTier.Starter, "bisa_broke_zh.png", "bisa_broke_en.png"),
+    (BankCreditTier.MiddleClass, "bisa_middle_zh.png", "bisa_middle_en.png"),
+    (BankCreditTier.NouveauRiche, "bisa_rich_zh.png", "bisa_rich_en.png"),
 };
 Expect(
     localizedCardFiles.All(expected =>

@@ -15,8 +15,8 @@ internal static class Program
     [
         new("bank_background.png", ConversionMode.OpaquePng, 0, 0, 0, 0),
         new("bank_logo.png", ConversionMode.TransparentBorderMatte, 16, 55, 3, 0),
-        new("visa_broke_en.png", ConversionMode.TransparentRoundedCorners, 18, 55, 4, 42),
-        new("visa_middle_en.png", ConversionMode.TransparentRoundedCorners, 12, 50, 4, 42),
+        new("bisa_broke_en.png", ConversionMode.TransparentRoundedCorners, 18, 55, 4, 42),
+        new("bisa_middle_en.png", ConversionMode.TransparentRoundedCorners, 12, 50, 4, 42),
     ];
 
     [STAThread]

@@ -375,16 +375,16 @@ public static class BankService
     {
         if (qualifyingEarned >= TycoonQualification)
         {
-            return CreditTier.VisaTycoon;
+            return CreditTier.BisaTycoon;
         }
 
         if (qualifyingEarned >= MiddleClassQualification)
         {
-            return CreditTier.VisaMiddleClass;
+            return CreditTier.BisaMiddleClass;
         }
 
         return qualifyingEarned >= PoorQualification
-            ? CreditTier.VisaPoor
+            ? CreditTier.BisaPoor
             : CreditTier.None;
     }
 
@@ -395,21 +395,21 @@ public static class BankService
         AscensionBankBenefits benefits =
             AscensionBankBenefits.For(player);
         if (qualifyingEarned
-            >= benefits.GetQualificationThreshold(CreditTier.VisaTycoon))
+            >= benefits.GetQualificationThreshold(CreditTier.BisaTycoon))
         {
-            return CreditTier.VisaTycoon;
+            return CreditTier.BisaTycoon;
         }
 
         if (qualifyingEarned
             >= benefits.GetQualificationThreshold(
-                CreditTier.VisaMiddleClass))
+                CreditTier.BisaMiddleClass))
         {
-            return CreditTier.VisaMiddleClass;
+            return CreditTier.BisaMiddleClass;
         }
 
         return qualifyingEarned
-                >= benefits.GetQualificationThreshold(CreditTier.VisaPoor)
-            ? CreditTier.VisaPoor
+                >= benefits.GetQualificationThreshold(CreditTier.BisaPoor)
+            ? CreditTier.BisaPoor
             : CreditTier.None;
     }
 
@@ -417,10 +417,10 @@ public static class BankService
     {
         return tier switch
         {
-            CreditTier.None => CreditTier.VisaPoor,
-            CreditTier.VisaPoor => CreditTier.VisaMiddleClass,
-            CreditTier.VisaMiddleClass => CreditTier.VisaTycoon,
-            CreditTier.VisaTycoon => CreditTier.VisaTycoon,
+            CreditTier.None => CreditTier.BisaPoor,
+            CreditTier.BisaPoor => CreditTier.BisaMiddleClass,
+            CreditTier.BisaMiddleClass => CreditTier.BisaTycoon,
+            CreditTier.BisaTycoon => CreditTier.BisaTycoon,
             _ => throw new ArgumentOutOfRangeException(
                 nameof(tier),
                 tier,
@@ -795,7 +795,7 @@ public static class BankService
             }
 
             CreditTier currentTier = GetStoredTier(state);
-            if (currentTier == CreditTier.VisaTycoon)
+            if (currentTier == CreditTier.BisaTycoon)
             {
                 return BankOperationResult.Fail(
                     BankErrorCode.AlreadyHighestCreditTier);
@@ -829,7 +829,7 @@ public static class BankService
                 BankErrorCode.CreditPermanentlyClosed);
         }
 
-        if (snapshot.CreditTier == CreditTier.VisaTycoon)
+        if (snapshot.CreditTier == CreditTier.BisaTycoon)
         {
             return BankOperationResult.Fail(
                 BankErrorCode.AlreadyHighestCreditTier);
@@ -1867,7 +1867,7 @@ public static class BankService
         => (CreditTier)state.CreditTier;
 
     private static bool IsValidCardTier(CreditTier tier)
-        => tier is >= CreditTier.VisaPoor and <= CreditTier.VisaTycoon;
+        => tier is >= CreditTier.BisaPoor and <= CreditTier.BisaTycoon;
 
     private static void BumpRevision(AccountState state)
     {

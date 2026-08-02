@@ -27,28 +27,28 @@ internal static class EmbeddedPayload
             Path.Combine("TDBank", "Assets", "bank_background.png"),
             false),
         new(
-            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_broke_zh.png",
-            Path.Combine("TDBank", "Assets", "visa_broke_zh.png"),
+            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_broke_zh.png",
+            Path.Combine("TDBank", "Assets", "bisa_broke_zh.png"),
             false),
         new(
-            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_middle_zh.png",
-            Path.Combine("TDBank", "Assets", "visa_middle_zh.png"),
+            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_middle_zh.png",
+            Path.Combine("TDBank", "Assets", "bisa_middle_zh.png"),
             false),
         new(
-            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_rich_zh.png",
-            Path.Combine("TDBank", "Assets", "visa_rich_zh.png"),
+            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_rich_zh.png",
+            Path.Combine("TDBank", "Assets", "bisa_rich_zh.png"),
             false),
         new(
-            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_broke_en.png",
-            Path.Combine("TDBank", "Assets", "visa_broke_en.png"),
+            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_broke_en.png",
+            Path.Combine("TDBank", "Assets", "bisa_broke_en.png"),
             false),
         new(
-            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_middle_en.png",
-            Path.Combine("TDBank", "Assets", "visa_middle_en.png"),
+            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_middle_en.png",
+            Path.Combine("TDBank", "Assets", "bisa_middle_en.png"),
             false),
         new(
-            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.visa_rich_en.png",
-            Path.Combine("TDBank", "Assets", "visa_rich_en.png"),
+            "CNJ.TowerDebt.Setup.Payload.TDBank.Assets.bisa_rich_en.png",
+            Path.Combine("TDBank", "Assets", "bisa_rich_en.png"),
             false),
         new(
             "CNJ.TowerDebt.Setup.Payload.TDLib.TDLib.dll",

@@ -2,7 +2,7 @@
   <img src="./TDBank/Assets/bank_logo.png" alt="TD Bank logo" width="180">
 </p>
 
-<h1 align="center">TD Bank v0.1.3 LTS</h1>
+<h1 align="center">TD Bank v0.1.4 LTS</h1>
 
 <p align="center"><strong>Turn today’s gold into tomorrow’s financial problems.</strong></p>
 
@@ -37,7 +37,7 @@ Every gameplay value and random probability is published in [`BALANCE.md`](BALAN
 
 ## Installation
 
-Download `TDBank_Setup_v0.1.3.exe` from this repository’s [Releases](../../releases).
+Download `TDBank_Setup_v0.1.4.exe` from this repository’s [Releases](../../releases).
 
 1. Fully exit Slay the Spire 2.
 2. Verify the SHA-256 published on the Release page. The current Setup is self-signed by `CNJ Tower Debt`; the signature verifies file integrity but is not a commercial trust certificate.
@@ -46,7 +46,7 @@ Download `TDBank_Setup_v0.1.3.exe` from this repository’s [Releases](../../rel
 
 Setup installs no Windows software. It only places these two mods in the game’s `mods` folder:
 
-- **TD Bank v0.1.3 LTS**
+- **TD Bank v0.1.4 LTS**
   Adds a bank to Slay the Spire 2 and changes gameplay.
 - **TDLib v0.1**  
   TD Bank’s dedicated save and multiplayer synchronization component. It only stores bank-account data and does not replace or affect BaseLib.
@@ -108,7 +108,7 @@ Build TD Bank and TDLib, run the tests, and publish the complete Setup:
 
 Point `-Sts2Path` at the v0.107.1 minimum baseline when producing release binaries. Pass current or future installations through `-RegressionSts2Paths` to run the exact release DLLs against those game assemblies.
 
-The default output is `artifacts/release-v0.1.3-lts`, including Setup, licenses, third-party notices, the verified-build report, and SHA-256 hashes.
+The default output is `artifacts/release-v0.1.4`, including Setup, licenses, third-party notices, the verified-build report, and SHA-256 hashes.
 
 Build only the mods:
 
@@ -163,7 +163,7 @@ Third-party components remain subject to their respective licenses. See [`THIRD_
 
 In this project, **TD** means **Tower Debt**. It has no affiliation with any bank named TD.
 
-This project is not endorsed, sponsored, or authorized by Mega Crit, Visa, Valve, Steam, or any bank. It is not real banking software and does not provide financial services or financial advice. All trademarks belong to their respective owners.
+This project is not endorsed, sponsored, or authorized by Mega Crit, BISA, Valve, Steam, or any bank. It is not real banking software and does not provide financial services or financial advice. All trademarks belong to their respective owners.
 
 The project is provided “as is.” Compatibility with future public betas, every third-party mod, every multiplayer environment, or every Steam Cloud state is not guaranteed.
 
@@ -196,7 +196,7 @@ LTS 版以 **v0.107.1 作为最低二进制基线**，并已在 **v0.109.1 与 v
 
 ## 安装
 
-推荐从本仓库的 [Releases](../../releases) 下载 `TDBank_Setup_v0.1.3.exe`。
+推荐从本仓库的 [Releases](../../releases) 下载 `TDBank_Setup_v0.1.4.exe`。
 
 1. 完全退出《杀戮尖塔 2》。
 2. 核对 Release 页面公布的 SHA-256。当前 Setup 由 `CNJ Tower Debt` 自签名；签名可以核对文件完整性，但不属于商业信任证书。
@@ -205,7 +205,7 @@ LTS 版以 **v0.107.1 作为最低二进制基线**，并已在 **v0.109.1 与 v
 
 本 Setup 不安装任何 Windows 软件，只把以下两个 Mod 放入游戏的 `mods` 文件夹：
 
-- **TD Bank v0.1.3 LTS**
+- **TD Bank v0.1.4 LTS**
   给《杀戮尖塔 2》增加一个银行，它会改变游戏玩法。
 - **TDLib v0.1**  
   TD Bank 专用的存档与多人同步组件。它只负责保存银行账户数据，不会替换或影响 BaseLib。
@@ -267,7 +267,7 @@ TDLib 的部分存档扩展代码及 `Sts2PathDiscovery.props` 改编自 BaseLib
 
 生成发布 DLL 时，`-Sts2Path` 必须指向最低基线 v0.107.1；把当前版或未来版本传给 `-RegressionSts2Paths`，脚本会用同一份发布 DLL 对这些游戏程序集做兼容测试。
 
-默认输出位于 `artifacts/release-v0.1.3-lts`，包括 Setup、许可证、第三方声明、已验证版本报告和 SHA-256。
+默认输出位于 `artifacts/release-v0.1.4`，包括 Setup、许可证、第三方声明、已验证版本报告和 SHA-256。
 
 只构建 Mod：
 
@@ -322,6 +322,6 @@ scripts/                     可复现发布脚本
 
 本项目中的 **TD** 只代表 **Tower Debt**，保证和任何叫 TD 的银行没有关联。
 
-本项目未获 Mega Crit、Visa、Valve、Steam 或任何银行认可、赞助或授权，不是真实银行软件，也不提供金融服务或金融建议。所有商标归各自权利人所有。
+本项目未获 Mega Crit、BISA、Valve、Steam 或任何银行认可、赞助或授权，不是真实银行软件，也不提供金融服务或金融建议。所有商标归各自权利人所有。
 
 项目按“现状”提供，不保证适配未来 public beta、所有第三方 Mod、所有多人环境或所有 Steam Cloud 状态。
